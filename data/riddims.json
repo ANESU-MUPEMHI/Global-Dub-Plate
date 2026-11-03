@@ -1,0 +1,102 @@
+[
+  {
+    "id": "sleng-teng",
+    "name": "Sleng Teng",
+    "year": 1985,
+    "producer": "King Jammy",
+    "bpm": 81,
+    "key": "D Minor",
+    "description": "The Casio MT-40 digital reggae revolution that started modern dancehall. Essential for clash counteraction.",
+    "genre": "Digital Dancehall"
+  },
+  {
+    "id": "real-rock",
+    "name": "Real Rock",
+    "year": 1967,
+    "producer": "C.S. Dodd / Studio One",
+    "bpm": 76,
+    "key": "A Minor",
+    "description": "The universal national anthem of sound clash foundation. Heavy bass groove, organ chords, roots authority.",
+    "genre": "Foundation Roots"
+  },
+  {
+    "id": "stalag-17",
+    "name": "Stalag 17",
+    "year": 1973,
+    "producer": "Winston Riley / Techniques",
+    "bpm": 82,
+    "key": "G Minor",
+    "description": "Tenor Saw 'Ring The Alarm' riddim. The #1 sound-killer riddim in sound clash history worldwide.",
+    "genre": "Rub-a-Dub"
+  },
+  {
+    "id": "the-answer",
+    "name": "The Answer",
+    "year": 1968,
+    "producer": "Studio One",
+    "bpm": 78,
+    "key": "C Major",
+    "description": "The quintessential counteraction rhythm. When an opposing sound plays a tune, you voice this to reply.",
+    "genre": "Rocksteady / Roots"
+  },
+  {
+    "id": "bam-bam",
+    "name": "Bam Bam / Murder She Wrote",
+    "year": 1992,
+    "producer": "Sly & Robbie",
+    "bpm": 94,
+    "key": "F Major",
+    "description": "Irresistible horn hook and bouncing drum groove. Guaranteed to erupt any sound system dance.",
+    "genre": "90s Dancehall"
+  },
+  {
+    "id": "golden-hen",
+    "name": "Golden Hen",
+    "year": 1985,
+    "producer": "Tenor Saw / Blue Mountain",
+    "bpm": 80,
+    "key": "E Minor",
+    "description": "Smooth, hypnotic rub-a-dub baseline. Perfect for vocalists delivering deep melodies and sound clash warnings.",
+    "genre": "Rub-a-Dub"
+  },
+  {
+    "id": "showtime",
+    "name": "Showtime",
+    "year": 1997,
+    "producer": "Dave Kelly / Madhouse",
+    "bpm": 102,
+    "key": "B Minor",
+    "description": "Aggressive, thunderous 90s dancehall pressure. Made famous by Bounty Killer and Beenie Man.",
+    "genre": "90s Hardcore Dancehall"
+  },
+  {
+    "id": "diwali",
+    "name": "Diwali",
+    "year": 2002,
+    "producer": "Steven 'Lenky' Marsden",
+    "bpm": 100,
+    "key": "D Minor",
+    "description": "Global clapping rhythm. Sean Paul 'Get Busy', Wayne Wonder 'No Letting Go'. High-energy dancehall anthem.",
+    "genre": "2000s Dancehall"
+  },
+  {
+    "id": "punanny",
+    "name": "Punanny",
+    "year": 1986,
+    "producer": "King Jammy",
+    "bpm": 88,
+    "key": "C Minor",
+    "description": "Raw, punchy 80s digital rhythm. Pure dancehall sound clash history.",
+    "genre": "Digital Dancehall"
+  },
+  {
+    "id": "full-up",
+    "name": "Full Up / Pass The Dutchie",
+    "year": 1968,
+    "producer": "Studio One / Sound Dimension",
+    "bpm": 77,
+    "key": "G Major",
+    "description": "Uplifting, bouncy studio one classic. Used by Mighty Diamonds and Musical Youth.",
+    "genre": "Foundation Reggae"
+  }
+]

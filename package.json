@@ -1,0 +1,24 @@
+{
+  "name": "global-dub-plate",
+  "version": "1.0.0",
+  "description": "Global Dub Plate - Live Dubplate, Jingle & Drop-In Escrow Platform for Reggae Sound Systems Worldwide",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test-api.js"
+  },
+  "keywords": [
+    "reggae",
+    "sound-system",
+    "dubplate",
+    "sound-clash",
+    "dancehall",
+    "stems",
+    "split-track",
+    "escrow",
+    "global-dub-plate"
+  ],
+  "author": "Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies",
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Dub Plate — Live Direct Dubplate, Jingle & Drop-In Escrow Platform</title>
+  <meta name="description" content="Global Dub Plate allows reggae sound systems worldwide to request live direct dub plates, drop-ins, jingles, and tempo click acapellas with instant 25% deposit escrow and studio video capture.">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-wrap">
+        <div class="brand-logo-icon">
+          <div class="brand-logo-inner"></div>
+        </div>
+        <div class="brand-text">
+          <h1>GLOBAL DUB PLATE <span style="font-size: 0.8rem; color: var(--gold-primary); font-weight: 600;">LIVE & DIRECT</span></h1>
+          <p>Worldwide Sound System Dubplate, Jingle & Acapella Escrow</p>
+        </div>
+      </div>
+
+      <!-- Stats Pill -->
+      <div class="header-stats">
+        <div class="header-stat-item">
+          <span class="pulse-dot"></span>
+          <span class="stat-num" id="stat-live-artists">7</span>
+          <span class="stat-lbl">Live In Studio</span>
+        </div>
+        <div class="header-stat-item">
+          <span class="stat-num" id="stat-total-cuts">1,420+</span>
+          <span class="stat-lbl">Cuts Voiced</span>
+        </div>
+        <div class="header-stat-item">
+          <span class="stat-num" id="stat-sound-systems">380+</span>
+          <span class="stat-lbl">Sound Systems</span>
+        </div>
+      </div>
+
+      <!-- Navigation Actions -->
+      <div class="nav-actions">
+        <button class="btn btn-outline btn-sm" id="btn-nav-register">
+          <i class="icon-mic"></i> Artist Roster Sign-Up
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- LIVE STUDIO MARQUEE TICKER -->
+  <div class="live-ticker-wrap" id="live-session-ticker">
+    <div class="ticker-content">Connecting to global reggae studios in Kingston, Accra, Harare, Oakland, Nairobi, London, Tokyo...</div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="app-container">
+
+    <!-- TABS NAVIGATION -->
+    <nav class="tabs-navigation">
+      <button class="tab-btn active" data-tab="roster">
+        <span class="pulse-dot" style="width: 6px; height: 6px;"></span> Live Artist Roster & Sessions
+      </button>
+      <button class="tab-btn" data-tab="vault">
+        🎛️ Sound System Dubplate Vault & Player
+      </button>
+      <button class="tab-btn" data-tab="artist-studio">
+        🎙️ Artist / Studio Recording Desk
+      </button>
+      <button class="tab-btn" data-tab="clash-guide">
+        📖 Sound Clash Culture & Dubplate Guide
+      </button>
+    </nav>
+
+    <!-- TAB 1: ARTISTS ROSTER -->
+    <section class="tab-pane active" id="tab-pane-roster">
+      
+      <!-- CONTROLS & FILTER BAR -->
+      <div class="controls-bar">
+        <div class="filter-row">
+          <!-- Country Filter Pills -->
+          <div class="filter-group" id="country-filters">
+            <span class="filter-label">Territory:</span>
+            <button class="filter-btn active" data-country="ALL">All Territories</button>
+            <button class="filter-btn" data-country="JAMAICA">🇯🇲 Jamaica</button>
+            <button class="filter-btn" data-country="GHANA">🇬🇭 Ghana</button>
+            <button class="filter-btn" data-country="ZIMBABWE">🇿🇼 Zimbabwe</button>
+            <button class="filter-btn" data-country="AMERICA">🇺🇸 America</button>
+            <button class="filter-btn" data-country="KENYA">🇰🇪 Kenya</button>
+            <button class="filter-btn" data-country="EUROPE">🇪🇺 Europe (UK/DE)</button>
+            <button class="filter-btn" data-country="JAPAN">🇯🇵 Japan</button>
+          </div>
+
+          <!-- Search Box -->
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="artist-search-input" placeholder="Search artist, studio, or hit song...">
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-group">
+            <span class="filter-label">Session Status:</span>
+            <select id="session-status-filter" class="form-control" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.82rem;">
+              <option value="ALL">All Sessions</option>
+              <option value="IN_STUDIO">🔴 Live In Studio (Instant Cuts)</option>
+              <option value="IN_SESSION">🟡 In Dub Session (Voicing Today)</option>
+            </select>
+          </div>
+
+          <div style="font-size: 0.78rem; color: var(--gold-primary);">
+            ⚡ <strong>25% Deposit Escrow:</strong> Pay 25% to start recording. Hear 25% preview audio before paying balance!
+          </div>
+        </div>
+      </div>
+
+      <!-- ARTIST CARDS GRID -->
+      <div class="artists-grid" id="artists-grid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- TAB 2: DUBPLATE VAULT & ORDERS -->
+    <section class="tab-pane" id="tab-pane-vault">
+      <div style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2>Your Sound System Dubplate Vault</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Manage your requested cuts, audition the 25% preview gate, pay balances, and download master WAVs, split tracks, and stems.
+          </p>
+        </div>
+      </div>
+
+      <!-- WAVEFORM CANVAS BOX -->
+      <div class="waveform-canvas-box">
+        <canvas id="waveform-canvas" width="1200" height="60"></canvas>
+      </div>
+
+      <!-- ORDERS LIST -->
+      <div id="orders-list">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- TAB 3: ARTIST STUDIO CONSOLE -->
+    <section class="tab-pane" id="tab-pane-artist-studio">
+      <div id="artist-studio-content">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- TAB 4: SOUND CLASH CULTURE GUIDE -->
+    <section class="tab-pane" id="tab-pane-clash-guide">
+      <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; max-width: 900px; margin: 0 auto;">
+        <h2 style="color: var(--gold-primary); margin-bottom: 0.5rem;">Sound System Culture & The Art of The Dubplate</h2>
+        <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">
+          In Jamaican and international sound system culture, a <strong>Dubplate</strong> (or "Special") is an exclusive, one-of-a-kind recording of a popular song where the artist re-records their lyrics specifically praising your Sound System and calling out rival sounds by name.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+          <div style="background: var(--bg-card); padding: 1.25rem; border-radius: 8px; border-left: 3px solid var(--gold-primary);">
+            <h4 style="color: #fff; margin-bottom: 0.35rem;">1. Dub Plate (Special)</h4>
+            <p style="font-size: 0.82rem; color: #94a3b8;">
+              Full vocal adaptation of an artist's anthem with customized lyrics killing the competition in a sound clash.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-card); padding: 1.25rem; border-radius: 8px; border-left: 3px solid var(--green-reggae);">
+            <h4 style="color: #fff; margin-bottom: 0.35rem;">2. Jingle / Radio Drop</h4>
+            <p style="font-size: 0.82rem; color: #94a3b8;">
+              Radio station ID, mixtape opener, or podcast intro with high-energy sound effects, lasers, and sirens.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-card); padding: 1.25rem; border-radius: 8px; border-left: 3px solid var(--red-clash);">
+            <h4 style="color: #fff; margin-bottom: 0.35rem;">3. Drop-In / Name Drop</h4>
+            <p style="font-size: 0.82rem; color: #94a3b8;">
+              Quick 5 to 15 second voice signature dropped by the selector during live dances, club sets, or transitions.
+            </p>
+          </div>
+
+          <div style="background: var(--bg-card); padding: 1.25rem; border-radius: 8px; border-left: 3px solid #3b82f6;">
+            <h4 style="color: #fff; margin-bottom: 0.35rem;">4. Tempo Click Acapella</h4>
+            <p style="font-size: 0.82rem; color: #94a3b8;">
+              Dry vocal recorded strictly on beat to a metronome click (no backing music) so you can drop it over ANY riddim in a clash!
+            </p>
+          </div>
+        </div>
+
+        <h3 style="color: #fff; margin-bottom: 0.75rem;">Why Split-Track & Stems Matter</h3>
+        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.6;">
+          Sound system selectors traditionally requested <strong>Split-Track Cuts</strong>: the vocal is recorded on the <strong>Left Channel</strong>, and the backing riddim is on the <strong>Right Channel</strong>. This allows the selector on a sound clash preamp to cut the bass, play the vocal raw, drop the riddim back in with echo delay, or swap riddims on the fly.
+        </p>
+
+        <h3 style="color: #fff; margin-bottom: 0.75rem;">How the 25% Deposit Escrow Protects You & The Artist</h3>
+        <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.6;">
+          1. <strong>25% Deposit</strong> locks in the artist's studio time and vocal mic.<br>
+          2. The artist voices your sound system name, records the cut, and uploads it.<br>
+          3. <strong>25% Audio Preview Gate:</strong> You audition the first 25% of the cut to verify voice authenticity, custom name pronunciation, and sound clash energy.<br>
+          4. <strong>100% Release:</strong> Pay the remaining 75% balance to unlock the full unwatermarked master WAV, split-track, stems pack, and in-studio 4K video proof!
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM PERSISTENT AUDIO PLAYER BAR -->
+  <aside class="bottom-player-bar">
+    <div class="player-inner">
+      <!-- Track Meta -->
+      <div class="player-track-info">
+        <h4 id="player-track-title">Select a Dubplate from Vault</h4>
+        <p id="player-subtitle">Global Dub Plate Master Engine</p>
+        <span class="player-gate-badge locked" id="player-gate-badge">
+          🔒 25% Preview Gate Active
+        </span>
+      </div>
+
+      <!-- Center Controls & Progress -->
+      <div class="player-center-controls">
+        <div class="player-buttons-row">
+          <button class="play-circle-btn" id="player-play-btn" title="Play / Pause">
+            ▶
+          </button>
+          <button class="btn btn-gold btn-sm" id="player-unlock-btn" style="display: none;">
+            Unlock Full Master
+          </button>
+        </div>
+
+        <div class="player-progress-row">
+          <span class="time-display" id="player-time-current">0:00</span>
+          <div class="progress-track-container" id="player-progress-container" title="Click to seek">
+            <div class="progress-lock-marker" title="25% Preview Gate Limit"></div>
+            <div class="progress-track-fill" id="player-progress"></div>
+          </div>
+          <span class="time-display" id="player-time-total">2:00</span>
+        </div>
+      </div>
+
+      <!-- Right Tools: FX Board, Split Mode & Stems -->
+      <div class="player-right-tools">
+        <!-- Sound Clash FX Board -->
+        <div class="soundboard-buttons">
+          <button class="btn-fx" id="btn-fx-siren" title="Dub Siren">🚨 Siren</button>
+          <button class="btn-fx" id="btn-fx-airhorn" title="Airhorn">🎺 Horn</button>
+          <button class="btn-fx" id="btn-fx-laser" title="Laser Gun">⚡ Laser</button>
+          <button class="btn-fx" id="btn-fx-tapestop" title="Turntable Tape Stop">⏹️ Stop</button>
+        </div>
+
+        <!-- Split Track Channel Switcher -->
+        <div class="split-track-group">
+          <button class="split-track-btn active" id="btn-split-both" title="Stereo Mix">Stereo</button>
+          <button class="split-track-btn" id="btn-split-left" title="Left Channel: Vocals Only">L (Vocal)</button>
+          <button class="split-track-btn" id="btn-split-right" title="Right Channel: Riddim Only">R (Riddim)</button>
+        </div>
+
+        <!-- Stem Mixer Toggle -->
+        <button class="btn btn-outline btn-sm" id="btn-toggle-stems" title="Multitrack Stems Mixer">
+          🎚️ Stems
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- STEMS MIXER DRAWER -->
+  <div class="stems-drawer" id="stems-drawer">
+    <div class="stems-drawer-header">
+      <h4>Multitrack Stems Mixer</h4>
+      <button class="modal-close" id="btn-close-stems" style="font-size: 1.1rem;">✕</button>
+    </div>
+    
+    <!-- Vocal Stem -->
+    <div class="stem-strip">
+      <span class="stem-label">🎤 Vocals</span>
+      <input type="range" min="0" max="100" value="90" class="stem-slider" id="stem-slider-vocal">
+      <div class="stem-toggles">
+        <button class="stem-btn" id="stem-mute-vocal" title="Mute">M</button>
+        <button class="stem-btn" id="stem-solo-vocal" title="Solo">S</button>
+      </div>
+    </div>
+
+    <!-- Riddim Stem -->
+    <div class="stem-strip">
+      <span class="stem-label">🎸 Riddim</span>
+      <input type="range" min="0" max="100" value="85" class="stem-slider" id="stem-slider-riddim">
+      <div class="stem-toggles">
+        <button class="stem-btn" id="stem-mute-riddim" title="Mute">M</button>
+        <button class="stem-btn" id="stem-solo-riddim" title="Solo">S</button>
+      </div>
+    </div>
+
+    <!-- Dub FX Stem -->
+    <div class="stem-strip">
+      <span class="stem-label">🔊 Dub FX</span>
+      <input type="range" min="0" max="100" value="75" class="stem-slider" id="stem-slider-dubFx">
+      <div class="stem-toggles">
+        <button class="stem-btn" id="stem-mute-dubFx" title="Mute">M</button>
+        <button class="stem-btn" id="stem-solo-dubFx" title="Solo">S</button>
+      </div>
+    </div>
+
+    <!-- Click Track Stem -->
+    <div class="stem-strip">
+      <span class="stem-label">⏱️ Click</span>
+      <input type="range" min="0" max="100" value="50" class="stem-slider" id="stem-slider-click">
+      <div class="stem-toggles">
+        <button class="stem-btn" id="stem-mute-click" title="Mute">M</button>
+        <button class="stem-btn" id="stem-solo-click" title="Solo">S</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: REQUEST DUBPLATE CUT -->
+  <div class="modal-overlay" id="cut-request-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h3>Request Cut Direct: <span id="modal-artist-name">Artist</span> <span id="modal-artist-flag"></span></h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted);" id="modal-artist-studio">Studio Name</p>
+        </div>
+        <button class="modal-close">&times;</button>
+      </div>
+
+      <form id="order-form">
+        <!-- Sound System & Selector Info -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="order-sound-name">Your Sound System Name *</label>
+            <input type="text" id="order-sound-name" class="form-control" placeholder="e.g. Stone Love / Bass Odyssey / King Addies" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="order-selector-name">Selector / DJ Name *</label>
+            <input type="text" id="order-selector-name" class="form-control" placeholder="e.g. Rory / Squingy / Baby G" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="order-sound-location">Sound City & Country</label>
+          <input type="text" id="order-sound-location" class="form-control" placeholder="e.g. Tokyo, Japan / Kingston, Jamaica / London, UK / New York, USA">
+        </div>
+
+        <!-- Recording Type Selection -->
+        <div class="form-group">
+          <label class="form-label">Select Recording Cut Type *</label>
+          <div class="radio-group-cards">
+            <label class="radio-card-label">
+              <input type="radio" name="recording-type" value="dubplate" checked>
+              <div class="radio-card-box">
+                <h5>Dub Plate</h5>
+                <p>Full Clash Cut</p>
+              </div>
+            </label>
+            <label class="radio-card-label">
+              <input type="radio" name="recording-type" value="jingle">
+              <div class="radio-card-box">
+                <h5>Jingle</h5>
+                <p>Radio / Mixtape</p>
+              </div>
+            </label>
+            <label class="radio-card-label">
+              <input type="radio" name="recording-type" value="dropIn">
+              <div class="radio-card-box">
+                <h5>Drop-In</h5>
+                <p>Voice ID</p>
+              </div>
+            </label>
+            <label class="radio-card-label">
+              <input type="radio" name="recording-type" value="shoutOut">
+              <div class="radio-card-box">
+                <h5>Shout Out</h5>
+                <p>Raw Acapella</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Artist Catalogue Song Selection -->
+        <div class="form-group">
+          <label class="form-label" for="order-catalog-song">Select Artist Song from Catalogue *</label>
+          <select id="order-catalog-song" class="form-control" required>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <!-- Custom Dub / Custom Riddim Section -->
+        <div class="toggle-row">
+          <div class="toggle-label-wrap">
+            <h5>Custom Dub Riddim Selection</h5>
+            <p>Voice lyrics on a different classic sound clash riddim instead of original</p>
+          </div>
+          <input type="checkbox" id="order-toggle-custom-riddim" style="width: 20px; height: 20px; accent-color: var(--gold-primary);">
+        </div>
+
+        <div class="form-group" id="custom-riddim-picker-container" style="display: none;">
+          <label class="form-label" for="order-custom-riddim-select">Choose Clash Riddim (+ $50 adaptation fee)</label>
+          <select id="order-custom-riddim-select" class="form-control">
+            <!-- Populated from riddims.json -->
+          </select>
+        </div>
+
+        <!-- Tempo Click Acapella Section -->
+        <div class="toggle-row">
+          <div class="toggle-label-wrap">
+            <h5>Tempo Click Acapella (No Music)</h5>
+            <p>Recorded strictly on-beat to metronome click for live remixing and sound clash juggling</p>
+          </div>
+          <input type="checkbox" id="order-toggle-tempo-click" style="width: 20px; height: 20px; accent-color: var(--gold-primary);">
+        </div>
+
+        <div class="form-group" id="tempo-click-container" style="display: none;">
+          <label class="form-label" for="order-tempo-bpm">Specify Metronome BPM for Click Track (70 - 150 BPM)</label>
+          <input type="number" id="order-tempo-bpm" class="form-control" value="85" min="60" max="180">
+        </div>
+
+        <!-- Delivery Format -->
+        <div class="form-group">
+          <label class="form-label">Delivery Audio Master Format *</label>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <label style="font-size: 0.82rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <input type="radio" name="delivery-format" value="stereo" checked> Full Stereo Master WAV
+            </label>
+            <label style="font-size: 0.82rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <input type="radio" name="delivery-format" value="split_track"> Split Track (L: Vocal / R: Riddim)
+            </label>
+            <label style="font-size: 0.82rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <input type="radio" name="delivery-format" value="stems"> Multitrack Stems Pack
+            </label>
+          </div>
+        </div>
+
+        <!-- Video Capture Add-on -->
+        <div class="toggle-row" style="border-color: rgba(59, 130, 246, 0.4);">
+          <div class="toggle-label-wrap">
+            <h5 style="color: #60a5fa;">📹 Request In-Studio 4K Video Capture</h5>
+            <p>Artist records studio video proof holding your sound name on board (for TikTok/IG & clash verification)</p>
+          </div>
+          <input type="checkbox" id="order-toggle-video-capture" style="width: 20px; height: 20px; accent-color: #3b82f6;">
+        </div>
+
+        <!-- Custom Lyrics / Clash Directions -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label class="form-label" style="margin-bottom: 0;" for="order-custom-lyrics">Custom Sound Clash Lyrics / Instructions</label>
+            <div style="display: flex; gap: 0.35rem;">
+              <button type="button" class="btn btn-outline btn-sm" id="btn-insert-clash-lyrics" style="padding: 0.15rem 0.45rem; font-size: 0.68rem;">+ Clash Template</button>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-insert-radio-lyrics" style="padding: 0.15rem 0.45rem; font-size: 0.68rem;">+ Radio Template</button>
+            </div>
+          </div>
+          <textarea id="order-custom-lyrics" class="form-control" rows="3" placeholder="e.g. Kill sound boy dead! When [Sound Name] plays, no rival sound can survive! Big up selector [Selector Name]..."></textarea>
+        </div>
+
+        <!-- Escrow Fee Breakdown -->
+        <div class="escrow-breakdown-box">
+          <div class="escrow-row">
+            <span>Base Recording Cut Fee:</span>
+            <strong id="calc-base-fee">$950</strong>
+          </div>
+          <div class="escrow-row">
+            <span>In-Studio Video Capture:</span>
+            <strong id="calc-video-fee">$0</strong>
+          </div>
+          <div class="escrow-row">
+            <span>Custom Riddim Voicing:</span>
+            <strong id="calc-riddim-fee">$0</strong>
+          </div>
+          <div class="escrow-row highlight">
+            <span>Total Dubplate Investment:</span>
+            <strong id="calc-total-fee">$950</strong>
+          </div>
+          <div class="escrow-row deposit-row">
+            <span>🔒 25% Deposit Required Immediately:</span>
+            <strong id="calc-deposit-due">$238</strong>
+          </div>
+          <div class="escrow-row" style="color: var(--text-muted); font-size: 0.78rem;">
+            <span>Balance due upon 25% preview verification:</span>
+            <strong id="calc-balance-due">$712</strong>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-gold btn-block" id="btn-submit-order" style="padding: 0.85rem; font-size: 1rem;">
+          🔒 Pay 25% Deposit & Lock Studio Session Direct
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: PAY REMAINING 75% BALANCE -->
+  <div class="modal-overlay" id="payment-modal">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3>Release Full Master Cut (Pay Remaining 75%)</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 1.25rem;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔓</div>
+        <h4 id="pay-artist-name">Artist Name</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          "<span id="pay-song-title">Song</span>" for <strong id="pay-sound-name">Sound</strong>
+        </p>
+        <span class="badge badge-warning" style="margin-top: 0.5rem;" id="pay-order-id">GDP-8821</span>
+      </div>
+
+      <div class="escrow-breakdown-box" style="margin-top: 0;">
+        <div class="escrow-row">
+          <span>Total Order Value:</span>
+          <span id="pay-total-fee">$1,120</span>
+        </div>
+        <div class="escrow-row">
+          <span>25% Deposit Already Paid:</span>
+          <span class="green" id="pay-deposit-paid">$280</span>
+        </div>
+        <div class="escrow-row highlight deposit-row" style="color: #f59e0b;">
+          <span>Remaining Balance Due (75%):</span>
+          <strong id="pay-balance-due">$840</strong>
+        </div>
+      </div>
+
+      <div style="background-color: var(--bg-card); padding: 0.75rem; border-radius: 6px; font-size: 0.78rem; color: #94a3b8; margin-bottom: 1.25rem;">
+        Payment unlocks: Full duration playback, Master 24-bit WAV download, Split-Track (L: Vocals / R: Riddim), Multitrack Stems Pack & 4K Studio Session Video.
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="btn btn-outline" style="flex: 1;" class="btn-modal-cancel">Cancel</button>
+        <button class="btn btn-green" style="flex: 2;" id="btn-confirm-payment">
+          Authorize & Release Master Dubplate
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: REGISTER NEW GLOBAL ARTIST -->
+  <div class="modal-overlay" id="register-artist-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Global Dubplate Artist & Sound Studio Registration</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+
+      <form id="register-artist-form">
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Join the worldwide network of reggae & sound clash artists cutting live specials for sound systems in Jamaica, Ghana, Zimbabwe, USA, Kenya, Europe, Japan and beyond.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="reg-artist-name">Artist / Stage Name *</label>
+            <input type="text" id="reg-artist-name" class="form-control" placeholder="e.g. Luciano / Agent Sasco / Popcaan" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-artist-country">Country of Representation *</label>
+            <select id="reg-artist-country" class="form-control" required>
+              <option value="Jamaica">🇯🇲 Jamaica</option>
+              <option value="Ghana">🇬🇭 Ghana</option>
+              <option value="Zimbabwe">🇿🇼 Zimbabwe</option>
+              <option value="America">🇺🇸 America</option>
+              <option value="Kenya">🇰🇪 Kenya</option>
+              <option value="United Kingdom">🇬🇧 United Kingdom / Europe</option>
+              <option value="Germany">🇩🇪 Germany / Europe</option>
+              <option value="Japan">🇯🇵 Japan</option>
+              <option value="South Africa">🇿🇦 South Africa</option>
+              <option value="Nigeria">🇳🇬 Nigeria</option>
+              <option value="Canada">🇨🇦 Canada</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="reg-artist-city">City / Region</label>
+            <input type="text" id="reg-artist-city" class="form-control" placeholder="e.g. Kingston / Harare / Accra">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-studio-name">Studio Facility Name</label>
+            <input type="text" id="reg-studio-name" class="form-control" placeholder="e.g. Big Yard Studio / Anchor Studio">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Set Your Pricing Fees (USD) *</label>
+          <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem;">
+            <div>
+              <span style="font-size: 0.68rem; color: var(--text-muted);">Dub Plate</span>
+              <input type="number" id="reg-fee-dubplate" class="form-control" value="800" required>
+            </div>
+            <div>
+              <span style="font-size: 0.68rem; color: var(--text-muted);">Jingle</span>
+              <input type="number" id="reg-fee-jingle" class="form-control" value="400" required>
+            </div>
+            <div>
+              <span style="font-size: 0.68rem; color: var(--text-muted);">Drop-In</span>
+              <input type="number" id="reg-fee-dropin" class="form-control" value="250" required>
+            </div>
+            <div>
+              <span style="font-size: 0.68rem; color: var(--text-muted);">Shout Out</span>
+              <input type="number" id="reg-fee-shoutout" class="form-control" value="180" required>
+            </div>
+            <div>
+              <span style="font-size: 0.68rem; color: var(--text-muted);">Video Capture</span>
+              <input type="number" id="reg-fee-video" class="form-control" value="100" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-catalog-songs">Catalogue Hit Songs (comma separated) *</label>
+          <input type="text" id="reg-catalog-songs" class="form-control" placeholder="Hit Song 1, Hit Song 2, Classic Sound Anthem" required>
+        </div>
+
+        <button type="submit" class="btn btn-gold btn-block" style="padding: 0.8rem;">
+          Join Global Dub Plate Artist Roster (Direct Escrow Enabled)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: VIDEO PREVIEW -->
+  <div class="modal-overlay" id="video-preview-modal">
+    <div class="modal-content" style="max-width: 640px; text-align: center;">
+      <div class="modal-header">
+        <div>
+          <h3 id="video-modal-title">In-Studio Video Capture</h3>
+          <p style="font-size: 0.75rem; color: var(--text-muted);" id="video-modal-sound">Studio Voicing Proof</p>
+        </div>
+        <button class="modal-close">&times;</button>
+      </div>
+
+      <div style="background-color: #000; border-radius: 8px; overflow: hidden; position: relative; padding-top: 56.25%; margin-bottom: 1rem; border: 1px solid var(--border-color);">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, #1e293b 0%, #020617 100%);">
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎙️ 📹</div>
+          <p style="font-size: 0.95rem; font-weight: 700; color: #fff;">4K Studio Vocal Booth Capture</p>
+          <span style="font-size: 0.75rem; color: var(--gold-primary); margin-top: 0.25rem;">[Live Timecode: 00:01:24:18] • Direct Voicing Verified</span>
+        </div>
+      </div>
+
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Official high-definition video proof showing the artist in the vocal booth holding your sound system slate and shouting out your sound crew!
+      </p>
+
+      <button class="btn btn-gold btn-block" onclick="alert('Downloading 4K In-Studio Session Video MP4!')">
+        Download 4K Studio Session Video (MP4)
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- =========================================================================
+       MANDATORY CREATOR & PROJECT ATTRIBUTION FOOTER (RULE[user_global])
+       ========================================================================= -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h4>GLOBAL DUB PLATE</h4>
+          <p>
+            The world's premier live dubplate, jingle, drop-in, and tempo click acapella escrow platform for reggae sound systems and sound clash culture across Jamaica, Ghana, Zimbabwe, USA, Kenya, Europe, and Japan.
+          </p>
+        </div>
+
+        <!-- Creator Profile Card -->
+        <div class="footer-attribution-card">
+          <h5>Platform Ownership & Creator Credentials</h5>
+          <p class="attribution-statement">
+            This project was made by <strong>Adrian Anesu Mupemhi</strong> for <strong>Jahvisions, Benjamin Music & Terence Taona Technologies</strong>.
+          </p>
+          <div style="background: rgba(0,0,0,0.5); padding: 0.5rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.72rem; color: #cbd5e1; margin-bottom: 0.75rem; border: 1px solid rgba(255,255,255,0.1); word-break: break-all;">
+            This project was made by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies.<br>
+            Owner: Adrian Anesu Mupemhi | Contact: +2772442 5958 | Address: 34 Derby Road, Kensington, Johannesburg, South Africa, 2094 | Email: mupemhianesu@gmail.com
+          </div>
+          <div class="attribution-details">
+            <div class="attribution-item">
+              <strong>Owner:</strong> Adrian Anesu Mupemhi
+            </div>
+            <div class="attribution-item">
+              <strong>Contact:</strong> <a href="tel:+27724425958">+2772442 5958</a>
+            </div>
+            <div class="attribution-item" style="grid-column: 1 / -1;">
+              <strong>Email:</strong> <a href="mailto:mupemhianesu@gmail.com">mupemhianesu@gmail.com</a>
+            </div>
+            <div class="attribution-item" style="grid-column: 1 / -1;">
+              <strong>Address:</strong> 34 Derby Road, Kensington, Johannesburg, South Africa, 2094
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 Global Dub Plate. All rights reserved. Sound Clash Escrow & Split-Track Delivery Standard.
+        </div>
+        <div>
+          Jahvisions • Benjamin Music • Terence Taona Technologies
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Scripts -->
+  <script src="./js/data.js"></script>
+  <script src="./js/audio-engine.js"></script>
+  <script src="./js/api.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
