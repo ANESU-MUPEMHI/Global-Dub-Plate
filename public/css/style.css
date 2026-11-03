@@ -1466,6 +1466,63 @@ body {
   color: #64748b;
 }
 
+/* USER PROFILE STYLES */
+.profile-header-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-primary), #b45309);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.15rem;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+  flex-shrink: 0;
+}
+
+.profile-section-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.15rem;
+}
+
+.profile-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.profile-preview-box {
+  background: #07090e;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--gold-primary);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+.user-avatar-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+.profile-autofill-banner {
+  animation: fadeIn 0.3s ease;
+}
+
 @media (max-width: 900px) {
   .player-inner {
     flex-direction: column;

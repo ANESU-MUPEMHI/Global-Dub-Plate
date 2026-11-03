@@ -3,8 +3,51 @@
 
 let inMemoryOrders = null;
 let inMemoryArtists = null;
+let inMemoryProfile = null;
 
 const GDP_API = {
+  async getProfile() {
+    try {
+      const res = await fetch('/api/profile');
+      const json = await res.json();
+      if (json.success && json.data) {
+        inMemoryProfile = json.data;
+        localStorage.setItem('gdp_user_profile', JSON.stringify(json.data));
+        return json.data;
+      }
+    } catch (e) {
+      // Fallback
+    }
+    const cached = localStorage.getItem('gdp_user_profile');
+    if (cached) {
+      try {
+        inMemoryProfile = JSON.parse(cached);
+        return inMemoryProfile;
+      } catch (err) {}
+    }
+    if (!inMemoryProfile) inMemoryProfile = { ...(window.DEFAULT_PROFILE || {}) };
+    return inMemoryProfile;
+  },
+
+  async saveProfile(profileData) {
+    inMemoryProfile = { ...inMemoryProfile, ...profileData };
+    localStorage.setItem('gdp_user_profile', JSON.stringify(inMemoryProfile));
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(inMemoryProfile)
+      });
+      const json = await res.json();
+      return json;
+    } catch (e) {
+      return {
+        success: true,
+        message: 'Profile saved locally in your sound system terminal!',
+        data: inMemoryProfile
+      };
+    }
+  },
   async getArtists() {
     try {
       const res = await fetch('/api/artists');

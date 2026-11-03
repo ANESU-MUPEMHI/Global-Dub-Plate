@@ -182,6 +182,40 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { success: true, count: orders.length, data: orders });
       }
 
+      // GET /api/profile
+      if (pathname === '/api/profile' && method === 'GET') {
+        const profile = readJson('profile.json', {
+          fullName: 'Adrian Anesu Mupemhi',
+          email: 'mupemhianesu@gmail.com',
+          phone: '+2772442 5958',
+          country: 'South Africa',
+          city: 'Johannesburg',
+          soundName: 'Jahvisions International Sound',
+          crewMembers: 'Selector Adrian, MC Fireseed, DJ Benjamin, Terence Dub Operator',
+          areasToMention: 'Johannesburg, Kensington, Harare, Kingston, Brixton, Tokyo',
+          tagLine: 'The Undisputed Dubplate Champions • Pure Reggae & Dancehall Pressure',
+          suggestions: "Please pronounce 'Jahvisions' clearly. For clash cuts, shout out the sound crew and state that no rival sound system can survive this selection. Keep it high energy with dub delay on the drop."
+        });
+        return sendJson(res, 200, { success: true, data: profile });
+      }
+
+      // POST /api/profile
+      if (pathname === '/api/profile' && method === 'POST') {
+        const payload = await parseBody(req);
+        const existing = readJson('profile.json', {});
+        const updatedProfile = {
+          ...existing,
+          ...payload,
+          updatedAt: new Date().toISOString()
+        };
+        writeJson('profile.json', updatedProfile);
+        return sendJson(res, 200, {
+          success: true,
+          message: 'User profile and sound system identity updated successfully!',
+          data: updatedProfile
+        });
+      }
+
       if (pathname === '/api/stats' && method === 'GET') {
         const artists = readJson('artists.json', []);
         const orders = readJson('orders.json', []);

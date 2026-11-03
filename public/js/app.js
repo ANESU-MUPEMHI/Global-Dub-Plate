@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     riddims: [],
     orders: [],
     stats: {},
+    userProfile: null,
     activeTab: 'roster',
     selectedCountry: 'ALL',
     selectedStatusFilter: 'ALL',
@@ -26,6 +27,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const orderModal = document.getElementById('cut-request-modal');
   const paymentModal = document.getElementById('payment-modal');
   const registerModal = document.getElementById('register-artist-modal');
+  const profileModal = document.getElementById('user-profile-modal');
+  const profileForm = document.getElementById('user-profile-form');
   const stemsDrawer = document.getElementById('stems-drawer');
   const videoModal = document.getElementById('video-preview-modal');
 
@@ -49,22 +52,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderOrders();
     setupWaveformVisualizer();
     checkAutoSelectFirstOrder();
+    updateUserProfileUI();
   }
 
   async function loadInitialData() {
     try {
-      const [artists, riddims, orders, stats] = await Promise.all([
+      const [artists, riddims, orders, stats, profile] = await Promise.all([
         window.GDP_API.getArtists(),
         window.GDP_API.getRiddims(),
         window.GDP_API.getOrders(),
-        window.GDP_API.getStats()
+        window.GDP_API.getStats(),
+        window.GDP_API.getProfile()
       ]);
       state.artists = artists;
       state.riddims = riddims;
       state.orders = orders;
       state.stats = stats;
+      state.userProfile = profile;
       renderLiveTicker();
       updateStatsDisplay();
+      updateUserProfileUI();
     } catch (err) {
       console.error('Failed to load initial data:', err);
       showToast('⚠️ Connecting in offline mode with cached sound data.', 'warning');
@@ -256,6 +263,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('modal-artist-flag').textContent = artist.flag;
     document.getElementById('modal-artist-studio').textContent = `${artist.studioName} (${artist.city})`;
 
+    // Pre-populate with user profile defaults if empty
+    if (state.userProfile) {
+      const orderPreviewName = document.getElementById('order-profile-preview-name');
+      if (orderPreviewName && state.userProfile.soundName) {
+        orderPreviewName.textContent = state.userProfile.soundName;
+      }
+      const soundInput = document.getElementById('order-sound-name');
+      if (soundInput && !soundInput.value) {
+        applyProfileToOrderForm();
+      }
+    }
+
     const catalogSelect = document.getElementById('order-catalog-song');
     catalogSelect.innerHTML = artist.catalog.map(song => `
       <option value="${song.title}" data-bpm="${song.bpm}" data-riddim="${song.riddim}">
@@ -272,6 +291,156 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     updateOrderModalCalculations();
     orderModal.classList.add('active');
+  }
+
+  // --- USER PROFILE & SOUND IDENTITY CONTROLLER ---
+
+  function updateUserProfileUI() {
+    if (!state.userProfile) return;
+    const p = state.userProfile;
+
+    const navLabel = document.getElementById('nav-user-label');
+    if (navLabel) {
+      const displayName = p.fullName ? p.fullName.split(' ')[0] : 'Selector';
+      const soundAbbr = p.soundName ? p.soundName.split(' ')[0] : 'Sound';
+      navLabel.textContent = `👤 ${displayName} (${soundAbbr})`;
+    }
+
+    const orderPreviewName = document.getElementById('order-profile-preview-name');
+    if (orderPreviewName && p.soundName) {
+      orderPreviewName.textContent = p.soundName;
+    }
+
+    const avatarInitials = document.getElementById('profile-modal-avatar-initials');
+    if (avatarInitials && p.fullName) {
+      const parts = p.fullName.trim().split(' ');
+      avatarInitials.textContent = parts.length > 1
+        ? (parts[0][0] + parts[1][0]).toUpperCase()
+        : p.fullName.slice(0, 2).toUpperCase();
+    }
+  }
+
+  function openProfileModal() {
+    if (!state.userProfile) {
+      state.userProfile = { ...(window.DEFAULT_PROFILE || {}) };
+    }
+    const p = state.userProfile;
+
+    // Contact Details
+    document.getElementById('profile-full-name').value = p.fullName || '';
+    document.getElementById('profile-email').value = p.email || '';
+    document.getElementById('profile-phone').value = p.phone || '';
+    document.getElementById('profile-location').value = p.location || ((p.city && p.country) ? `${p.city}, ${p.country}` : '');
+
+    // 5 Sound System Specifics (Editable)
+    document.getElementById('profile-sound-name').value = p.soundName || '';
+    document.getElementById('profile-crew-members').value = p.crewMembers || '';
+    document.getElementById('profile-areas').value = p.areasToMention || '';
+    document.getElementById('profile-tagline').value = p.tagLine || '';
+    document.getElementById('profile-suggestions').value = p.suggestions || '';
+
+    updateLiveSlatePreview();
+    profileModal.classList.add('active');
+  }
+
+  function updateLiveSlatePreview() {
+    const soundName = document.getElementById('profile-sound-name')?.value || 'Your Sound System';
+    const crew = document.getElementById('profile-crew-members')?.value || 'Selector & Crew';
+    const areas = document.getElementById('profile-areas')?.value || 'Global';
+    const tagline = document.getElementById('profile-tagline')?.value || '';
+    const suggestions = document.getElementById('profile-suggestions')?.value || '';
+
+    const previewEl = document.getElementById('profile-live-slate-preview');
+    if (previewEl) {
+      previewEl.innerHTML = `
+        "Big up <strong class="gold">${escapeHtml(soundName)}</strong>! Representing <strong>${escapeHtml(areas)}</strong>! Shouting out <strong>${escapeHtml(crew)}</strong>! <em>${escapeHtml(tagline)}</em>"<br>
+        ${suggestions ? `<span style="font-size: 0.72rem; color: #94a3b8; display: block; margin-top: 0.25rem;">[Studio Note: ${escapeHtml(suggestions)}]</span>` : ''}
+      `;
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag] || tag));
+  }
+
+  async function handleSaveProfile(e) {
+    e.preventDefault();
+
+    const fullName = document.getElementById('profile-full-name').value.trim();
+    const email = document.getElementById('profile-email').value.trim();
+    const phone = document.getElementById('profile-phone').value.trim();
+    const locationVal = document.getElementById('profile-location').value.trim();
+    const soundName = document.getElementById('profile-sound-name').value.trim();
+    const crewMembers = document.getElementById('profile-crew-members').value.trim();
+    const areasToMention = document.getElementById('profile-areas').value.trim();
+    const tagLine = document.getElementById('profile-tagline').value.trim();
+    const suggestions = document.getElementById('profile-suggestions').value.trim();
+
+    if (!fullName || !email || !soundName) {
+      showToast('Please provide your name, email, and sound system name!', 'error');
+      return;
+    }
+
+    const payload = {
+      fullName,
+      email,
+      phone,
+      location: locationVal,
+      soundName,
+      crewMembers,
+      areasToMention,
+      tagLine,
+      suggestions
+    };
+
+    const submitBtn = document.getElementById('btn-save-profile');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner"></span> Saving Sound System Credentials...`;
+
+    try {
+      const res = await window.GDP_API.saveProfile(payload);
+      if (res.success && res.data) {
+        state.userProfile = res.data;
+        updateUserProfileUI();
+        profileModal.classList.remove('active');
+        showToast('✅ Sound System Profile & Voicing Identity Saved Successfully!', 'success');
+      } else {
+        showToast(res.message || 'Error saving profile', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to save profile', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<i class="icon-save"></i> Save Sound System Profile & Identity`;
+    }
+  }
+
+  function applyProfileToOrderForm() {
+    if (!state.userProfile) return;
+    const p = state.userProfile;
+
+    if (p.soundName) document.getElementById('order-sound-name').value = p.soundName;
+    if (p.fullName) document.getElementById('order-selector-name').value = p.fullName;
+    if (p.location || (p.city && p.country)) {
+      document.getElementById('order-sound-location').value = p.location || `${p.city}, ${p.country}`;
+    }
+
+    let clashDirection = `Big up ${p.soundName || 'Champion Sound'}!`;
+    if (p.areasToMention) clashDirection += ` Representing ${p.areasToMention}!`;
+    if (p.crewMembers) clashDirection += ` Shout out the crew: ${p.crewMembers}.`;
+    if (p.tagLine) clashDirection += ` "${p.tagLine}!"`;
+    if (p.suggestions) clashDirection += ` [Special Instructions: ${p.suggestions}]`;
+
+    document.getElementById('order-custom-lyrics').value = clashDirection;
+    showToast(`⚡ Profile details & crew specs applied to order!`, 'success');
   }
 
   function updateOrderModalCalculations() {
@@ -1114,6 +1283,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('register-artist-form')?.addEventListener('submit', submitArtistRegistration);
     document.getElementById('btn-nav-register')?.addEventListener('click', () => {
       registerModal.classList.add('active');
+    });
+
+    // Profile Modal Listeners
+    document.getElementById('btn-nav-profile')?.addEventListener('click', openProfileModal);
+    document.getElementById('btn-autofill-profile')?.addEventListener('click', applyProfileToOrderForm);
+    document.getElementById('user-profile-form')?.addEventListener('submit', handleSaveProfile);
+
+    // Live preview reactive updates on typing in profile fields
+    ['profile-sound-name', 'profile-crew-members', 'profile-areas', 'profile-tagline', 'profile-suggestions'].forEach(fieldId => {
+      document.getElementById(fieldId)?.addEventListener('input', updateLiveSlatePreview);
     });
   }
 

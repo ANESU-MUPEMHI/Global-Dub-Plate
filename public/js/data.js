@@ -567,3 +567,17 @@ window.DEFAULT_ORDERS = [
     "videoUrl": null
   }
 ];
+
+window.DEFAULT_PROFILE = {
+  "fullName": "Adrian Anesu Mupemhi",
+  "email": "mupemhianesu@gmail.com",
+  "phone": "+2772442 5958",
+  "country": "South Africa",
+  "city": "Johannesburg",
+  "soundName": "Jahvisions International Sound",
+  "crewMembers": "Selector Adrian, MC Fireseed, DJ Benjamin, Terence Dub Operator",
+  "areasToMention": "Johannesburg, Kensington, Harare, Kingston, Brixton, Tokyo",
+  "tagLine": "The Undisputed Dubplate Champions • Pure Reggae & Dancehall Pressure",
+  "suggestions": "Please pronounce 'Jahvisions' clearly. For clash cuts, shout out the sound crew and state that no rival sound system can survive this selection. Keep it high energy with dub delay on the drop."
+};
+
