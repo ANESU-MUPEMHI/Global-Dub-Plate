@@ -46,6 +46,19 @@
    - Dual interface for recording artists and studio engineers to receive orders, voice specials on mic, review escrow balances, and set custom rates.
    - Open registration for reggae/dancehall artists worldwide to join the platform roster.
 
+10. **Comprehensive User Profile & Sound System Identity:**
+    - Click **"👤 Selector Profile"** in the top navigation bar to open the comprehensive profile management console.
+    - **User & Contact Information:**
+      - Full Name, Email Address, Direct Phone / WhatsApp number for international studio coordination, City & Country.
+    - **Sound System / Radio Identity (Editable):**
+      - **1. Sound Name / Radio Name (Editable):** Official sound system or radio station name called out by the artist.
+      - **2. Crew Members:** Lineup of selectors, MCs, dubbox operators, and engineers to big up in vocal intros and outros.
+      - **3. Areas to Mention:** Localities, neighborhoods, or territories to represent in the lyrics (e.g. Johannesburg, Kensington, Harare, Kingston, Brixton, Brooklyn, Tokyo).
+      - **4. Tag Line:** Official slogan or audio trademark (e.g. *"The Undisputed Dubplate Champions • Pure Reggae & Dancehall Pressure"*).
+      - **5. Suggestions (Extra Info for Dub or Jingle):** Voice directions, pronunciation guidance, clash callouts, energy levels, and clean vs clash requirements sent to the artist's studio screen.
+    - **Live Artist Studio Slate Preview:** Reactive real-time preview showing how the artist will read and voice the sound system's shout-outs.
+    - **1-Click Autofill Integration:** Auto-applies profile defaults and sound system specifications directly into the dubplate order form.
+
 ---
 
 ## 🚀 Getting Started
