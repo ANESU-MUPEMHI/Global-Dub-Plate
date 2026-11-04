@@ -159,9 +159,15 @@ body {
 
 .ticker-content {
   display: inline-block;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: #e2e8f0;
-  animation: marquee 35s linear infinite;
+  animation: marquee 95s linear infinite;
+  will-change: transform;
+}
+
+.live-ticker-wrap:hover .ticker-content {
+  animation-play-state: paused;
+  cursor: default;
 }
 
 .ticker-pill {
