@@ -578,6 +578,74 @@ window.DEFAULT_PROFILE = {
   "crewMembers": "Selector Adrian, MC Fireseed, DJ Benjamin, Terence Dub Operator",
   "areasToMention": "Johannesburg, Kensington, Harare, Kingston, Brixton, Tokyo",
   "tagLine": "The Undisputed Dubplate Champions • Pure Reggae & Dancehall Pressure",
-  "suggestions": "Please pronounce 'Jahvisions' clearly. For clash cuts, shout out the sound crew and state that no rival sound system can survive this selection. Keep it high energy with dub delay on the drop."
+  "activeMode": "dubplate",
+  "suggestions": "Kill any rival sound system! State that Jahvisions rules the arena from Johannesburg to Kingston. Add heavy dub delay on the chorus hook.",
+  "suggestionsDubplate": "Kill any rival sound system! State that Jahvisions rules the arena from Johannesburg to Kingston. Add heavy dub delay on the chorus hook.",
+  "suggestionsJingle": "High energy radio / mixtape station ID! Start with siren sweep, shout out 'You are locked in live with Jahvisions International Sound, strictly reggae pressure!'",
+  "suggestionsDropIn": "Punchy 5-10 second voice tag: 'Hold tight! You're rocking with the undisputed champions, Jahvisions Sound!'",
+  "suggestionsShoutOut": "Dry tempo click acapella on beat. Shout out Selector Adrian, MC Fireseed, Terence, and Benjamin, and big up the worldwide sound system massive!"
 };
+
+window.DEFAULT_NOTIFICATIONS = [
+  {
+    "id": "NOTIF-101",
+    "orderId": "GDP-8821",
+    "type": "preview_ready",
+    "title": "🎵 Dubplate Preview Ready (25% Gate Active)",
+    "message": "Capleton uploaded your dubplate special 'Slew Dem' from King Jammy's Studio (Kingston 🇯🇲)! 25% audio preview length is now unlocked in player. Pay 75% balance to unlock master WAV, split-track & 4K video.",
+    "timestamp": "2026-11-04T19:30:00.000Z",
+    "unread": true,
+    "artistName": "Capleton (The Fireman)",
+    "artistFlag": "🇯🇲",
+    "recordingType": "dubplate",
+    "depositAmount": 280,
+    "balanceAmount": 840,
+    "icon": "🎵"
+  },
+  {
+    "id": "NOTIF-102",
+    "orderId": "GDP-9104",
+    "type": "in_studio",
+    "title": "🎙️ Artist in Vocal Booth (Voicing Now)",
+    "message": "Winky D received your jingle request for Stereo One Sound and is currently voicing at Vigilance Music Studio (Harare 🇿🇼).",
+    "timestamp": "2026-11-04T18:45:00.000Z",
+    "unread": true,
+    "artistName": "Winky D (The Gafa)",
+    "artistFlag": "🇿🇼",
+    "recordingType": "jingle",
+    "depositAmount": 90,
+    "balanceAmount": 270,
+    "icon": "🎙️"
+  },
+  {
+    "id": "NOTIF-103",
+    "orderId": "GDP-7409",
+    "type": "completed",
+    "title": "✅ 100% Master Dub Delivered",
+    "message": "Buju Banton dubplate 'Champion' fully unlocked! Master stereo WAV, split-track voice/music stems, and 4K vocal booth studio video are ready to download.",
+    "timestamp": "2026-11-03T15:20:00.000Z",
+    "unread": false,
+    "artistName": "Buju Banton",
+    "artistFlag": "🇯🇲",
+    "recordingType": "dubplate",
+    "depositAmount": 1350,
+    "balanceAmount": 0,
+    "icon": "🏆"
+  },
+  {
+    "id": "NOTIF-104",
+    "orderId": null,
+    "type": "system",
+    "title": "🛡️ Global Sound System Escrow Verified",
+    "message": "Jahvisions International Sound profile initialized. Direct forwarding enabled to studios in Jamaica, Ghana, Zimbabwe, USA, Kenya, Europe & Japan with 25% escrow guarantee.",
+    "timestamp": "2026-11-02T12:00:00.000Z",
+    "unread": false,
+    "artistName": "Global Dub Plate",
+    "artistFlag": "🌐",
+    "recordingType": "system",
+    "depositAmount": 0,
+    "balanceAmount": 0,
+    "icon": "🛡️"
+  }
+];
 

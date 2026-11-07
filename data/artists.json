@@ -1,5 +1,93 @@
 [
   {
+    "id": "jahseed",
+    "name": "Jahseed",
+    "country": "South Africa",
+    "countryCode": "SO",
+    "flag": "🇿🇦",
+    "city": "Joohannesburg",
+    "studioStatus": "in_studio",
+    "studioName": "Maximum Styles Records",
+    "sessionTitle": "Direct Global Dub Voicing",
+    "bio": "Official Reggae & Sound System talent representing South Africa. Ready to cut custom clash anthems and jingles live direct.",
+    "pricing": {
+      "dubplate": 800,
+      "jingle": 400,
+      "dropIn": 250,
+      "shoutOut": 180,
+      "videoCapture": 100
+    },
+    "catalog": [
+      {
+        "id": "song-1",
+        "title": "Thathisighubhu",
+        "year": 2026,
+        "riddim": "Custom Dub Selection",
+        "bpm": 85
+      },
+      {
+        "id": "song-2",
+        "title": "The Way Kungakhona",
+        "year": 2026,
+        "riddim": "Custom Dub Selection",
+        "bpm": 85
+      },
+      {
+        "id": "song-3",
+        "title": "Mari Yepepha",
+        "year": 2026,
+        "riddim": "Custom Dub Selection",
+        "bpm": 85
+      },
+      {
+        "id": "song-4",
+        "title": "Come to Far",
+        "year": 2026,
+        "riddim": "Custom Dub Selection",
+        "bpm": 85
+      },
+      {
+        "id": "song-5",
+        "title": "Ndipendule",
+        "year": 2026,
+        "riddim": "Custom Dub Selection",
+        "bpm": 85
+      },
+      {
+        "id": "song-6",
+        "title": "Makeba",
+        "year": 2026,
+        "riddim": "Custom Dub Selection",
+        "bpm": 85
+      },
+      {
+        "id": "song-7",
+        "title": "Brave True & Strong",
+        "year": 2026,
+        "riddim": "Custom Dub Selection",
+        "bpm": 85
+      },
+      {
+        "id": "song-8",
+        "title": "Siyajabula",
+        "year": 2026,
+        "riddim": "Custom Dub Selection",
+        "bpm": 85
+      },
+      {
+        "id": "song-9",
+        "title": "",
+        "year": 2026,
+        "riddim": "Custom Dub Selection",
+        "bpm": 85
+      }
+    ],
+    "sampleVocal": "Live direct from South Africa! Jahseed voicing specials for the global sound system movement!",
+    "rating": 5,
+    "completedCuts": 1,
+    "responseTime": "Instant / Within 2 hrs"
+  },
+  {
     "id": "buju-banton",
     "name": "Buju Banton",
     "country": "Jamaica",
@@ -18,15 +106,51 @@
       "videoCapture": 150
     },
     "catalog": [
-      { "id": "bb-1", "title": "Champion", "year": 1995, "riddim": "Champion Riddim", "bpm": 92 },
-      { "id": "bb-2", "title": "Destiny", "year": 1997, "riddim": "Destiny Riddim", "bpm": 78 },
-      { "id": "bb-3", "title": "Driver A", "year": 2006, "riddim": "Taxi Riddim", "bpm": 85 },
-      { "id": "bb-4", "title": "Untold Stories", "year": 1995, "riddim": "Acoustic Roots", "bpm": 74 },
-      { "id": "bb-5", "title": "Batty Rider", "year": 1992, "riddim": "Bogle Riddim", "bpm": 98 },
-      { "id": "bb-6", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 85 }
+      {
+        "id": "bb-1",
+        "title": "Champion",
+        "year": 1995,
+        "riddim": "Champion Riddim",
+        "bpm": 92
+      },
+      {
+        "id": "bb-2",
+        "title": "Destiny",
+        "year": 1997,
+        "riddim": "Destiny Riddim",
+        "bpm": 78
+      },
+      {
+        "id": "bb-3",
+        "title": "Driver A",
+        "year": 2006,
+        "riddim": "Taxi Riddim",
+        "bpm": 85
+      },
+      {
+        "id": "bb-4",
+        "title": "Untold Stories",
+        "year": 1995,
+        "riddim": "Acoustic Roots",
+        "bpm": 74
+      },
+      {
+        "id": "bb-5",
+        "title": "Batty Rider",
+        "year": 1992,
+        "riddim": "Bogle Riddim",
+        "bpm": 98
+      },
+      {
+        "id": "bb-6",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 85
+      }
     ],
     "sampleVocal": "Sound boy step up if yuh dare! Global Dub Plate killing sound tonight!",
-    "rating": 5.0,
+    "rating": 5,
     "completedCuts": 142,
     "responseTime": "Instant / Within 3 hrs"
   },
@@ -49,12 +173,48 @@
       "videoCapture": 120
     },
     "catalog": [
-      { "id": "cap-1", "title": "Tour", "year": 1994, "riddim": "Tour Riddim", "bpm": 92 },
-      { "id": "cap-2", "title": "Jah Jah City", "year": 2000, "riddim": "One For The Road", "bpm": 79 },
-      { "id": "cap-3", "title": "Raggy Road", "year": 1997, "riddim": "Raggy Road Riddim", "bpm": 84 },
-      { "id": "cap-4", "title": "Slew Dem", "year": 1999, "riddim": "Bellyas Riddim", "bpm": 96 },
-      { "id": "cap-5", "title": "Who Dem", "year": 2000, "riddim": "Bug Riddim", "bpm": 95 },
-      { "id": "cap-6", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 88 }
+      {
+        "id": "cap-1",
+        "title": "Tour",
+        "year": 1994,
+        "riddim": "Tour Riddim",
+        "bpm": 92
+      },
+      {
+        "id": "cap-2",
+        "title": "Jah Jah City",
+        "year": 2000,
+        "riddim": "One For The Road",
+        "bpm": 79
+      },
+      {
+        "id": "cap-3",
+        "title": "Raggy Road",
+        "year": 1997,
+        "riddim": "Raggy Road Riddim",
+        "bpm": 84
+      },
+      {
+        "id": "cap-4",
+        "title": "Slew Dem",
+        "year": 1999,
+        "riddim": "Bellyas Riddim",
+        "bpm": 96
+      },
+      {
+        "id": "cap-5",
+        "title": "Who Dem",
+        "year": 2000,
+        "riddim": "Bug Riddim",
+        "bpm": 95
+      },
+      {
+        "id": "cap-6",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 88
+      }
     ],
     "sampleVocal": "Fire burn all sound boy! From London to Kingston, this sound rule di clash!",
     "rating": 4.9,
@@ -80,14 +240,44 @@
       "videoCapture": 150
     },
     "catalog": [
-      { "id": "ch-1", "title": "Here Comes Trouble", "year": 2013, "riddim": "Rootsman Riddim", "bpm": 76 },
-      { "id": "ch-2", "title": "Skankin' Sweet", "year": 2017, "riddim": "Chronology Riddim", "bpm": 74 },
-      { "id": "ch-3", "title": "Smile Jamaica", "year": 2013, "riddim": "Silly Walks Riddim", "bpm": 78 },
-      { "id": "ch-4", "title": "Capture Land", "year": 2014, "riddim": "Dread & Terrible", "bpm": 77 },
-      { "id": "ch-5", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 76 }
+      {
+        "id": "ch-1",
+        "title": "Here Comes Trouble",
+        "year": 2013,
+        "riddim": "Rootsman Riddim",
+        "bpm": 76
+      },
+      {
+        "id": "ch-2",
+        "title": "Skankin' Sweet",
+        "year": 2017,
+        "riddim": "Chronology Riddim",
+        "bpm": 74
+      },
+      {
+        "id": "ch-3",
+        "title": "Smile Jamaica",
+        "year": 2013,
+        "riddim": "Silly Walks Riddim",
+        "bpm": 78
+      },
+      {
+        "id": "ch-4",
+        "title": "Capture Land",
+        "year": 2014,
+        "riddim": "Dread & Terrible",
+        "bpm": 77
+      },
+      {
+        "id": "ch-5",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 76
+      }
     ],
     "sampleVocal": "Here comes trouble for di rival sound! Sound system play sweet reggae music!",
-    "rating": 5.0,
+    "rating": 5,
     "completedCuts": 95,
     "responseTime": "Within 4 hrs"
   },
@@ -110,10 +300,34 @@
       "videoCapture": 100
     },
     "catalog": [
-      { "id": "sp-1", "title": "So Mi Like It", "year": 2014, "riddim": "Boom Box Riddim", "bpm": 105 },
-      { "id": "sp-2", "title": "Go Down Deh", "year": 2021, "riddim": "Shaggy Production", "bpm": 102 },
-      { "id": "sp-3", "title": "Romantic Mood", "year": 2018, "riddim": "Steely & Clevie", "bpm": 96 },
-      { "id": "sp-4", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 100 }
+      {
+        "id": "sp-1",
+        "title": "So Mi Like It",
+        "year": 2014,
+        "riddim": "Boom Box Riddim",
+        "bpm": 105
+      },
+      {
+        "id": "sp-2",
+        "title": "Go Down Deh",
+        "year": 2021,
+        "riddim": "Shaggy Production",
+        "bpm": 102
+      },
+      {
+        "id": "sp-3",
+        "title": "Romantic Mood",
+        "year": 2018,
+        "riddim": "Steely & Clevie",
+        "bpm": 96
+      },
+      {
+        "id": "sp-4",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 100
+      }
     ],
     "sampleVocal": "Big up my selector right now! No other sound can test your speakers!",
     "rating": 4.9,
@@ -139,11 +353,41 @@
       "videoCapture": 100
     },
     "catalog": [
-      { "id": "st-1", "title": "Run Go", "year": 2015, "riddim": "Roots Reggae Riddim", "bpm": 78 },
-      { "id": "st-2", "title": "Tomorrow", "year": 2018, "riddim": "Attitude Riddim", "bpm": 86 },
-      { "id": "st-3", "title": "Hero", "year": 2017, "riddim": "Epistles of Mama", "bpm": 94 },
-      { "id": "st-4", "title": "Activate", "year": 2020, "riddim": "Afro-Dancehall", "bpm": 104 },
-      { "id": "st-5", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 85 }
+      {
+        "id": "st-1",
+        "title": "Run Go",
+        "year": 2015,
+        "riddim": "Roots Reggae Riddim",
+        "bpm": 78
+      },
+      {
+        "id": "st-2",
+        "title": "Tomorrow",
+        "year": 2018,
+        "riddim": "Attitude Riddim",
+        "bpm": 86
+      },
+      {
+        "id": "st-3",
+        "title": "Hero",
+        "year": 2017,
+        "riddim": "Epistles of Mama",
+        "bpm": 94
+      },
+      {
+        "id": "st-4",
+        "title": "Activate",
+        "year": 2020,
+        "riddim": "Afro-Dancehall",
+        "bpm": 104
+      },
+      {
+        "id": "st-5",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 85
+      }
     ],
     "sampleVocal": "1GAD! Stonebwoy reporting live from Accra to your sound system!",
     "rating": 4.9,
@@ -169,10 +413,34 @@
       "videoCapture": 90
     },
     "catalog": [
-      { "id": "sw-1", "title": "Gringo", "year": 2018, "riddim": "Gringo Riddim", "bpm": 92 },
-      { "id": "sw-2", "title": "My Level", "year": 2018, "riddim": "Reign Riddim", "bpm": 90 },
-      { "id": "sw-3", "title": "Ayoo", "year": 2017, "riddim": "Street Riddim", "bpm": 98 },
-      { "id": "sw-4", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 92 }
+      {
+        "id": "sw-1",
+        "title": "Gringo",
+        "year": 2018,
+        "riddim": "Gringo Riddim",
+        "bpm": 92
+      },
+      {
+        "id": "sw-2",
+        "title": "My Level",
+        "year": 2018,
+        "riddim": "Reign Riddim",
+        "bpm": 90
+      },
+      {
+        "id": "sw-3",
+        "title": "Ayoo",
+        "year": 2017,
+        "riddim": "Street Riddim",
+        "bpm": 98
+      },
+      {
+        "id": "sw-4",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 92
+      }
     ],
     "sampleVocal": "Paah paah paah! Shatta Movement says this sound is the champion!",
     "rating": 4.8,
@@ -198,14 +466,44 @@
       "videoCapture": 80
     },
     "catalog": [
-      { "id": "wd-1", "title": "Disappear", "year": 2015, "riddim": "Oskid Production", "bpm": 98 },
-      { "id": "wd-2", "title": "Kasong Kejecha", "year": 2018, "riddim": "Gafa Futi", "bpm": 94 },
-      { "id": "wd-3", "title": "Twenty Five", "year": 2016, "riddim": "Vigilance", "bpm": 86 },
-      { "id": "wd-4", "title": "MuGarden", "year": 2019, "riddim": "Garden Riddim", "bpm": 88 },
-      { "id": "wd-5", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 92 }
+      {
+        "id": "wd-1",
+        "title": "Disappear",
+        "year": 2015,
+        "riddim": "Oskid Production",
+        "bpm": 98
+      },
+      {
+        "id": "wd-2",
+        "title": "Kasong Kejecha",
+        "year": 2018,
+        "riddim": "Gafa Futi",
+        "bpm": 94
+      },
+      {
+        "id": "wd-3",
+        "title": "Twenty Five",
+        "year": 2016,
+        "riddim": "Vigilance",
+        "bpm": 86
+      },
+      {
+        "id": "wd-4",
+        "title": "MuGarden",
+        "year": 2019,
+        "riddim": "Garden Riddim",
+        "bpm": 88
+      },
+      {
+        "id": "wd-5",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 92
+      }
     ],
     "sampleVocal": "Gafa president! When this sound drops a tune, every problem must disappear!",
-    "rating": 5.0,
+    "rating": 5,
     "completedCuts": 174,
     "responseTime": "Within 2 hrs"
   },
@@ -228,10 +526,34 @@
       "videoCapture": 70
     },
     "catalog": [
-      { "id": "no-1", "title": "Handipere Power", "year": 2021, "riddim": "Mustard Seed", "bpm": 95 },
-      { "id": "no-2", "title": "Peter Pan", "year": 2021, "riddim": "Mustard Seed Riddim", "bpm": 88 },
-      { "id": "no-3", "title": "Safe", "year": 2020, "riddim": "Sunlight Riddim", "bpm": 84 },
-      { "id": "no-4", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 90 }
+      {
+        "id": "no-1",
+        "title": "Handipere Power",
+        "year": 2021,
+        "riddim": "Mustard Seed",
+        "bpm": 95
+      },
+      {
+        "id": "no-2",
+        "title": "Peter Pan",
+        "year": 2021,
+        "riddim": "Mustard Seed Riddim",
+        "bpm": 88
+      },
+      {
+        "id": "no-3",
+        "title": "Safe",
+        "year": 2020,
+        "riddim": "Sunlight Riddim",
+        "bpm": 84
+      },
+      {
+        "id": "no-4",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 90
+      }
     ],
     "sampleVocal": "Never run out of power! Shouting out the biggest sound in the area!",
     "rating": 4.9,
@@ -257,10 +579,34 @@
       "videoCapture": 120
     },
     "catalog": [
-      { "id": "cb-1", "title": "Come Around", "year": 2007, "riddim": "Come Around Riddim", "bpm": 76 },
-      { "id": "cb-2", "title": "Mamacita", "year": 2007, "riddim": "Mamacita Riddim", "bpm": 92 },
-      { "id": "cb-3", "title": "Blind To You", "year": 2007, "riddim": "Blind To You Riddim", "bpm": 80 },
-      { "id": "cb-4", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 80 }
+      {
+        "id": "cb-1",
+        "title": "Come Around",
+        "year": 2007,
+        "riddim": "Come Around Riddim",
+        "bpm": 76
+      },
+      {
+        "id": "cb-2",
+        "title": "Mamacita",
+        "year": 2007,
+        "riddim": "Mamacita Riddim",
+        "bpm": 92
+      },
+      {
+        "id": "cb-3",
+        "title": "Blind To You",
+        "year": 2007,
+        "riddim": "Blind To You Riddim",
+        "bpm": 80
+      },
+      {
+        "id": "cb-4",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 80
+      }
     ],
     "sampleVocal": "Finally the herb has come around! Big up di champion sound system!",
     "rating": 4.9,
@@ -286,10 +632,34 @@
       "videoCapture": 75
     },
     "catalog": [
-      { "id": "wy-1", "title": "Nakupenda Pia", "year": 2013, "riddim": "Lovechild Riddim", "bpm": 94 },
-      { "id": "wy-2", "title": "She Say Dat", "year": 2010, "riddim": "Dancehall Beat", "bpm": 100 },
-      { "id": "wy-3", "title": "Chuki", "year": 2008, "riddim": "East Coast Roots", "bpm": 84 },
-      { "id": "wy-4", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 90 }
+      {
+        "id": "wy-1",
+        "title": "Nakupenda Pia",
+        "year": 2013,
+        "riddim": "Lovechild Riddim",
+        "bpm": 94
+      },
+      {
+        "id": "wy-2",
+        "title": "She Say Dat",
+        "year": 2010,
+        "riddim": "Dancehall Beat",
+        "bpm": 100
+      },
+      {
+        "id": "wy-3",
+        "title": "Chuki",
+        "year": 2008,
+        "riddim": "East Coast Roots",
+        "bpm": 84
+      },
+      {
+        "id": "wy-4",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 90
+      }
     ],
     "sampleVocal": "Wyre representing East Africa! Straight love and power to the sound system!",
     "rating": 4.8,
@@ -315,10 +685,34 @@
       "videoCapture": 100
     },
     "catalog": [
-      { "id": "gl-1", "title": "Incredible (M-Beat)", "year": 1994, "riddim": "Jungle Sound", "bpm": 165 },
-      { "id": "gl-2", "title": "Champagne Dance", "year": 1993, "riddim": "Champagne Riddim", "bpm": 96 },
-      { "id": "gl-3", "title": "Mad Dem", "year": 1992, "riddim": "Fashion Records", "bpm": 90 },
-      { "id": "gl-4", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 100 }
+      {
+        "id": "gl-1",
+        "title": "Incredible (M-Beat)",
+        "year": 1994,
+        "riddim": "Jungle Sound",
+        "bpm": 165
+      },
+      {
+        "id": "gl-2",
+        "title": "Champagne Dance",
+        "year": 1993,
+        "riddim": "Champagne Riddim",
+        "bpm": 96
+      },
+      {
+        "id": "gl-3",
+        "title": "Mad Dem",
+        "year": 1992,
+        "riddim": "Fashion Records",
+        "bpm": 90
+      },
+      {
+        "id": "gl-4",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 100
+      }
     ],
     "sampleVocal": "Junglist massive! General Levy killing sound boy with incredible power!",
     "rating": 4.9,
@@ -344,10 +738,34 @@
       "videoCapture": 110
     },
     "catalog": [
-      { "id": "pu-1", "title": "Forever", "year": 2000, "riddim": "Roots Reggae Japan", "bpm": 76 },
-      { "id": "pu-2", "title": "I Wanna Know You", "year": 2001, "riddim": "Lovers Rock", "bpm": 74 },
-      { "id": "pu-3", "title": "Feel It", "year": 2003, "riddim": "Dancehall Groove", "bpm": 92 },
-      { "id": "pu-4", "title": "Custom / Freestyle Cut", "year": 2026, "riddim": "Custom Selection", "bpm": 80 }
+      {
+        "id": "pu-1",
+        "title": "Forever",
+        "year": 2000,
+        "riddim": "Roots Reggae Japan",
+        "bpm": 76
+      },
+      {
+        "id": "pu-2",
+        "title": "I Wanna Know You",
+        "year": 2001,
+        "riddim": "Lovers Rock",
+        "bpm": 74
+      },
+      {
+        "id": "pu-3",
+        "title": "Feel It",
+        "year": 2003,
+        "riddim": "Dancehall Groove",
+        "bpm": 92
+      },
+      {
+        "id": "pu-4",
+        "title": "Custom / Freestyle Cut",
+        "year": 2026,
+        "riddim": "Custom Selection",
+        "bpm": 80
+      }
     ],
     "sampleVocal": "From Tokyo to the world! Pushim voicing live for the undisputed champion sound!",
     "rating": 4.9,

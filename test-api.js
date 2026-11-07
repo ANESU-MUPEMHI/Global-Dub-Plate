@@ -7,10 +7,12 @@ const artists = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/artists.js
 const riddims = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/riddims.json'), 'utf8'));
 const orders = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/orders.json'), 'utf8'));
 const profile = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/profile.json'), 'utf8'));
+const notifications = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/notifications.json'), 'utf8'));
 
 console.log(`✓ Artists count: ${artists.length}`);
 console.log(`✓ Riddims count: ${riddims.length}`);
 console.log(`✓ Orders count: ${orders.length}`);
+console.log(`✓ Notifications count: ${notifications.length} (${notifications.filter(n => n.unread).length} unread)`);
 console.log(`✓ User Profile Loaded: "${profile.fullName}" (${profile.email}, ${profile.phone})`);
 console.log(`✓ 1. Sound Name / Radio Name: "${profile.soundName}"`);
 console.log(`✓ 2. Crew Members: "${profile.crewMembers}"`);

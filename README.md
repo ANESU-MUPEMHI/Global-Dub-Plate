@@ -59,6 +59,14 @@
     - **Live Artist Studio Slate Preview:** Reactive real-time preview showing how the artist will read and voice the sound system's shout-outs.
     - **1-Click Autofill Integration:** Auto-applies profile defaults and sound system specifications directly into the dubplate order form.
 
+11. **Modern 6-Track Digital Audio Workstation (DAW) & Auto-Hide Mixer:**
+    - **6 Multitrack Synchronized Channels:** TR-808 Riddim, Juno 106 Lead Vocal, Moog Sub 37 Backing/Chants, Korg Minilogue Dub FX, Yamaha DX7 Echo/Reverb, Korg MS1 Clash Drops, plus Master Stereo Buss.
+    - **Arrangement Timeline & Bar Grid:** Bar ruler (1 to 49), real-time vertical playhead scrubber, SMPTE timecode and bar/beat meters.
+    - **Audio Editing Suite:** Selection pointer (`V`), scissors audio slice tool (`C`) with razor-blade splitting, audio fade/gain curve shaper (`E`), and boundary slip/trim (`T`).
+    - **Auto-Hide Mixer Dock:** Smooth auto-collapsing 34px bottom mixer dock that expands on hover or click for full screen timeline real estate, with pinned open toggle.
+    - **Dual LED VU Meters & Faders:** 12-segment dual LED VU meters displaying real-time RMS levels, pan rotary dials, dual delay sends, and long-throw channel faders.
+    - **Slide-out Audio Pool & 24-bit WAV Mixdown:** Dedicated takes drawer with quick audition, track routing, and master bounce export.
+
 ---
 
 ## 🚀 Getting Started

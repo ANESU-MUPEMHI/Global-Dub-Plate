@@ -4,6 +4,7 @@
 let inMemoryOrders = null;
 let inMemoryArtists = null;
 let inMemoryProfile = null;
+let inMemoryNotifications = null;
 
 const GDP_API = {
   async getProfile() {
@@ -250,6 +251,114 @@ const GDP_API = {
         success: true,
         message: `Welcome to Global Dub Plate, ${artistData.name}!`,
         artist: newArtist
+      };
+    }
+  },
+
+  async getNotifications() {
+    try {
+      const res = await fetch('/api/notifications');
+      const json = await res.json();
+      inMemoryNotifications = json.data;
+      return json.data || [];
+    } catch (e) {
+      if (!inMemoryNotifications) inMemoryNotifications = [...(window.DEFAULT_NOTIFICATIONS || [])];
+      return inMemoryNotifications;
+    }
+  },
+
+  async markAllNotificationsRead() {
+    try {
+      const res = await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mark_all_read' })
+      });
+      const json = await res.json();
+      inMemoryNotifications = json.data;
+      return json;
+    } catch (e) {
+      if (!inMemoryNotifications) inMemoryNotifications = [...(window.DEFAULT_NOTIFICATIONS || [])];
+      inMemoryNotifications.forEach(n => { n.unread = false; });
+      return { success: true, data: inMemoryNotifications, unreadCount: 0 };
+    }
+  },
+
+  async markNotificationRead(id) {
+    try {
+      const res = await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mark_read', id })
+      });
+      const json = await res.json();
+      inMemoryNotifications = json.data;
+      return json;
+    } catch (e) {
+      if (!inMemoryNotifications) inMemoryNotifications = [...(window.DEFAULT_NOTIFICATIONS || [])];
+      const notif = inMemoryNotifications.find(n => n.id === id);
+      if (notif) notif.unread = false;
+      return { success: true, data: inMemoryNotifications };
+    }
+  },
+
+  async updateArtist(artistId, updatePayload) {
+    try {
+      const res = await fetch(`/api/artists/${artistId}/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatePayload)
+      });
+      return await res.json();
+    } catch (e) {
+      if (!inMemoryArtists) inMemoryArtists = [...(window.DEFAULT_ARTISTS || [])];
+      const artist = inMemoryArtists.find(a => a.id === artistId);
+      if (artist) {
+        Object.assign(artist, updatePayload);
+        if (updatePayload.pricing) {
+          artist.pricing = { ...artist.pricing, ...updatePayload.pricing };
+        }
+        return { success: true, message: 'Artist updated locally', artist };
+      }
+      return { success: false, message: 'Artist not found' };
+    }
+  },
+
+  async requestArtistPayout(artistId, payoutData) {
+    try {
+      const res = await fetch(`/api/artists/${artistId}/payout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payoutData)
+      });
+      return await res.json();
+    } catch (e) {
+      return {
+        success: true,
+        message: `Payout of $${payoutData.amount} registered via ${payoutData.method}!`,
+        payout: {
+          id: `PAYOUT-${Date.now()}`,
+          artistId,
+          amount: payoutData.amount,
+          payoutMethod: payoutData.method,
+          status: 'processing',
+          createdAt: new Date().toISOString()
+        }
+      };
+    }
+  },
+
+  async sendOrderReminder(orderId) {
+    try {
+      const res = await fetch(`/api/orders/${orderId}/reminder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return await res.json();
+    } catch (e) {
+      return {
+        success: true,
+        message: 'Reminder notification delivered to Sound System profile inbox!'
       };
     }
   }

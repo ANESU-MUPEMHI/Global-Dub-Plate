@@ -216,6 +216,42 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
+      // GET /api/notifications
+      if (pathname === '/api/notifications' && method === 'GET') {
+        const notifications = readJson('notifications.json', []);
+        const unreadCount = notifications.filter(n => n.unread).length;
+        return sendJson(res, 200, { success: true, count: notifications.length, unreadCount, data: notifications });
+      }
+
+      // POST /api/notifications
+      if (pathname === '/api/notifications' && method === 'POST') {
+        const payload = await parseBody(req);
+        const notifications = readJson('notifications.json', []);
+        if (payload.action === 'mark_all_read') {
+          notifications.forEach(n => { n.unread = false; });
+          writeJson('notifications.json', notifications);
+          return sendJson(res, 200, { success: true, message: 'All notifications marked as read', unreadCount: 0, data: notifications });
+        }
+        if (payload.action === 'mark_read' && payload.id) {
+          const item = notifications.find(n => n.id === payload.id);
+          if (item) item.unread = false;
+          writeJson('notifications.json', notifications);
+          const unreadCount = notifications.filter(n => n.unread).length;
+          return sendJson(res, 200, { success: true, unreadCount, data: notifications });
+        }
+        const newNotif = {
+          id: `NOTIF-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          unread: true,
+          icon: payload.icon || '🔔',
+          ...payload
+        };
+        notifications.unshift(newNotif);
+        writeJson('notifications.json', notifications);
+        const unreadCount = notifications.filter(n => n.unread).length;
+        return sendJson(res, 201, { success: true, notification: newNotif, unreadCount, data: notifications });
+      }
+
       if (pathname === '/api/stats' && method === 'GET') {
         const artists = readJson('artists.json', []);
         const orders = readJson('orders.json', []);
@@ -314,6 +350,25 @@ const server = http.createServer(async (req, res) => {
         orders.unshift(newOrder);
         writeJson('orders.json', orders);
 
+        // Auto-create notification in user profile inbox
+        const notifs = readJson('notifications.json', []);
+        notifs.unshift({
+          id: `NOTIF-${Date.now()}`,
+          orderId: newOrder.id,
+          type: 'order_dispatched',
+          title: `🚀 Request Forwarded to ${newOrder.artistName}`,
+          message: `Your ${newOrder.recordingType.toUpperCase()} request for "${newOrder.soundSystem}" has been forwarded to the vocal booth! 25% deposit ($${newOrder.pricing.depositPaid.toFixed(2)}) secured in escrow.`,
+          timestamp: new Date().toISOString(),
+          unread: true,
+          artistName: newOrder.artistName,
+          artistFlag: newOrder.artistFlag || '🇯🇲',
+          recordingType: newOrder.recordingType,
+          depositAmount: newOrder.pricing.depositPaid,
+          balanceAmount: newOrder.pricing.balanceDue,
+          icon: '🚀'
+        });
+        writeJson('notifications.json', notifs);
+
         return sendJson(res, 201, {
           success: true,
           message: '25% Deposit received! Dub plate order dispatched to studio.',
@@ -342,6 +397,25 @@ const server = http.createServer(async (req, res) => {
         orders[orderIndex] = order;
         writeJson('orders.json', orders);
 
+        // Auto-create notification for master unlock
+        const notifs = readJson('notifications.json', []);
+        notifs.unshift({
+          id: `NOTIF-${Date.now()}`,
+          orderId: order.id,
+          type: 'master_unlocked',
+          title: `🏆 Master Audio & Stems Unlocked: ${order.audioTitle}`,
+          message: `100% Full Payment of $${order.pricing.totalFee.toFixed(2)} completed. Full stereo WAV, split-track voice/music stems, and 4K studio video are ready to download!`,
+          timestamp: new Date().toISOString(),
+          unread: true,
+          artistName: order.artistName,
+          artistFlag: order.artistFlag || '🇯🇲',
+          recordingType: order.recordingType,
+          depositAmount: order.pricing.totalFee,
+          balanceAmount: 0,
+          icon: '🏆'
+        });
+        writeJson('notifications.json', notifs);
+
         return sendJson(res, 200, {
           success: true,
           message: 'Full balance paid! Master Dubplate and Stems unlocked.',
@@ -365,10 +439,111 @@ const server = http.createServer(async (req, res) => {
         orders[orderIndex] = order;
         writeJson('orders.json', orders);
 
+        // Auto-create notification in user profile inbox for 25% preview ready
+        const notifs = readJson('notifications.json', []);
+        notifs.unshift({
+          id: `NOTIF-${Date.now()}`,
+          orderId: order.id,
+          type: 'preview_ready',
+          title: `🎵 Dubplate Preview Ready (25% Gate Active): ${order.audioTitle}`,
+          message: `${order.artistName} has voiced and uploaded your cut from ${order.studioName || 'the studio'}! 25% audio preview is now unlocked in your Vault. Pay 75% balance to unlock master WAV, split-track & 4K video.`,
+          timestamp: new Date().toISOString(),
+          unread: true,
+          artistName: order.artistName,
+          artistFlag: order.artistFlag || '🇯🇲',
+          recordingType: order.recordingType,
+          depositAmount: order.pricing.depositPaid,
+          balanceAmount: order.pricing.balanceDue,
+          icon: '🎵'
+        });
+        writeJson('notifications.json', notifs);
+
         return sendJson(res, 200, {
           success: true,
           message: 'Dub plate uploaded! Sound system notified for 25% preview.',
           order
+        });
+      }
+
+      // POST /api/orders/:id/reminder
+      const reminderMatch = pathname.match(/^\/api\/orders\/([a-zA-Z0-9\-_]+)\/reminder$/);
+      if (reminderMatch && method === 'POST') {
+        const orderId = reminderMatch[1];
+        const orders = readJson('orders.json', []);
+        const order = orders.find(o => o.id === orderId);
+        if (!order) {
+          return sendJson(res, 404, { success: false, message: 'Order not found' });
+        }
+        const notifs = readJson('notifications.json', []);
+        notifs.unshift({
+          id: `NOTIF-${Date.now()}`,
+          orderId: order.id,
+          type: 'balance_reminder',
+          title: `🔔 Studio Reminder: ${order.artistName} awaiting balance release`,
+          message: `${order.artistName} is ready to ship your 100% unwatermarked master WAV, split-track & stems for "${order.soundSystem}". Pay remaining $${order.pricing.balanceDue} to release immediately.`,
+          timestamp: new Date().toISOString(),
+          unread: true,
+          artistName: order.artistName,
+          artistFlag: order.artistFlag || '🇯🇲',
+          recordingType: order.recordingType,
+          depositAmount: order.pricing.depositPaid,
+          balanceAmount: order.pricing.balanceDue,
+          icon: '🔔'
+        });
+        writeJson('notifications.json', notifs);
+        return sendJson(res, 200, {
+          success: true,
+          message: `Reminder ping sent to ${order.soundSystem}'s Profile Inbox!`
+        });
+      }
+
+      // POST /api/artists/:id/update
+      const artistUpdateMatch = pathname.match(/^\/api\/artists\/([a-zA-Z0-9\-_]+)\/update$/);
+      if (artistUpdateMatch && method === 'POST') {
+        const artistId = artistUpdateMatch[1];
+        const payload = await parseBody(req);
+        const artists = readJson('artists.json', []);
+        const idx = artists.findIndex(a => a.id === artistId);
+        if (idx === -1) {
+          return sendJson(res, 404, { success: false, message: 'Artist not found' });
+        }
+        artists[idx] = {
+          ...artists[idx],
+          ...payload,
+          pricing: {
+            ...artists[idx].pricing,
+            ...(payload.pricing || {})
+          }
+        };
+        writeJson('artists.json', artists);
+        return sendJson(res, 200, {
+          success: true,
+          message: 'Artist profile & rate card updated successfully!',
+          artist: artists[idx]
+        });
+      }
+
+      // POST /api/artists/:id/payout
+      const payoutMatch = pathname.match(/^\/api\/artists\/([a-zA-Z0-9\-_]+)\/payout$/);
+      if (payoutMatch && method === 'POST') {
+        const artistId = payoutMatch[1];
+        const payload = await parseBody(req);
+        const payouts = readJson('payouts.json', []);
+        const payoutRecord = {
+          id: `PAYOUT-${Date.now()}`,
+          artistId,
+          amount: Number(payload.amount) || 500,
+          payoutMethod: payload.method || 'wire_transfer',
+          accountDetails: payload.accountDetails || 'Default Verified Payout Rail',
+          status: 'processing',
+          createdAt: new Date().toISOString()
+        };
+        payouts.unshift(payoutRecord);
+        writeJson('payouts.json', payouts);
+        return sendJson(res, 201, {
+          success: true,
+          message: `Payout request of $${payoutRecord.amount} dispatched! Funds will settle via ${payoutRecord.payoutMethod}.`,
+          payout: payoutRecord
         });
       }
 
@@ -465,6 +640,28 @@ const server = http.createServer(async (req, res) => {
   serveStaticFile(req, res, pathname);
 });
 
-server.listen(PORT, () => {
-  console.log(`Global Dub Plate server running on port ${PORT}`);
+function startServer(portToTry) {
+  server.listen(portToTry, () => {
+    console.log(`=======================================================`);
+    console.log(`🎶 Global Dub Plate Platform is LIVE on:`);
+    console.log(`👉 http://localhost:${portToTry}`);
+    console.log(`=======================================================`);
+  });
+}
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    const nextPorts = [3333, 8888, 4000, 5000, 8080];
+    const currentPort = server.address() ? server.address().port : PORT;
+    const nextPort = nextPorts.find(p => p > currentPort) || (currentPort + 1);
+    console.log(`⚠️ Port ${currentPort} is currently occupied. Auto-switching to port ${nextPort}...`);
+    setTimeout(() => {
+      startServer(nextPort);
+    }, 200);
+  } else {
+    console.error('Server error:', err);
+  }
 });
+
+const defaultPort = process.env.PORT ? parseInt(process.env.PORT, 10) : 3333;
+startServer(defaultPort);

@@ -161,7 +161,7 @@ body {
   display: inline-block;
   font-size: 0.82rem;
   color: #e2e8f0;
-  animation: marquee 95s linear infinite;
+  animation: marquee 190s linear infinite;
   will-change: transform;
 }
 
@@ -806,6 +806,12 @@ body {
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
+.badge-purple {
+  background-color: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
 /* BOTTOM PLAYER */
 .bottom-player-bar {
   background-color: #0b0f19;
@@ -881,27 +887,109 @@ body {
 .player-buttons-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.65rem;
 }
 
 .play-circle-btn {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  border: none;
-  color: #000;
-  font-size: 1.2rem;
+  border: 2px solid rgba(255, 255, 255, 0.25);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
-  transition: transform 0.15s ease;
+  transition: all 0.2s ease;
+  user-select: none;
+  position: relative;
 }
 
-.play-circle-btn:hover {
+/* STOPPED state - Gold / Amber START */
+.play-circle-btn.is-stopped {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #000;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+}
+
+.play-circle-btn.is-stopped:hover {
   transform: scale(1.08);
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.85);
+}
+
+/* PLAYING state - Vivid Red STOP */
+.play-circle-btn.is-playing {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+  animation: pulse-stop-btn 1.5s infinite;
+}
+
+.play-circle-btn.is-playing:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 26px rgba(239, 68, 68, 0.95);
+}
+
+@keyframes pulse-stop-btn {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 26px rgba(239, 68, 68, 0.95);
+  }
+}
+
+.play-circle-btn .main-symbol {
+  font-size: 1.15rem;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.play-circle-btn .main-label {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+/* Companion START & STOP pill buttons */
+.player-action-btn {
+  background: #111827;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.player-action-btn:hover {
+  background: #1e293b;
+  color: #fff;
+  border-color: var(--border-highlight);
+}
+
+.player-action-btn.btn-start:hover,
+.player-action-btn.btn-start.active {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.player-action-btn.btn-stop:hover,
+.player-action-btn.btn-stop.active {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 
 .player-progress-row {
@@ -1488,6 +1576,171 @@ body {
   flex-shrink: 0;
 }
 
+/* Profile Modal Navigation Tabs */
+.profile-modal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.profile-tab-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.2s ease;
+}
+
+.profile-tab-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: var(--border-highlight);
+}
+
+.profile-tab-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(217, 119, 6, 0.12));
+  border-color: var(--gold-primary);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+}
+
+.tab-badge {
+  background-color: var(--red-jamaica);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+}
+
+/* Nav Inbox Button & Badges */
+.nav-inbox-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nav-notification-badge {
+  background-color: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.38rem;
+  border-radius: 10px;
+  line-height: 1;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  animation: pulse 2s infinite;
+}
+
+.profile-ping-dot {
+  width: 7px;
+  height: 7px;
+  background-color: var(--gold-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--gold-primary);
+  display: inline-block;
+  margin-left: 0.25rem;
+  animation: pulse 2s infinite;
+}
+
+/* Forward Request to Artist Card */
+.forward-request-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 10px;
+  padding: 1.15rem;
+  margin-top: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.forward-fee-strip {
+  margin-top: 0.85rem;
+  padding: 0.6rem 0.85rem;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px dashed rgba(245, 158, 11, 0.3);
+}
+
+/* Profile Inbox List & Cards */
+.profile-inbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.inbox-card {
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.inbox-card:hover {
+  border-color: var(--border-highlight);
+  background: #131c33;
+}
+
+.inbox-card.unread {
+  border-left: 4px solid var(--gold-primary);
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.1) 0%, #0f172a 100%);
+}
+
+.inbox-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.inbox-card-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.inbox-card-time {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.inbox-card-body {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  line-height: 1.45;
+  margin-bottom: 0.5rem;
+}
+
+.inbox-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .profile-section-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -1505,6 +1758,97 @@ body {
   font-size: 0.88rem;
   font-weight: 700;
   color: #fff;
+}
+
+/* 4-Way Mode Toggle for Profile */
+.profile-mode-toggle-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--bg-primary);
+  padding: 0.35rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.profile-mode-toggle-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.6rem 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+}
+
+.profile-mode-toggle-btn:hover {
+  background-color: var(--bg-card);
+  color: #fff;
+  border-color: var(--border-highlight);
+}
+
+.profile-mode-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(217, 119, 6, 0.12));
+  border-color: var(--gold-primary);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);
+}
+
+.profile-mode-toggle-btn .mode-icon {
+  font-size: 1.2rem;
+  margin-bottom: 0.15rem;
+}
+
+.profile-mode-toggle-btn .mode-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.profile-mode-toggle-btn .mode-desc {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.profile-mode-toggle-btn.active .mode-desc {
+  color: var(--gold-primary);
+}
+
+.suggestion-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.suggestion-preset-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.preset-pill-btn {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: var(--gold-primary);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.preset-pill-btn:hover {
+  background: var(--gold-primary);
+  color: #000;
 }
 
 .profile-preview-box {
@@ -1561,3 +1905,1838 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ==========================================================================
+   PORTAL DUAL-ROLE MODE SWITCHER & ARTIST STUDIO STYLES
+   Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+   ========================================================================== */
+
+.portal-role-container {
+  display: flex;
+  align-items: center;
+  margin: 0 0.5rem;
+}
+
+.portal-role-pills {
+  display: inline-flex;
+  background: rgba(10, 15, 29, 0.95);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 30px;
+  padding: 3px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.portal-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 1rem;
+  border-radius: 25px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  text-align: left;
+}
+
+.portal-pill-btn .pill-icon {
+  font-size: 1.15rem;
+}
+
+.portal-pill-btn .pill-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.portal-pill-btn .pill-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #cbd5e1;
+}
+
+.portal-pill-btn .pill-sub {
+  font-size: 0.62rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.portal-pill-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.portal-pill-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%);
+  border: 1px solid var(--gold-primary);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);
+}
+
+.portal-pill-btn.active .pill-title {
+  color: var(--gold-primary);
+}
+
+.portal-pill-btn.active .pill-sub {
+  color: #cbd5e1;
+}
+
+.portal-pill-btn .pill-badge {
+  background: var(--red-clash);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  margin-left: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Operator Banner */
+.studio-operator-banner {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(8, 12, 22, 0.98) 100%);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--gold-primary);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.operator-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.operator-avatar-box {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 2px solid var(--gold-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  position: relative;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
+}
+
+.operator-avatar-box .flag-chip {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  font-size: 1.1rem;
+}
+
+.operator-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.2rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.operator-info p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.operator-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.status-toggle-pills {
+  display: inline-flex;
+  background: #090d16;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 2px;
+}
+
+.status-pill-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-pill-btn.active.live {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.status-pill-btn.active.session {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--gold-primary);
+  border: 1px solid var(--gold-primary);
+}
+
+.status-pill-btn.active.offline {
+  background: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  border: 1px solid #64748b;
+}
+
+/* Teleprompter Monitor Console */
+.teleprompter-monitor {
+  background: #020408;
+  border: 2px solid #1e293b;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.teleprompter-header-bar {
+  background: #080d18;
+  border-bottom: 1px solid #1e293b;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.prompter-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prompter-body-screen {
+  padding: 2rem 2.5rem;
+  color: #f8fafc;
+  font-family: system-ui, -apple-system, sans-serif;
+  position: relative;
+  background: radial-gradient(circle at center, #090f1d 0%, #020408 100%);
+}
+
+.prompter-target-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold-primary);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.prompter-sound-name {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+  letter-spacing: 0.03em;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.prompter-grid-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.prompter-field-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+.prompter-field-label {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.35rem;
+  font-weight: 700;
+}
+
+.prompter-field-value {
+  font-size: 0.95rem;
+  color: #f1f5f9;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.prompter-lyrics-box {
+  background: rgba(0, 0, 0, 0.65);
+  border: 2px dashed rgba(245, 158, 11, 0.45);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.25rem 0;
+  position: relative;
+}
+
+.prompter-lyrics-title {
+  font-size: 0.78rem;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.prompter-lyrics-text {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #fef08a;
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* Metronome Rhythm Console */
+.metronome-strip {
+  background: #0a0f1d;
+  border-top: 1px solid #1e293b;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.metronome-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.metronome-beats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.metronome-beat-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 2px solid #334155;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.1s ease;
+}
+
+.metronome-beat-dot.active {
+  background: var(--gold-primary);
+  border-color: #fff;
+  color: #000;
+  box-shadow: 0 0 12px var(--gold-primary);
+  transform: scale(1.15);
+}
+
+.metronome-beat-dot.downbeat.active {
+  background: var(--red-clash);
+  box-shadow: 0 0 14px var(--red-clash);
+}
+
+/* Studio Recording Voicing Station */
+.booth-voicing-station {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.vu-meter-card {
+  background: #020408;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.vu-meter-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.vu-meter-bars {
+  display: flex;
+  gap: 3px;
+  height: 24px;
+  align-items: flex-end;
+  background: #0b1120;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.vu-bar {
+  flex: 1;
+  background: #1e293b;
+  height: 20%;
+  border-radius: 2px;
+  transition: height 0.08s ease;
+}
+
+.vu-bar.green { background: #10b981; }
+.vu-bar.yellow { background: #f59e0b; }
+.vu-bar.red { background: #ef4444; }
+
+.video-slate-card {
+  background: radial-gradient(circle at center, #1e293b 0%, #030712 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.video-slate-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.video-slate-indicator .rec-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  animation: pulse 1s infinite;
+}
+
+/* Escrow Financial Cards */
+.escrow-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.escrow-metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.escrow-metric-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.escrow-metric-card.accent-gold {
+  border-top: 3px solid var(--gold-primary);
+}
+
+.escrow-metric-card.accent-green {
+  border-top: 3px solid var(--green-reggae);
+}
+
+.escrow-metric-card.accent-blue {
+  border-top: 3px solid #3b82f6;
+}
+
+.escrow-metric-label {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.escrow-metric-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: var(--font-mono);
+}
+
+.escrow-metric-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Payout Rails Grid */
+.payout-rails-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.5rem 0;
+}
+
+.payout-rail-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.payout-rail-card:hover, .payout-rail-card.selected {
+  border-color: var(--gold-primary);
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.payout-rail-card.selected::after {
+  content: "✓";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--gold-primary);
+  font-weight: 900;
+  font-size: 0.85rem;
+}
+
+/* Rate Card Inputs Grid */
+.rate-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.rate-card-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.rate-card-item label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+.rate-card-item input {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold-primary);
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   GLOBAL DUB PLATE PROFESSIONAL MULTITRACK DAW STYLES
+   Modeled after Modern Timeline Arranger & Auto-Hide Mixer Console
+   Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+   ========================================================================== */
+
+.daw-workstation-chassis {
+  background: #11141c;
+  border: 1px solid #1f2533;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #f1f5f9;
+}
+
+/* 1. TOP DAW WINDOW & MENU BAR */
+.daw-window-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #181c26;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid #232a3b;
+  user-select: none;
+}
+
+.daw-window-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.daw-traffic-lights {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.daw-traffic-lights .light {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.daw-traffic-lights .light.red { background: #ff5f56; border: 1px solid #e0443e; }
+.daw-traffic-lights .light.yellow { background: #ffbd2e; border: 1px solid #dea123; }
+.daw-traffic-lights .light.green { background: #27c93f; border: 1px solid #1aab29; }
+
+.daw-menu-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.daw-menu-nav .menu-item {
+  cursor: pointer;
+  padding: 0.15rem 0.3rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.daw-menu-nav .menu-item:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.daw-menu-nav .menu-item.active {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.daw-window-center {
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  letter-spacing: 0.02em;
+}
+
+.daw-window-center strong {
+  color: #f59e0b;
+}
+
+.daw-window-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.daw-dsp-gauge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-family: var(--font-mono, monospace);
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.daw-dsp-gauge .dsp-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  animation: pulse-dsp 1.6s infinite ease-in-out;
+}
+
+@keyframes pulse-dsp {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+.daw-audio-badge {
+  font-size: 0.68rem;
+  font-family: var(--font-mono, monospace);
+  color: #94a3b8;
+  background: #11141c;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #232a3b;
+}
+
+/* 2. TOP TRANSPORT & EDITING TOOLBAR */
+.daw-transport-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: #151923;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #232a3b;
+}
+
+.daw-tools-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.daw-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #0d1017;
+  border: 1px solid #232a3b;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+}
+
+.daw-search-box .search-icon {
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.daw-search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f1f5f9;
+  font-size: 0.72rem;
+  width: 170px;
+}
+
+.daw-search-box input::placeholder {
+  color: #64748b;
+}
+
+.daw-edit-tools-group {
+  display: flex;
+  background: #0d1017;
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid #232a3b;
+  gap: 2px;
+}
+
+.daw-edit-tools-group .tool-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.3rem 0.55rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.15s ease;
+}
+
+.daw-edit-tools-group .tool-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.daw-edit-tools-group .tool-btn.active {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+}
+
+/* Musical Meter, BPM & Transport Center */
+.daw-transport-center {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.daw-metric-box {
+  background: #0d1017;
+  border: 1px solid #232a3b;
+  padding: 0.25rem 0.55rem;
+  border-radius: 5px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: #f1f5f9;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.daw-metric-box .metric-sub {
+  font-size: 0.6rem;
+  color: #64748b;
+}
+
+.daw-bpm-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #0d1017;
+  border: 1px solid #232a3b;
+  border-radius: 5px;
+  padding: 0.2rem 0.45rem;
+}
+
+.daw-bpm-box .bpm-input {
+  width: 44px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f59e0b;
+  font-weight: 800;
+  font-size: 0.85rem;
+  font-family: var(--font-mono, monospace);
+  text-align: center;
+}
+
+.daw-bpm-box .bpm-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.daw-bpm-box .btn-tap-tempo {
+  background: #1f2533;
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.daw-bpm-box .btn-tap-tempo:active {
+  background: #f59e0b;
+  color: #000;
+}
+
+.daw-transport-buttons {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: #0d1017;
+  padding: 3px;
+  border-radius: 6px;
+  border: 1px solid #232a3b;
+}
+
+.daw-tr-btn {
+  background: #161a24;
+  border: 1px solid #232a3b;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  width: 30px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.daw-tr-btn:hover {
+  background: #232a3b;
+  color: #fff;
+}
+
+.daw-tr-play:hover,
+.daw-tr-play.active {
+  background: #10b981;
+  color: #000;
+  font-weight: 900;
+  border-color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.daw-tr-stop:hover,
+.daw-tr-stop.active {
+  background: #334155;
+  color: #fff;
+}
+
+.daw-tr-rec .rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.daw-tr-rec.active .rec-dot {
+  animation: pulse-rec 0.8s infinite;
+}
+
+@keyframes pulse-rec {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 4px #ef4444; }
+  50% { transform: scale(1.35); box-shadow: 0 0 12px #ef4444; }
+}
+
+.daw-time-display-box {
+  background: #090b10;
+  border: 1px solid #232a3b;
+  border-radius: 6px;
+  padding: 0.2rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-mono, monospace);
+  min-width: 85px;
+}
+
+.daw-time-display-box .time-main {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #f8fafc;
+  letter-spacing: 0.04em;
+}
+
+.daw-time-display-box .time-sub {
+  font-size: 0.58rem;
+  color: #64748b;
+  font-weight: 700;
+}
+
+/* Right DAW Actions Cluster */
+.daw-actions-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-daw-action {
+  background: #181d29;
+  border: 1px solid #232a3b;
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.btn-daw-action:hover {
+  background: #232a3b;
+  color: #fff;
+  border-color: #3b82f6;
+}
+
+.btn-daw-action.autohide-active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+/* 3. MAIN WORK AREA: TIMELINE ARRANGEMENT VIEW & TRACKS */
+.daw-main-arrangement-view {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  position: relative;
+  background: #0d1017;
+  overflow: hidden;
+  min-height: 440px;
+}
+
+/* Track Header Left Column */
+.daw-tracks-header-col {
+  background: #11141c;
+  border-right: 2px solid #1f2533;
+  z-index: 5;
+}
+
+.track-header-col-top {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  background: #151924;
+  border-bottom: 1px solid #1f2533;
+}
+
+.track-type-pills {
+  display: flex;
+  gap: 4px;
+}
+
+.track-type-pills .type-pill {
+  font-size: 0.64rem;
+  color: #64748b;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.track-type-pills .type-pill.active {
+  background: #1f2533;
+  color: #f1f5f9;
+}
+
+/* Track Header Rows */
+.daw-track-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-bottom: 1px solid #1c212e;
+  padding: 0 0.5rem 0 0;
+  background: #131722;
+  transition: background 0.15s;
+}
+
+.daw-track-header:hover {
+  background: #161b29;
+}
+
+.daw-track-header.trk-blue .trk-hdr-color-strip { background: #3b82f6; }
+.daw-track-header.trk-purple .trk-hdr-color-strip { background: #8b5cf6; }
+.daw-track-header.trk-green .trk-hdr-color-strip { background: #10b981; }
+.daw-track-header.trk-magenta .trk-hdr-color-strip { background: #ec4899; }
+.daw-track-header.trk-cyan .trk-hdr-color-strip { background: #06b6d4; }
+.daw-track-header.trk-pink .trk-hdr-color-strip { background: #f43f5e; }
+.daw-track-header.trk-master .trk-hdr-color-strip.master-strip { background: #f59e0b; }
+
+.trk-hdr-color-strip {
+  width: 5px;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.trk-hdr-info {
+  flex: 1;
+  padding: 0 0.5rem;
+  overflow: hidden;
+}
+
+.trk-hdr-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trk-hdr-num {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #94a3b8;
+  font-family: var(--font-mono, monospace);
+}
+
+.trk-hdr-name {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trk-hdr-meta {
+  font-size: 0.62rem;
+  color: #64748b;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trk-hdr-controls {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.trk-hdr-controls .trk-btn {
+  width: 19px;
+  height: 19px;
+  border-radius: 3px;
+  border: 1px solid #232a3b;
+  background: #181d29;
+  color: #94a3b8;
+  font-size: 0.58rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.trk-hdr-controls .trk-btn:hover {
+  background: #232a3b;
+  color: #fff;
+}
+
+.trk-hdr-controls .btn-trk-rec.active {
+  background: #dc2626;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+.trk-hdr-controls .btn-trk-solo.active {
+  background: #eab308;
+  color: #000;
+  border-color: #facc15;
+}
+
+.trk-hdr-controls .btn-trk-mute.active {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #60a5fa;
+}
+
+/* Timeline Arrangement Grid (Right Column) */
+.daw-timeline-col {
+  position: relative;
+  overflow-x: auto;
+  background: #0b0e15;
+  cursor: default;
+}
+
+/* Timeline Ruler Header */
+.daw-timeline-ruler {
+  height: 28px;
+  background: #131722;
+  border-bottom: 1px solid #1f2533;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  min-width: 900px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ruler-bar-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #2a3346;
+  padding-left: 4px;
+  font-size: 0.65rem;
+  color: #64748b;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+
+/* Playhead Scrubber Line */
+.daw-playhead-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.95);
+  z-index: 25;
+  pointer-events: none;
+  transition: left 0.04s linear;
+}
+
+.daw-playhead-line .playhead-cap {
+  width: 11px;
+  height: 14px;
+  background: #ffffff;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  margin-left: -5px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+}
+
+/* Scissors Cut Line Overlay */
+.daw-scissors-cut-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  border-left: 2px dashed #ef4444;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.scissors-cursor-tag {
+  position: absolute;
+  top: 6px;
+  left: 4px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* Track Arrangement Lanes */
+.daw-track-lane {
+  height: 64px;
+  position: relative;
+  border-bottom: 1px solid #181d29;
+  min-width: 900px;
+}
+
+.timeline-lane-grid {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(to right, transparent, transparent 8.33%, rgba(255, 255, 255, 0.025) 8.33%, rgba(255, 255, 255, 0.025) 8.43%);
+  pointer-events: none;
+}
+
+/* Clip Blocks on the Timeline */
+.daw-clip-block {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3px 5px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.daw-clip-block:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.6);
+}
+
+.daw-clip-block.selected {
+  outline: 2px solid #fff;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+}
+
+/* Clip Color Variants (Modeled after reference image) */
+.daw-clip-block.clip-blue {
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  border: 1px solid #60a5fa;
+}
+
+.daw-clip-block.clip-purple {
+  background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%);
+  border: 1px solid #a78bfa;
+}
+
+.daw-clip-block.clip-green {
+  background: linear-gradient(180deg, #10b981 0%, #047857 100%);
+  border: 1px solid #34d399;
+}
+
+.daw-clip-block.clip-magenta {
+  background: linear-gradient(180deg, #ec4899 0%, #be185d 100%);
+  border: 1px solid #f472b6;
+}
+
+.daw-clip-block.clip-purple-bright {
+  background: linear-gradient(180deg, #9333ea 0%, #7e22ce 100%);
+  border: 1px solid #c084fc;
+}
+
+.daw-clip-block.clip-pink {
+  background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
+  border: 1px solid #fb7185;
+}
+
+.clip-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.clip-top-bar .clip-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.clip-top-bar .clip-time {
+  font-size: 0.55rem;
+  opacity: 0.8;
+  font-family: var(--font-mono, monospace);
+}
+
+.clip-waveform-svg {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.clip-waveform-svg .clip-wave {
+  width: 100%;
+  height: 28px;
+}
+
+/* Audio Curves & Trim Handles on Clip */
+.clip-curve-handle {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0,0,0,0.8);
+  z-index: 5;
+  transition: transform 0.15s ease;
+}
+
+.clip-curve-handle:hover {
+  transform: scale(1.4);
+  background: #38bdf8;
+}
+
+.clip-curve-handle.curve-in { left: 0; }
+.clip-curve-handle.curve-out { right: 0; }
+
+.clip-trim-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: ew-resize;
+  background: transparent;
+  z-index: 4;
+}
+
+.clip-trim-handle:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.clip-trim-handle.trim-left { left: 0; }
+.clip-trim-handle.trim-right { right: 0; }
+
+/* 4. SLIDE-OUT AUDIO POOL & PLAYLIST DRAWER */
+.daw-playlist-drawer {
+  position: absolute;
+  top: 85px;
+  right: 0;
+  width: 320px;
+  bottom: 0;
+  background: #11141c;
+  border-left: 2px solid #232a3b;
+  z-index: 50;
+  box-shadow: -8px 0 25px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+}
+
+.daw-playlist-drawer .drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #161922;
+  border-bottom: 1px solid #232a3b;
+}
+
+.daw-playlist-drawer .drawer-header h4 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.daw-playlist-drawer .btn-close-drawer {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.daw-playlist-drawer .drawer-clips-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.drawer-clip-card {
+  background: #181d2a;
+  border: 1px solid #283144;
+  border-radius: 6px;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: border-color 0.15s ease;
+}
+
+.drawer-clip-card:hover {
+  border-color: #3b82f6;
+}
+
+.drawer-clip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+}
+
+.drawer-clip-title {
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.drawer-clip-meta {
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+.drawer-clip-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.btn-group-mini {
+  display: flex;
+  gap: 2px;
+}
+
+.btn-mini-trk {
+  background: #242c3d;
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.btn-mini-trk:hover, .btn-mini-trk.loaded {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #60a5fa;
+}
+
+/* 5. BOTTOM DOCK: MIXER CONSOLE WITH AUTO-HIDE */
+.daw-mixer-dock {
+  background: #0d1017;
+  border-top: 2px solid #1f2533;
+  box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.7);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 40;
+}
+
+/* AUTO-HIDE MODE BEHAVIOR */
+.daw-mixer-dock.autohide-mode {
+  position: sticky;
+  bottom: 0;
+  transform: translateY(calc(100% - 34px));
+}
+
+.daw-mixer-dock.autohide-mode:hover,
+.daw-mixer-dock.autohide-mode.expanded {
+  transform: translateY(0);
+  box-shadow: 0 -12px 35px rgba(0, 0, 0, 0.95);
+}
+
+.daw-mixer-dock.pinned-mode {
+  transform: translateY(0) !important;
+  position: relative;
+}
+
+/* Mixer Handle Bar */
+.mixer-dock-handle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #161922;
+  border-bottom: 1px solid #232a3b;
+  padding: 0.35rem 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dock-handle-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dock-handle-icon {
+  font-size: 0.85rem;
+}
+
+.dock-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  letter-spacing: 0.05em;
+}
+
+.dock-hint {
+  font-size: 0.65rem;
+  color: #64748b;
+  font-family: var(--font-mono, monospace);
+}
+
+.dock-handle-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.autohide-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  color: #cbd5e1;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.autohide-checkbox-label input {
+  accent-color: #3b82f6;
+}
+
+.btn-dock-toggle {
+  background: #1f2533;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Mixer Channel Strips Chassis (Modeled after screenshot) */
+.mixer-strips-chassis {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr) 1.25fr;
+  gap: 6px;
+  padding: 0.65rem 1rem;
+  background: #0c0f16;
+  overflow-x: auto;
+}
+
+.daw-channel-strip {
+  background: #141722;
+  border: 1px solid #202738;
+  border-radius: 6px;
+  padding: 0.5rem 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 105px;
+  transition: border-color 0.15s ease;
+}
+
+.daw-channel-strip:hover {
+  border-color: #334155;
+}
+
+.ch-strip-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #cbd5e1;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #1c2230;
+}
+
+.ch-strip-top .ch-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ch-strip-top .ch-insert-dropdown {
+  font-size: 0.55rem;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.ch-pan-send-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 2px;
+}
+
+.ch-rotary-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.rotary-label {
+  font-size: 0.52rem;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.rotary-dial {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #1c2230;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+/* Fader & Dual LED Meter Body */
+.ch-meter-fader-body {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  height: 110px;
+  background: #0b0d14;
+  border-radius: 4px;
+  padding: 4px;
+  border: 1px solid #1c2230;
+}
+
+.daw-vu-meter-column {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  height: 100%;
+}
+
+.meter-scale-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  color: #64748b;
+  line-height: 1;
+  height: 100%;
+}
+
+.dual-led-bar {
+  display: flex;
+  gap: 2px;
+  height: 100%;
+  width: 14px;
+  background: #05070a;
+  border-radius: 2px;
+  padding: 1px;
+}
+
+.dual-led-bar.master-dual {
+  width: 18px;
+}
+
+.led-col {
+  flex: 1;
+  background: #090d16;
+  border-radius: 1px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1.5px;
+  padding: 1px;
+}
+
+.daw-led-seg {
+  width: 100%;
+  height: 5px;
+  border-radius: 1px;
+  background: #182234;
+  opacity: 0.35;
+  transition: opacity 0.05s ease;
+}
+
+.daw-led-seg.lit.green {
+  background: #10b981;
+  opacity: 1;
+  box-shadow: 0 0 3px #10b981;
+}
+
+.daw-led-seg.lit.yellow {
+  background: #f59e0b;
+  opacity: 1;
+  box-shadow: 0 0 4px #f59e0b;
+}
+
+.daw-led-seg.lit.red {
+  background: #ef4444;
+  opacity: 1;
+  box-shadow: 0 0 6px #ef4444;
+}
+
+.ch-fader-track {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.daw-vertical-fader {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: slider-vertical;
+  height: 100px;
+  width: 16px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.daw-vertical-fader.master-fader {
+  accent-color: #f59e0b;
+}
+
+/* Strip Buttons Row: FX, S, M, R */
+.ch-strip-btns-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.mix-btn {
+  flex: 1;
+  height: 18px;
+  border: 1px solid #232a3b;
+  background: #1a1f2c;
+  color: #94a3b8;
+  font-size: 0.58rem;
+  font-weight: 800;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+}
+
+.mix-btn:hover {
+  background: #232a3b;
+  color: #fff;
+}
+
+.mix-btn.btn-r.active {
+  background: #dc2626;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+.mix-btn.btn-s.active {
+  background: #eab308;
+  color: #000;
+  border-color: #facc15;
+}
+
+.mix-btn.btn-m.active {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #60a5fa;
+}
+
+.master-pan-row {
+  justify-content: center;
+  align-items: center;
+  height: 26px;
+}
+
+.master-bus-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #f59e0b;
+  text-transform: uppercase;
+}
+
+.master-btns-row {
+  justify-content: center;
+}
+
+.master-readout {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #f59e0b;
+  text-align: center;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .daw-main-arrangement-view {
+    grid-template-columns: 180px 1fr;
+  }
+  .mixer-strips-chassis {
+    grid-template-columns: repeat(3, 1fr) 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .daw-main-arrangement-view {
+    grid-template-columns: 140px 1fr;
+  }
+}
+

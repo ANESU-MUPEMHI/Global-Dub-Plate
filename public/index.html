@@ -23,8 +23,29 @@
         </div>
       </div>
 
-      <!-- Stats Pill -->
-      <div class="header-stats">
+      <!-- Portal Role Mode Switcher (Sound System ⇄ Artist Studio) -->
+      <div class="portal-role-container">
+        <div class="portal-role-pills" id="portal-role-switcher" role="tablist" aria-label="Select Portal Operating Mode">
+          <button type="button" class="portal-pill-btn active" id="btn-role-selector" data-role="sound_system" title="Sound System / Selector Marketplace & Vault">
+            <span class="pill-icon">🔊</span>
+            <span class="pill-text-wrap">
+              <span class="pill-title">Sound System Portal</span>
+              <span class="pill-sub">Selector Desk & Vault</span>
+            </span>
+          </button>
+          <button type="button" class="portal-pill-btn" id="btn-role-artist" data-role="artist" title="Artist Vocal Booth & Escrow Desk">
+            <span class="pill-icon">🎙️</span>
+            <span class="pill-text-wrap">
+              <span class="pill-title">Artist Studio Portal</span>
+              <span class="pill-sub">Vocal Booth & Escrow</span>
+            </span>
+            <span class="pill-badge pulse" id="header-artist-queue-badge">1</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Pill: Sound System Portal -->
+      <div class="header-stats" id="stats-sound-system">
         <div class="header-stat-item">
           <span class="pulse-dot"></span>
           <span class="stat-num" id="stat-live-artists">7</span>
@@ -40,11 +61,34 @@
         </div>
       </div>
 
+      <!-- Stats Pill: Artist Studio Portal -->
+      <div class="header-stats" id="stats-artist-studio" style="display: none;">
+        <div class="header-stat-item">
+          <span class="pulse-dot" style="background: var(--gold-primary); box-shadow: 0 0 8px var(--gold-primary);"></span>
+          <span class="stat-num" id="stat-artist-holding" style="color: var(--gold-primary);">$1,120</span>
+          <span class="stat-lbl">25% In Escrow</span>
+        </div>
+        <div class="header-stat-item">
+          <span class="stat-num" id="stat-artist-cleared" style="color: #10b981;">$4,850</span>
+          <span class="stat-lbl">Cleared Earnings</span>
+        </div>
+        <div class="header-stat-item">
+          <span class="stat-num" id="stat-artist-pending" style="color: #f87171;">2 Cuts</span>
+          <span class="stat-lbl">Pending Mic</span>
+        </div>
+      </div>
+
       <!-- Navigation Actions -->
       <div class="nav-actions">
-        <button class="btn btn-gold btn-sm" id="btn-nav-profile" title="View & Edit Sound System Profile">
+        <button class="btn btn-outline btn-sm nav-inbox-btn" id="btn-nav-inbox" title="Profile Inbox & Studio Notifications">
+          <span class="nav-inbox-icon">🔔</span>
+          <span class="nav-inbox-label">Inbox</span>
+          <span class="nav-notification-badge" id="nav-inbox-count">2</span>
+        </button>
+        <button class="btn btn-gold btn-sm" id="btn-nav-profile" title="View & Edit My Request / Sound Profile">
           <span class="user-avatar-dot"></span>
           <span id="nav-user-label">👤 Selector Profile</span>
+          <span class="profile-ping-dot" id="nav-profile-dot"></span>
         </button>
         <button class="btn btn-outline btn-sm" id="btn-nav-register">
           <i class="icon-mic"></i> Artist Roster Sign-Up
@@ -61,19 +105,38 @@
   <!-- MAIN APP CONTAINER -->
   <main class="app-container">
 
-    <!-- TABS NAVIGATION -->
-    <nav class="tabs-navigation">
+    <!-- TABS NAVIGATION: SOUND SYSTEM PORTAL -->
+    <nav class="tabs-navigation" id="tabs-sound-system">
       <button class="tab-btn active" data-tab="roster">
         <span class="pulse-dot" style="width: 6px; height: 6px;"></span> Live Artist Roster & Sessions
       </button>
       <button class="tab-btn" data-tab="vault">
         🎛️ Sound System Dubplate Vault & Player
       </button>
-      <button class="tab-btn" data-tab="artist-studio">
-        🎙️ Artist / Studio Recording Desk
+      <button class="tab-btn" data-tab="artist-recorder">
+        🎚️ 4-Track Dubplate Studio Recorder
       </button>
       <button class="tab-btn" data-tab="clash-guide">
         📖 Sound Clash Culture & Dubplate Guide
+      </button>
+    </nav>
+
+    <!-- TABS NAVIGATION: ARTIST STUDIO PORTAL -->
+    <nav class="tabs-navigation" id="tabs-artist-studio" style="display: none;">
+      <button class="tab-btn active" data-tab="artist-booth">
+        🎙️ Live Vocal Booth & Teleprompter
+      </button>
+      <button class="tab-btn" data-tab="artist-recorder">
+        🎚️ 4-Track Dubplate Studio Recorder
+      </button>
+      <button class="tab-btn" data-tab="artist-queue">
+        📋 Clash Orders & Voicing Queue <span class="tab-badge" id="artist-queue-tab-badge">1</span>
+      </button>
+      <button class="tab-btn" data-tab="artist-escrow">
+        💰 Escrow Earnings & Payout Terminal
+      </button>
+      <button class="tab-btn" data-tab="artist-rates">
+        ⚙️ Rate Card & Studio Availability
       </button>
     </nav>
 
@@ -147,11 +210,1260 @@
       </div>
     </section>
 
-    <!-- TAB 3: ARTIST STUDIO CONSOLE -->
-    <section class="tab-pane" id="tab-pane-artist-studio">
-      <div id="artist-studio-content">
+    <!-- =========================================================================
+         ARTIST STUDIO PORTAL PANES (Created by Adrian Anesu Mupemhi)
+         ========================================================================= -->
+
+    <!-- ARTIST PANE 1: VOCAL BOOTH & TELEPROMPTER -->
+    <section class="tab-pane" id="tab-pane-artist-booth">
+      <!-- Operator Banner -->
+      <div class="studio-operator-banner">
+        <div class="operator-left">
+          <div class="operator-avatar-box">
+            <span id="booth-operator-avatar">🎙️</span>
+            <span class="flag-chip" id="booth-operator-flag">🇯🇲</span>
+          </div>
+          <div class="operator-info">
+            <h3 id="booth-operator-name">
+              <span>Capleton (The Fireman)</span>
+              <span class="badge badge-warning" id="booth-facility-badge" style="font-size: 0.68rem;">David House Productions</span>
+            </h3>
+            <p id="booth-operator-subtitle">
+              Kingston, Jamaica • Live Direct Sound Clash Special Desk
+            </p>
+          </div>
+        </div>
+
+        <div class="operator-controls">
+          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <span style="font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Operating Booth As:</span>
+            <select id="booth-artist-select" class="form-control" style="font-size: 0.82rem; padding: 0.35rem 0.75rem; border-color: var(--gold-primary); min-width: 220px;">
+              <!-- Dynamically populated with all artists -->
+            </select>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <span style="font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Booth Studio Status:</span>
+            <div class="status-toggle-pills" id="booth-status-toggle">
+              <button type="button" class="status-pill-btn active live" data-status="in_studio">🔴 Live in Studio</button>
+              <button type="button" class="status-pill-btn session" data-status="in_session">🟡 In Dub Session</button>
+              <button type="button" class="status-pill-btn offline" data-status="offline">⚫ Offline</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Clash Order Selector for Teleprompter -->
+      <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <span style="font-size: 0.82rem; color: #cbd5e1; font-weight: 700;">🎯 Select Order to Voice in Vocal Booth:</span>
+          <select id="booth-target-order-select" class="form-control" style="width: auto; min-width: 340px; font-size: 0.82rem; border-color: var(--gold-primary);">
+            <!-- Populated with pending orders -->
+          </select>
+        </div>
+        <div style="font-size: 0.78rem; color: var(--gold-primary);" id="booth-order-deposit-status">
+          🔒 25% Deposit Held in Escrow: <strong>$280.00</strong>
+        </div>
+      </div>
+
+      <!-- High-Contrast Teleprompter Screen -->
+      <div class="teleprompter-monitor">
+        <div class="teleprompter-header-bar">
+          <div class="prompter-badge-group">
+            <span class="badge badge-warning" id="prompter-order-type">🎵 DUB PLATE SPECIAL</span>
+            <span class="badge badge-info" id="prompter-order-id">GDP-8821</span>
+            <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd;" id="prompter-format">Split Track (L: Vocal / R: Riddim)</span>
+          </div>
+          <div style="font-size: 0.8rem; color: #94a3b8;">
+            Anthem: <strong style="color: #fff;" id="prompter-song-title">Slew Dem</strong> • Riddim: <strong style="color: var(--gold-primary);" id="prompter-riddim-name">Stalag 17</strong>
+          </div>
+        </div>
+
+        <div class="prompter-body-screen">
+          <div class="prompter-target-title">
+            <span>🔊 Target Sound System & Radio Identity (Voice Exactly As Written)</span>
+          </div>
+          <div class="prompter-sound-name" id="prompter-sound-name">
+            JAHVISIONS INTERNATIONAL SOUND
+          </div>
+
+          <div class="prompter-grid-details">
+            <div class="prompter-field-card">
+              <div class="prompter-field-label">🎤 Crew Members & Selectors to Big Up:</div>
+              <div class="prompter-field-value" id="prompter-crew-members">Selector Adrian, MC Fireseed, DJ Benjamin, Terence Dub Operator</div>
+            </div>
+            <div class="prompter-field-card">
+              <div class="prompter-field-label">🌍 Territories & Cities to Represent:</div>
+              <div class="prompter-field-value" id="prompter-areas">Johannesburg, Kensington, Harare, Kingston, Brixton, Tokyo</div>
+            </div>
+            <div class="prompter-field-card" style="grid-column: 1 / -1;">
+              <div class="prompter-field-label">⚡ Official Sound Slogan / Trademark Catchphrase:</div>
+              <div class="prompter-field-value" id="prompter-tagline">"The Undisputed Dubplate Champions • Pure Reggae & Dancehall Pressure"</div>
+            </div>
+          </div>
+
+          <div class="prompter-lyrics-box">
+            <div class="prompter-lyrics-title">
+              <span>🔥 Custom Sound Clash Lyrics & Booth Instructions:</span>
+            </div>
+            <div class="prompter-lyrics-text" id="prompter-custom-lyrics">
+              "Big up Jahvisions International Sound! Representing Johannesburg, Kensington, Harare, Kingston, Brixton, Tokyo! Shouting out Selector Adrian, MC Fireseed, DJ Benjamin, Terence Dub Operator! Kill any rival sound system! State that Jahvisions rules the arena from Johannesburg to Kingston. Add heavy dub delay on the chorus hook."
+            </div>
+          </div>
+        </div>
+
+        <!-- Metronome Rhythm Console -->
+        <div class="metronome-strip">
+          <div class="metronome-left">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1;">⏱️ Riddim Tempo:</span>
+              <span class="badge badge-warning" id="prompter-bpm" style="font-size: 0.85rem; font-family: var(--font-mono);">82 BPM</span>
+            </div>
+
+            <div class="metronome-beats" id="metronome-beats-container">
+              <div class="metronome-beat-dot downbeat" data-beat="1">1</div>
+              <div class="metronome-beat-dot" data-beat="2">2</div>
+              <div class="metronome-beat-dot" data-beat="3">3</div>
+              <div class="metronome-beat-dot" data-beat="4">4</div>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-outline btn-sm" id="btn-prompter-metronome" style="font-weight: 700;">
+            <span id="metronome-btn-icon">▶</span> <span id="metronome-btn-text">Start 4-Beat Count-In Click</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Studio Recording Voicing Station -->
+      <div class="booth-voicing-station">
+        <!-- Live Mic VU Meter -->
+        <div class="vu-meter-card">
+          <div class="vu-meter-header">
+            <span>🎙️ Shure SM7B Vocal Booth Mic Input</span>
+            <span style="color: #10b981;" id="vu-meter-status">● Live Signal Active (-12 dB)</span>
+          </div>
+          <div class="vu-meter-bars" id="vu-meter-display">
+            <!-- 16 segments from green to red -->
+          </div>
+          <p style="font-size: 0.72rem; color: #64748b; margin: 0.5rem 0 0 0;">
+            Studio compressor and vocal plate reverb locked to sound clash preset.
+          </p>
+        </div>
+
+        <!-- Studio Slate & Voicing Action -->
+        <div class="video-slate-card">
+          <div class="video-slate-indicator">
+            <span class="rec-dot"></span> 4K REC READY
+          </div>
+          <div style="font-size: 2.2rem; margin-bottom: 0.25rem;">🎬</div>
+          <h4 style="margin: 0 0 0.25rem 0; font-size: 0.95rem; color: #fff;">In-Studio Slate Cam</h4>
+          <p style="font-size: 0.72rem; color: var(--gold-primary); margin: 0 0 0.75rem 0;" id="booth-slate-text">
+            "Jahvisions International Sound • Dubplate Take 1"
+          </p>
+          <button type="button" class="btn btn-gold btn-block" id="btn-booth-voice-now" style="padding: 0.75rem; font-weight: 800; font-size: 0.95rem; box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);">
+            🎙️ Record & Voice Cut (Upload 25% Preview Gate)
+          </button>
+          <button type="button" class="btn btn-outline btn-block btn-sm" id="btn-open-4track-from-booth" style="margin-top: 0.5rem; font-weight: 700;">
+            🎚️ Open 4-Track Dub Recorder & Mixer Console
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         MINI FOUR TRACK DUB RECORDER & MULTITRACK MIXER CONSOLE
+         Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+         ========================================================================= -->
+    <section class="tab-pane" id="tab-pane-artist-recorder">
+      <div class="daw-workstation-chassis">
+        
+        <!-- 1. TOP DAW WINDOW & MENU BAR -->
+        <header class="daw-window-bar">
+          <div class="daw-window-left">
+            <div class="daw-traffic-lights">
+              <span class="light red"></span>
+              <span class="light yellow"></span>
+              <span class="light green"></span>
+            </div>
+            <nav class="daw-menu-nav">
+              <span class="menu-item">File</span>
+              <span class="menu-item">Edit</span>
+              <span class="menu-item">Create</span>
+              <span class="menu-item">View</span>
+              <span class="menu-item">Options</span>
+              <span class="menu-item active">Dubplate Tools</span>
+            </nav>
+          </div>
+
+          <div class="daw-window-center">
+            <span class="daw-brand-title">Global Dub Plate DAW : <strong id="daw-project-sound-name">Jahvisions International Sound</strong></span>
+          </div>
+
+          <div class="daw-window-right">
+            <div class="daw-dsp-gauge">
+              <span class="dsp-dot"></span>
+              <span>CPU 12%</span>
+            </div>
+            <div class="daw-audio-badge">24-bit • 44.1kHz</div>
+          </div>
+        </header>
+
+        <!-- 2. TOP TRANSPORT & EDITING TOOLBAR -->
+        <div class="daw-transport-bar">
+          
+          <!-- Search & Tool Selectors -->
+          <div class="daw-tools-cluster">
+            <div class="daw-search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="daw-clip-search" placeholder="Search clips, riddims, sound fx..." aria-label="Search audio clips">
+            </div>
+
+            <div class="daw-edit-tools-group" role="group" aria-label="Audio editing tools">
+              <button type="button" class="tool-btn active" id="daw-tool-pointer" title="Pointer / Selection Tool (V)">
+                <span>👆</span> Pointer
+              </button>
+              <button type="button" class="tool-btn" id="daw-tool-scissors" title="Scissors Split Tool (C) — Slice audio clips on timeline">
+                <span>✂️</span> Scissors
+              </button>
+              <button type="button" class="tool-btn" id="daw-tool-curves" title="Audio Curves Tool (E) — Shape Fade-in, Fade-out & Gain curves">
+                <span>📈</span> Curves
+              </button>
+              <button type="button" class="tool-btn" id="daw-tool-slip" title="Slip / Trim Tool (T) — Top & tail clip boundaries">
+                <span>📐</span> Slip Trim
+              </button>
+            </div>
+          </div>
+
+          <!-- Musical Meter, BPM & Transport Center -->
+          <div class="daw-transport-center">
+            
+            <!-- Time Signature -->
+            <div class="daw-metric-box" title="Time Signature">
+              <span class="metric-val">4/4</span>
+              <span class="metric-sub">▾</span>
+            </div>
+
+            <!-- Tempo & Tap -->
+            <div class="daw-bpm-box">
+              <input type="number" min="50" max="180" value="85" id="daw-tempo-input" class="bpm-input" title="Dubplate Tempo (BPM)">
+              <span class="bpm-label">BPM</span>
+              <button type="button" class="btn-tap-tempo" id="daw-btn-tap" title="Tap Tempo">TAP</button>
+            </div>
+
+            <!-- Transport Buttons -->
+            <div class="daw-transport-buttons">
+              <button type="button" class="daw-tr-btn" id="daw-btn-rtz" title="Return to Bar 1 (0:00)">
+                <span>⏮</span>
+              </button>
+              <button type="button" class="daw-tr-btn" id="daw-btn-rew" title="Rewind">
+                <span>⏪</span>
+              </button>
+              <button type="button" class="daw-tr-btn daw-tr-play" id="daw-btn-play" title="Start Playback (Space)">
+                <span>▶</span>
+              </button>
+              <button type="button" class="daw-tr-btn daw-tr-stop" id="daw-btn-stop" title="Stop & Reset">
+                <span>⏹</span>
+              </button>
+              <button type="button" class="daw-tr-btn daw-tr-rec" id="daw-btn-rec" title="Record Armed Tracks">
+                <span class="rec-dot"></span>
+              </button>
+              <button type="button" class="daw-tr-btn" id="daw-btn-ff" title="Fast Forward">
+                <span>⏩</span>
+              </button>
+            </div>
+
+            <!-- Timecode & Bar Display -->
+            <div class="daw-time-display-box" title="Timeline Timecode">
+              <span class="time-main" id="daw-timecode-display">02:35:42</span>
+              <span class="time-sub" id="daw-bar-beat-display">BAR 09 . 02</span>
+            </div>
+
+          </div>
+
+          <!-- Right DAW Action Buttons -->
+          <div class="daw-actions-cluster">
+            <button type="button" class="btn-daw-action" id="btn-toggle-playlist-drawer" title="Open Audio Pool & Clips Playlist">
+              📋 Audio Pool (<span id="daw-pool-count">13</span>)
+            </button>
+
+            <!-- AUTO-HIDE MIXER TOGGLE -->
+            <button type="button" class="btn-daw-action autohide-active" id="btn-toggle-autohide-mixer" title="Toggle Auto-Hide for Mixer Console">
+              <span id="autohide-indicator-icon">🎚️</span>
+              <span id="autohide-status-text">Mixer: Auto-Hide ON</span>
+            </button>
+
+            <button type="button" class="btn btn-gold btn-xs" id="daw-btn-bounce-master" title="Bounce 24-bit Master Mixdown WAV">
+              💾 Bounce WAV
+            </button>
+          </div>
+
+        </div>
+
+        <!-- 3. MAIN WORK AREA: TIMELINE ARRANGEMENT VIEW & TRACKS -->
+        <div class="daw-main-arrangement-view">
+          
+          <!-- LEFT: TRACK CONTROL HEADERS COLUMN -->
+          <div class="daw-tracks-header-col">
+            <div class="track-header-col-top">
+              <div class="track-type-pills">
+                <span class="type-pill active">In. Audio</span>
+                <span class="type-pill">MIDI</span>
+                <span class="type-pill">FX</span>
+              </div>
+            </div>
+
+            <!-- Track 1 Header -->
+            <div class="daw-track-header trk-blue" data-track="1" id="hdr-trk-1">
+              <div class="trk-hdr-color-strip"></div>
+              <div class="trk-hdr-info">
+                <div class="trk-hdr-title-row">
+                  <span class="trk-hdr-num">01</span>
+                  <span class="trk-hdr-name">TR-808 Music / Riddim</span>
+                </div>
+                <div class="trk-hdr-meta">Riddim Stereo • Master Bus</div>
+              </div>
+              <div class="trk-hdr-controls">
+                <button type="button" class="trk-btn btn-trk-rec" data-track="1" id="btn-rec-1" title="Arm Record">R</button>
+                <button type="button" class="trk-btn btn-trk-solo" data-track="1" id="btn-solo-1" title="Solo">S</button>
+                <button type="button" class="trk-btn btn-trk-mute" data-track="1" id="btn-mute-1" title="Mute">M</button>
+              </div>
+            </div>
+
+            <!-- Track 2 Header -->
+            <div class="daw-track-header trk-purple" data-track="2" id="hdr-trk-2">
+              <div class="trk-hdr-color-strip"></div>
+              <div class="trk-hdr-info">
+                <div class="trk-hdr-title-row">
+                  <span class="trk-hdr-num">02</span>
+                  <span class="trk-hdr-name">Juno 106 - Lead Vocal</span>
+                </div>
+                <div class="trk-hdr-meta">Input 1 (Studio Mic) • Master</div>
+              </div>
+              <div class="trk-hdr-controls">
+                <button type="button" class="trk-btn btn-trk-rec active" data-track="2" id="btn-rec-2" title="Arm Record">R</button>
+                <button type="button" class="trk-btn btn-trk-solo" data-track="2" id="btn-solo-2" title="Solo">S</button>
+                <button type="button" class="trk-btn btn-trk-mute" data-track="2" id="btn-mute-2" title="Mute">M</button>
+              </div>
+            </div>
+
+            <!-- Track 3 Header -->
+            <div class="daw-track-header trk-green" data-track="3" id="hdr-trk-3">
+              <div class="trk-hdr-color-strip"></div>
+              <div class="trk-hdr-info">
+                <div class="trk-hdr-title-row">
+                  <span class="trk-hdr-num">03</span>
+                  <span class="trk-hdr-name">Moog Sub 37 - Backing & Chants</span>
+                </div>
+                <div class="trk-hdr-meta">Chant Bus • Master</div>
+              </div>
+              <div class="trk-hdr-controls">
+                <button type="button" class="trk-btn btn-trk-rec" data-track="3" id="btn-rec-3" title="Arm Record">R</button>
+                <button type="button" class="trk-btn btn-trk-solo" data-track="3" id="btn-solo-3" title="Solo">S</button>
+                <button type="button" class="trk-btn btn-trk-mute" data-track="3" id="btn-mute-3" title="Mute">M</button>
+              </div>
+            </div>
+
+            <!-- Track 4 Header -->
+            <div class="daw-track-header trk-magenta" data-track="4" id="hdr-trk-4">
+              <div class="trk-hdr-color-strip"></div>
+              <div class="trk-hdr-info">
+                <div class="trk-hdr-title-row">
+                  <span class="trk-hdr-num">04</span>
+                  <span class="trk-hdr-name">Korg Minilogue - Synth / Dub FX</span>
+                </div>
+                <div class="trk-hdr-meta">Dub Siren & Clash Bus • Master</div>
+              </div>
+              <div class="trk-hdr-controls">
+                <button type="button" class="trk-btn btn-trk-rec" data-track="4" id="btn-rec-4" title="Arm Record">R</button>
+                <button type="button" class="trk-btn btn-trk-solo" data-track="4" id="btn-solo-4" title="Solo">S</button>
+                <button type="button" class="trk-btn btn-trk-mute" data-track="4" id="btn-mute-4" title="Mute">M</button>
+              </div>
+            </div>
+
+            <!-- Track 5 Header -->
+            <div class="daw-track-header trk-cyan" data-track="5" id="hdr-trk-5">
+              <div class="trk-hdr-color-strip"></div>
+              <div class="trk-hdr-info">
+                <div class="trk-hdr-title-row">
+                  <span class="trk-hdr-num">05</span>
+                  <span class="trk-hdr-name">Yamaha DX7 - Tape Echo & Reverb</span>
+                </div>
+                <div class="trk-hdr-meta">Tubby Space Echo Bus • Master</div>
+              </div>
+              <div class="trk-hdr-controls">
+                <button type="button" class="trk-btn btn-trk-rec" data-track="5" id="btn-rec-5" title="Arm Record">R</button>
+                <button type="button" class="trk-btn btn-trk-solo" data-track="5" id="btn-solo-5" title="Solo">S</button>
+                <button type="button" class="trk-btn btn-trk-mute" data-track="5" id="btn-mute-5" title="Mute">M</button>
+              </div>
+            </div>
+
+            <!-- Track 6 Header -->
+            <div class="daw-track-header trk-pink" data-track="6" id="hdr-trk-6">
+              <div class="trk-hdr-color-strip"></div>
+              <div class="trk-hdr-info">
+                <div class="trk-hdr-title-row">
+                  <span class="trk-hdr-num">06</span>
+                  <span class="trk-hdr-name">Korg MS1 - Sound Clash Drops</span>
+                </div>
+                <div class="trk-hdr-meta">Drop In Tag Bus • Master</div>
+              </div>
+              <div class="trk-hdr-controls">
+                <button type="button" class="trk-btn btn-trk-rec" data-track="6" id="btn-rec-6" title="Arm Record">R</button>
+                <button type="button" class="trk-btn btn-trk-solo" data-track="6" id="btn-solo-6" title="Solo">S</button>
+                <button type="button" class="trk-btn btn-trk-mute" data-track="6" id="btn-mute-6" title="Mute">M</button>
+              </div>
+            </div>
+
+            <!-- Master Reference Header -->
+            <div class="daw-track-header trk-master" id="hdr-trk-master">
+              <div class="trk-hdr-color-strip master-strip"></div>
+              <div class="trk-hdr-info">
+                <div class="trk-hdr-title-row">
+                  <span class="trk-hdr-num gold">M</span>
+                  <span class="trk-hdr-name gold">Master Stereo Buss</span>
+                </div>
+                <div class="trk-hdr-meta">Brickwall Limiter • Tube Saturation</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: TIMELINE ARRANGEMENT GRID WITH AUDIO CLIPS -->
+          <div class="daw-timeline-col" id="daw-timeline-col">
+            
+            <!-- Timeline Ruler Bars Header -->
+            <div class="daw-timeline-ruler" id="daw-timeline-ruler">
+              <div class="ruler-bar-mark" style="left: 0%;"><span>1</span></div>
+              <div class="ruler-bar-mark" style="left: 8.33%;"><span>5</span></div>
+              <div class="ruler-bar-mark" style="left: 16.66%;"><span>9</span></div>
+              <div class="ruler-bar-mark" style="left: 25.00%;"><span>13</span></div>
+              <div class="ruler-bar-mark" style="left: 33.33%;"><span>17</span></div>
+              <div class="ruler-bar-mark" style="left: 41.66%;"><span>21</span></div>
+              <div class="ruler-bar-mark" style="left: 50.00%;"><span>25</span></div>
+              <div class="ruler-bar-mark" style="left: 58.33%;"><span>29</span></div>
+              <div class="ruler-bar-mark" style="left: 66.66%;"><span>33</span></div>
+              <div class="ruler-bar-mark" style="left: 75.00%;"><span>37</span></div>
+              <div class="ruler-bar-mark" style="left: 83.33%;"><span>41</span></div>
+              <div class="ruler-bar-mark" style="left: 91.66%;"><span>45</span></div>
+              <div class="ruler-bar-mark" style="left: 100%;"><span>49</span></div>
+            </div>
+
+            <!-- Playhead Vertical Scrubber Line -->
+            <div class="daw-playhead-line" id="daw-playhead" style="left: 54%;">
+              <div class="playhead-cap"></div>
+            </div>
+
+            <!-- Scissors Cut Line Overlay (Follows cursor when Scissors tool is active) -->
+            <div class="daw-scissors-cut-line" id="daw-scissors-line" style="display: none;">
+              <div class="scissors-cursor-tag">✂️ Split</div>
+            </div>
+
+            <!-- Track 1 Lane: TR-808 Music / Riddim (Blue) -->
+            <div class="daw-track-lane lane-1" data-track="1" id="lane-trk-1">
+              <div class="timeline-lane-grid"></div>
+              
+              <!-- Clip 1: TR-808 Part A -->
+              <div class="daw-clip-block clip-blue" style="left: 14%; width: 15%;" data-clip-id="clip-sleng-teng-1" title="TR-808 Sleng Teng Riddim - Part 1">
+                <div class="clip-top-bar">
+                  <span class="clip-label">TR-808 Sleng Teng (A)</span>
+                  <span class="clip-time">0:00 - 0:08</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q5 5 10 20 T20 20 T30 8 T40 20 T50 20 T60 5 T70 20 T80 20 T90 10 T100 20" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="1.8"/>
+                    <path d="M0 20 L0 35 L100 35 L100 20 Z" fill="rgba(255,255,255,0.08)"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in" title="Fade In Curve Handle"></div>
+                <div class="clip-curve-handle curve-out" title="Fade Out Curve Handle"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+
+              <!-- Clip 2: TR-808 Part B -->
+              <div class="daw-clip-block clip-blue" style="left: 35%; width: 14%;" data-clip-id="clip-sleng-teng-2" title="TR-808 Sleng Teng Riddim - Part 2">
+                <div class="clip-top-bar">
+                  <span class="clip-label">TR-808 Sleng Teng (B)</span>
+                  <span class="clip-time">0:08 - 0:16</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q5 8 10 20 T20 20 T30 12 T40 20 T50 20 T60 8 T70 20 T80 20 T90 14 T100 20" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="1.8"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+
+              <!-- Clip 3: TR-808 Hook -->
+              <div class="daw-clip-block clip-blue" style="left: 52%; width: 12%;" data-clip-id="clip-sleng-teng-3" title="TR-808 Chorus Cut">
+                <div class="clip-top-bar">
+                  <span class="clip-label">TR-808 Chorus</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q5 6 10 20 T20 20 T30 5 T40 20 T50 20 T60 5 T70 20 T80 20 T90 5 T100 20" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="1.8"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+
+              <!-- Clip 4: TR-808 Outro -->
+              <div class="daw-clip-block clip-blue" style="left: 67%; width: 14%;" data-clip-id="clip-sleng-teng-4" title="TR-808 Heavy Steppers">
+                <div class="clip-top-bar">
+                  <span class="clip-label">TR-808 Steppers Outro</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q5 7 10 20 T20 20 T30 10 T40 20 T50 20 T60 7 T70 20 T80 20 T90 10 T100 20" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="1.8"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+            </div>
+
+            <!-- Track 2 Lane: Juno 106 - Lead Vocal (Purple) -->
+            <div class="daw-track-lane lane-2" data-track="2" id="lane-trk-2">
+              <div class="timeline-lane-grid"></div>
+
+              <!-- Lead Vocal Clip 1 -->
+              <div class="daw-clip-block clip-purple" style="left: 14%; width: 15%;" data-clip-id="clip-vocal-1" title="Capleton Lead Toast - Verse 1">
+                <div class="clip-top-bar">
+                  <span class="clip-label">Juno 106 - Lead Toast 1</span>
+                  <span class="clip-time">0:00 - 0:08</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q10 2 20 20 T40 5 T60 20 T80 8 T100 20" stroke="rgba(255,255,255,0.85)" fill="none" stroke-width="2"/>
+                    <path d="M0 20 L0 38 L100 38 L100 20 Z" fill="rgba(255,255,255,0.1)"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+
+              <!-- Lead Vocal Clip 2 (Long Verse) -->
+              <div class="daw-clip-block clip-purple" style="left: 52%; width: 25%;" data-clip-id="clip-vocal-2" title="Capleton Dubplate Special - Hook & Clash Kill">
+                <div class="clip-top-bar">
+                  <span class="clip-label">Juno 106 - Clash Hook Special</span>
+                  <span class="clip-time">0:16 - 0:32</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 200 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q10 4 20 20 T40 2 T60 20 T80 4 T100 20 T120 2 T140 20 T160 5 T180 20 T200 20" stroke="rgba(255,255,255,0.85)" fill="none" stroke-width="2"/>
+                    <path d="M0 20 L0 38 L200 38 L200 20 Z" fill="rgba(255,255,255,0.12)"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+            </div>
+
+            <!-- Track 3 Lane: Moog Sub 37 - Backing & Chants (Green) -->
+            <div class="daw-track-lane lane-3" data-track="3" id="lane-trk-3">
+              <div class="timeline-lane-grid"></div>
+
+              <!-- Chant Clip 1 -->
+              <div class="daw-clip-block clip-green" style="left: 14%; width: 14%;" data-clip-id="clip-chant-1" title="Chant: Kill Sound Boy Dead!">
+                <div class="clip-top-bar">
+                  <span class="clip-label">Moog Sub 37 - Kill Sound!</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q15 6 30 20 T60 4 T80 20 T100 20" stroke="rgba(255,255,255,0.8)" fill="none" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+
+              <!-- Chant Clip 2 -->
+              <div class="daw-clip-block clip-green" style="left: 35%; width: 13%;" data-clip-id="clip-chant-2" title="Chant: Pull Up Selecta!">
+                <div class="clip-top-bar">
+                  <span class="clip-label">Moog Sub 37 - Pull Up!</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q10 8 25 20 T50 4 T75 20 T100 20" stroke="rgba(255,255,255,0.8)" fill="none" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+
+              <!-- Chant Clip 3 -->
+              <div class="daw-clip-block clip-green" style="left: 52%; width: 14%;" data-clip-id="clip-chant-3" title="Chant: More Fire!">
+                <div class="clip-top-bar">
+                  <span class="clip-label">Moog Sub 37 - More Fire!</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q15 5 30 20 T60 3 T90 20 T100 20" stroke="rgba(255,255,255,0.8)" fill="none" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+            </div>
+
+            <!-- Track 4 Lane: Korg Minilogue - Synth / Dub FX (Magenta) -->
+            <div class="daw-track-lane lane-4" data-track="4" id="lane-trk-4">
+              <div class="timeline-lane-grid"></div>
+
+              <!-- Dub FX Clip: King Tubby Dub Siren Sweep -->
+              <div class="daw-clip-block clip-magenta" style="left: 35%; width: 18%;" data-clip-id="clip-fx-siren" title="Korg Minilogue - Dub Siren Echo Sweep">
+                <div class="clip-top-bar">
+                  <span class="clip-label">Korg Minilogue - Dub Siren</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 150 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q15 2 30 20 T60 3 T90 20 T120 4 T150 20" stroke="rgba(255,255,255,0.85)" fill="none" stroke-width="2"/>
+                    <path d="M0 20 L0 38 L150 38 L150 20 Z" fill="rgba(255,255,255,0.1)"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+            </div>
+
+            <!-- Track 5 Lane: Yamaha DX7 - Tape Echo & Reverb (Cyan/Purple) -->
+            <div class="daw-track-lane lane-5" data-track="5" id="lane-trk-5">
+              <div class="timeline-lane-grid"></div>
+
+              <!-- Reverb Splash Clip -->
+              <div class="daw-clip-block clip-purple-bright" style="left: 52%; width: 22%;" data-clip-id="clip-reverb-crash" title="Yamaha DX7 - Tubby Spring Reverb Splash">
+                <div class="clip-top-bar">
+                  <span class="clip-label">Yamaha DX7 - Spring Crash</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 180 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q10 1 20 20 T40 6 T60 20 T90 8 T120 20 T150 12 T180 20" stroke="rgba(255,255,255,0.85)" fill="none" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+            </div>
+
+            <!-- Track 6 Lane: Korg MS1 - Sound Clash Drops (Pink) -->
+            <div class="daw-track-lane lane-6" data-track="6" id="lane-trk-6">
+              <div class="timeline-lane-grid"></div>
+
+              <!-- Clash Drop Clip -->
+              <div class="daw-clip-block clip-pink" style="left: 35%; width: 13%;" data-clip-id="clip-clash-drop" title="Korg MS1 - Jahvisions Anthem Drop">
+                <div class="clip-top-bar">
+                  <span class="clip-label">Korg MS1 - Jahvisions Drop</span>
+                </div>
+                <div class="clip-waveform-svg">
+                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+                    <path d="M0 20 Q15 4 30 20 T60 6 T90 20 T100 20" stroke="rgba(255,255,255,0.85)" fill="none" stroke-width="2"/>
+                  </svg>
+                </div>
+                <div class="clip-curve-handle curve-in"></div>
+                <div class="clip-curve-handle curve-out"></div>
+                <div class="clip-trim-handle trim-left"></div>
+                <div class="clip-trim-handle trim-right"></div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- 4. SLIDE-OUT / POPUP AUDIO POOL & PLAYLIST DRAWER -->
+        <div class="daw-playlist-drawer" id="daw-playlist-drawer" style="display: none;">
+          <div class="drawer-header">
+            <h4>📋 Audio Pool & Dubplate Takes</h4>
+            <div class="drawer-header-actions">
+              <label class="btn btn-outline btn-xs" title="Import Audio File">
+                ➕ Import WAV
+                <input type="file" id="daw-input-import" accept="audio/*" style="display:none;">
+              </label>
+              <button type="button" class="btn-close-drawer" id="btn-close-playlist-drawer" title="Close Drawer">✕</button>
+            </div>
+          </div>
+          <div class="drawer-clips-scroll" id="daw-drawer-clips-list">
+            <!-- Dynamic pool clips -->
+          </div>
+        </div>
+
+        <!-- 5. BOTTOM DOCK: MIXER CONSOLE WITH AUTO-HIDE -->
+        <div class="daw-mixer-dock autohide-mode" id="daw-mixer-dock">
+          
+          <!-- Dock Handle & Auto-Hide Control Bar -->
+          <div class="mixer-dock-handle-bar" id="mixer-dock-handle-bar">
+            <div class="dock-handle-left">
+              <span class="dock-handle-icon">🎚️</span>
+              <strong class="dock-title">MIXER CONSOLE</strong>
+              <span class="dock-hint" id="dock-status-hint">Auto-Hide Active (Hover or Click to Expand)</span>
+            </div>
+
+            <div class="dock-handle-right">
+              <label class="autohide-checkbox-label">
+                <input type="checkbox" id="chk-mixer-autohide" checked>
+                <span>Auto-Hide Channels</span>
+              </label>
+              <button type="button" class="btn-dock-toggle" id="btn-dock-manual-toggle" title="Toggle Mixer Open/Closed">
+                <span id="dock-caret-symbol">▲</span> <span id="dock-btn-text">Expand Mixer</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Channel Strips Chassis (Modeled after user screenshot) -->
+          <div class="mixer-strips-chassis" id="mixer-strips-chassis">
+            
+            <!-- Channel 1: TR-808 (Music / Riddim) -->
+            <div class="daw-channel-strip ch-1" data-track="1">
+              <div class="ch-strip-top">
+                <span class="ch-name">01 TR-808</span>
+                <span class="ch-insert-dropdown">Inserts ▾</span>
+              </div>
+              <div class="ch-pan-send-row">
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Pan</span>
+                  <input type="range" class="rotary-dial" min="-100" max="100" value="0" id="mix-pan-1">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send A</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="30" id="mix-senda-1">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send B</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="20" id="mix-sendb-1">
+                </div>
+              </div>
+              <!-- Fader & LED Meter Section -->
+              <div class="ch-meter-fader-body">
+                <div class="daw-vu-meter-column">
+                  <div class="meter-scale-text">
+                    <span>0</span>
+                    <span>-6</span>
+                    <span>-12</span>
+                    <span>-18</span>
+                    <span>-24</span>
+                    <span>-30</span>
+                    <span>-44</span>
+                  </div>
+                  <div class="dual-led-bar" id="mix-vu-1">
+                    <div class="led-col left" id="mix-vu-1-l"></div>
+                    <div class="led-col right" id="mix-vu-1-r"></div>
+                  </div>
+                </div>
+                <div class="ch-fader-track">
+                  <input type="range" orient="vertical" min="0" max="120" value="85" class="daw-vertical-fader" id="mix-fader-1" data-track="1">
+                </div>
+              </div>
+              <!-- Strip Buttons: FX, S, M, R -->
+              <div class="ch-strip-btns-row">
+                <button type="button" class="mix-btn btn-fx" title="Toggle Channel FX Inserts">FX</button>
+                <button type="button" class="mix-btn btn-s" data-track="1" id="mix-btn-s-1" title="Solo">S</button>
+                <button type="button" class="mix-btn btn-m" data-track="1" id="mix-btn-m-1" title="Mute">M</button>
+                <button type="button" class="mix-btn btn-r" data-track="1" id="mix-btn-r-1" title="Record Arm">R</button>
+              </div>
+            </div>
+
+            <!-- Channel 2: Juno 106 - Lead Voice -->
+            <div class="daw-channel-strip ch-2" data-track="2">
+              <div class="ch-strip-top">
+                <span class="ch-name">02 Juno 106</span>
+                <span class="ch-insert-dropdown">Inserts ▾</span>
+              </div>
+              <div class="ch-pan-send-row">
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Pan</span>
+                  <input type="range" class="rotary-dial" min="-100" max="100" value="0" id="mix-pan-2">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send A</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="50" id="mix-senda-2">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send B</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="40" id="mix-sendb-2">
+                </div>
+              </div>
+              <div class="ch-meter-fader-body">
+                <div class="daw-vu-meter-column">
+                  <div class="meter-scale-text">
+                    <span>0</span>
+                    <span>-6</span>
+                    <span>-12</span>
+                    <span>-18</span>
+                    <span>-24</span>
+                    <span>-30</span>
+                    <span>-44</span>
+                  </div>
+                  <div class="dual-led-bar" id="mix-vu-2">
+                    <div class="led-col left" id="mix-vu-2-l"></div>
+                    <div class="led-col right" id="mix-vu-2-r"></div>
+                  </div>
+                </div>
+                <div class="ch-fader-track">
+                  <input type="range" orient="vertical" min="0" max="120" value="90" class="daw-vertical-fader" id="mix-fader-2" data-track="2">
+                </div>
+              </div>
+              <div class="ch-strip-btns-row">
+                <button type="button" class="mix-btn btn-fx">FX</button>
+                <button type="button" class="mix-btn btn-s" data-track="2" id="mix-btn-s-2">S</button>
+                <button type="button" class="mix-btn btn-m" data-track="2" id="mix-btn-m-2">M</button>
+                <button type="button" class="mix-btn btn-r active" data-track="2" id="mix-btn-r-2">R</button>
+              </div>
+            </div>
+
+            <!-- Channel 3: Moog Sub 37 - Backing & Chants -->
+            <div class="daw-channel-strip ch-3" data-track="3">
+              <div class="ch-strip-top">
+                <span class="ch-name">03 Moog Sub 37</span>
+                <span class="ch-insert-dropdown">Inserts ▾</span>
+              </div>
+              <div class="ch-pan-send-row">
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Pan</span>
+                  <input type="range" class="rotary-dial" min="-100" max="100" value="-25" id="mix-pan-3">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send A</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="45" id="mix-senda-3">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send B</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="25" id="mix-sendb-3">
+                </div>
+              </div>
+              <div class="ch-meter-fader-body">
+                <div class="daw-vu-meter-column">
+                  <div class="meter-scale-text">
+                    <span>0</span>
+                    <span>-6</span>
+                    <span>-12</span>
+                    <span>-18</span>
+                    <span>-24</span>
+                    <span>-30</span>
+                    <span>-44</span>
+                  </div>
+                  <div class="dual-led-bar" id="mix-vu-3">
+                    <div class="led-col left" id="mix-vu-3-l"></div>
+                    <div class="led-col right" id="mix-vu-3-r"></div>
+                  </div>
+                </div>
+                <div class="ch-fader-track">
+                  <input type="range" orient="vertical" min="0" max="120" value="78" class="daw-vertical-fader" id="mix-fader-3" data-track="3">
+                </div>
+              </div>
+              <div class="ch-strip-btns-row">
+                <button type="button" class="mix-btn btn-fx">FX</button>
+                <button type="button" class="mix-btn btn-s" data-track="3" id="mix-btn-s-3">S</button>
+                <button type="button" class="mix-btn btn-m" data-track="3" id="mix-btn-m-3">M</button>
+                <button type="button" class="mix-btn btn-r" data-track="3" id="mix-btn-r-3">R</button>
+              </div>
+            </div>
+
+            <!-- Channel 4: Korg Minilogue - Dub FX -->
+            <div class="daw-channel-strip ch-4" data-track="4">
+              <div class="ch-strip-top">
+                <span class="ch-name">04 Korg Minilog</span>
+                <span class="ch-insert-dropdown">Inserts ▾</span>
+              </div>
+              <div class="ch-pan-send-row">
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Pan</span>
+                  <input type="range" class="rotary-dial" min="-100" max="100" value="25" id="mix-pan-4">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send A</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="80" id="mix-senda-4">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send B</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="60" id="mix-sendb-4">
+                </div>
+              </div>
+              <div class="ch-meter-fader-body">
+                <div class="daw-vu-meter-column">
+                  <div class="meter-scale-text">
+                    <span>0</span>
+                    <span>-6</span>
+                    <span>-12</span>
+                    <span>-18</span>
+                    <span>-24</span>
+                    <span>-30</span>
+                    <span>-44</span>
+                  </div>
+                  <div class="dual-led-bar" id="mix-vu-4">
+                    <div class="led-col left" id="mix-vu-4-l"></div>
+                    <div class="led-col right" id="mix-vu-4-r"></div>
+                  </div>
+                </div>
+                <div class="ch-fader-track">
+                  <input type="range" orient="vertical" min="0" max="120" value="75" class="daw-vertical-fader" id="mix-fader-4" data-track="4">
+                </div>
+              </div>
+              <div class="ch-strip-btns-row">
+                <button type="button" class="mix-btn btn-fx">FX</button>
+                <button type="button" class="mix-btn btn-s" data-track="4" id="mix-btn-s-4">S</button>
+                <button type="button" class="mix-btn btn-m" data-track="4" id="mix-btn-m-4">M</button>
+                <button type="button" class="mix-btn btn-r" data-track="4" id="mix-btn-r-4">R</button>
+              </div>
+            </div>
+
+            <!-- Channel 5: Yamaha DX7 - Tape Echo / Reverb -->
+            <div class="daw-channel-strip ch-5" data-track="5">
+              <div class="ch-strip-top">
+                <span class="ch-name">05 Yamaha DX7</span>
+                <span class="ch-insert-dropdown">Inserts ▾</span>
+              </div>
+              <div class="ch-pan-send-row">
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Pan</span>
+                  <input type="range" class="rotary-dial" min="-100" max="100" value="-15" id="mix-pan-5">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send A</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="50" id="mix-senda-5">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send B</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="70" id="mix-sendb-5">
+                </div>
+              </div>
+              <div class="ch-meter-fader-body">
+                <div class="daw-vu-meter-column">
+                  <div class="meter-scale-text">
+                    <span>0</span>
+                    <span>-6</span>
+                    <span>-12</span>
+                    <span>-18</span>
+                    <span>-24</span>
+                    <span>-30</span>
+                    <span>-44</span>
+                  </div>
+                  <div class="dual-led-bar" id="mix-vu-5">
+                    <div class="led-col left" id="mix-vu-5-l"></div>
+                    <div class="led-col right" id="mix-vu-5-r"></div>
+                  </div>
+                </div>
+                <div class="ch-fader-track">
+                  <input type="range" orient="vertical" min="0" max="120" value="70" class="daw-vertical-fader" id="mix-fader-5" data-track="5">
+                </div>
+              </div>
+              <div class="ch-strip-btns-row">
+                <button type="button" class="mix-btn btn-fx">FX</button>
+                <button type="button" class="mix-btn btn-s" data-track="5" id="mix-btn-s-5">S</button>
+                <button type="button" class="mix-btn btn-m" data-track="5" id="mix-btn-m-5">M</button>
+                <button type="button" class="mix-btn btn-r" data-track="5" id="mix-btn-r-5">R</button>
+              </div>
+            </div>
+
+            <!-- Channel 6: Korg MS1 - Sound Clash Drops -->
+            <div class="daw-channel-strip ch-6" data-track="6">
+              <div class="ch-strip-top">
+                <span class="ch-name">06 Korg MS1</span>
+                <span class="ch-insert-dropdown">Inserts ▾</span>
+              </div>
+              <div class="ch-pan-send-row">
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Pan</span>
+                  <input type="range" class="rotary-dial" min="-100" max="100" value="15" id="mix-pan-6">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send A</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="20" id="mix-senda-6">
+                </div>
+                <div class="ch-rotary-unit">
+                  <span class="rotary-label">Send B</span>
+                  <input type="range" class="rotary-dial" min="0" max="100" value="10" id="mix-sendb-6">
+                </div>
+              </div>
+              <div class="ch-meter-fader-body">
+                <div class="daw-vu-meter-column">
+                  <div class="meter-scale-text">
+                    <span>0</span>
+                    <span>-6</span>
+                    <span>-12</span>
+                    <span>-18</span>
+                    <span>-24</span>
+                    <span>-30</span>
+                    <span>-44</span>
+                  </div>
+                  <div class="dual-led-bar" id="mix-vu-6">
+                    <div class="led-col left" id="mix-vu-6-l"></div>
+                    <div class="led-col right" id="mix-vu-6-r"></div>
+                  </div>
+                </div>
+                <div class="ch-fader-track">
+                  <input type="range" orient="vertical" min="0" max="120" value="82" class="daw-vertical-fader" id="mix-fader-6" data-track="6">
+                </div>
+              </div>
+              <div class="ch-strip-btns-row">
+                <button type="button" class="mix-btn btn-fx">FX</button>
+                <button type="button" class="mix-btn btn-s" data-track="6" id="mix-btn-s-6">S</button>
+                <button type="button" class="mix-btn btn-m" data-track="6" id="mix-btn-m-6">M</button>
+                <button type="button" class="mix-btn btn-r" data-track="6" id="mix-btn-r-6">R</button>
+              </div>
+            </div>
+
+            <!-- Master Channel (Far Right) -->
+            <div class="daw-channel-strip ch-master" data-track="master">
+              <div class="ch-strip-top">
+                <span class="ch-name gold">Master</span>
+                <span class="ch-insert-dropdown">Limiter ▾</span>
+              </div>
+              <div class="ch-pan-send-row master-pan-row">
+                <span class="master-bus-label">Stereo Buss</span>
+              </div>
+              <div class="ch-meter-fader-body">
+                <div class="daw-vu-meter-column">
+                  <div class="meter-scale-text">
+                    <span>0</span>
+                    <span>-6</span>
+                    <span>-12</span>
+                    <span>-18</span>
+                    <span>-24</span>
+                    <span>-30</span>
+                    <span>-44</span>
+                  </div>
+                  <div class="dual-led-bar master-dual" id="mix-vu-master">
+                    <div class="led-col left" id="mix-vu-master-l"></div>
+                    <div class="led-col right" id="mix-vu-master-r"></div>
+                  </div>
+                </div>
+                <div class="ch-fader-track">
+                  <input type="range" orient="vertical" min="0" max="120" value="85" class="daw-vertical-fader master-fader" id="daw-master-fader">
+                </div>
+              </div>
+              <div class="ch-strip-btns-row master-btns-row">
+                <div class="master-readout" id="daw-master-fader-val">0.0 dB</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+        <!-- ARTIST PANE 2: CLASH ORDERS & VOICING QUEUE -->
+    <section class="tab-pane" id="tab-pane-artist-queue">
+      <div style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2>Artist Dubplate Orders & Voicing Queue</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Manage incoming sound system clash requests, voice 25% preview cuts, and track cleared escrow payouts.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="artist-queue-filter-buttons">
+          <button type="button" class="filter-btn active" data-queue-filter="ALL">All Orders (<span id="queue-count-all">0</span>)</button>
+          <button type="button" class="filter-btn" data-queue-filter="PENDING">🔴 Needs Voicing (<span id="queue-count-pending">0</span>)</button>
+          <button type="button" class="filter-btn" data-queue-filter="PREVIEW">🟡 25% Preview Delivered (<span id="queue-count-preview">0</span>)</button>
+          <button type="button" class="filter-btn" data-queue-filter="COMPLETED">🟢 100% Cleared Masters (<span id="queue-count-completed">0</span>)</button>
+        </div>
+      </div>
+
+      <div id="artist-queue-list">
         <!-- Rendered dynamically by app.js -->
       </div>
+    </section>
+
+    <!-- ARTIST PANE 3: ESCROW EARNINGS & PAYOUT TERMINAL -->
+    <section class="tab-pane" id="tab-pane-artist-escrow">
+      <div style="margin-bottom: 1.25rem;">
+        <h2>Artist Escrow Vault & Payout Terminal</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          Track your secured 25% deposit in-holdings, cleared 75% master balances, and request multi-rail payouts.
+        </p>
+      </div>
+
+      <!-- Financial Metric Cards -->
+      <div class="escrow-dashboard-grid">
+        <div class="escrow-metric-card accent-gold">
+          <div class="escrow-metric-label">
+            <span>🔒 25% Deposits In-Holding (Escrow)</span>
+          </div>
+          <div class="escrow-metric-value" id="escrow-holding-value">$1,120.00</div>
+          <div class="escrow-metric-sub">Secured before entering booth; released to selector preview.</div>
+        </div>
+
+        <div class="escrow-metric-card accent-green">
+          <div class="escrow-metric-label">
+            <span>💰 Cleared Available Balance</span>
+          </div>
+          <div class="escrow-metric-value" id="escrow-cleared-value">$4,850.00</div>
+          <div class="escrow-metric-sub">100% unlocked by sound systems; ready for immediate withdrawal.</div>
+        </div>
+
+        <div class="escrow-metric-card accent-blue">
+          <div class="escrow-metric-label">
+            <span>📈 Lifetime Dubplate Revenue</span>
+          </div>
+          <div class="escrow-metric-value" id="escrow-lifetime-value">$38,400.00</div>
+          <div class="escrow-metric-sub">Total gross dub cuts across Jamaica, Africa, Europe & Japan.</div>
+        </div>
+
+        <div class="escrow-metric-card">
+          <div class="escrow-metric-label">
+            <span>💿 Completed Master Cuts</span>
+          </div>
+          <div class="escrow-metric-value" id="escrow-cuts-count">48 Cuts</div>
+          <div class="escrow-metric-sub">Full stereo master WAVs and multitrack stems delivered.</div>
+        </div>
+      </div>
+
+      <!-- Payout Withdrawal Terminal Card -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="color: #fff; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>💸 Request Immediate Payout Withdrawal</span>
+          <span class="badge badge-success" style="font-size: 0.68rem;">Zero Platform Processing Fee</span>
+        </h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Select your payout settlement rail. Withdrawals are processed through international banking, mobile money, or instant crypto rails.
+        </p>
+
+        <!-- Payout Rails -->
+        <div class="payout-rails-grid" id="payout-rails-container">
+          <div class="payout-rail-card selected" data-rail="wire_transfer">
+            <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🏦</div>
+            <strong style="color: #fff; font-size: 0.85rem; display: block;">Bank Wire / SWIFT</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">NCB Jamaica / Stanbic / FNB</span>
+          </div>
+          <div class="payout-rail-card" data-rail="mobile_money">
+            <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📱</div>
+            <strong style="color: #fff; font-size: 0.85rem; display: block;">Mobile Money Express</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">EcoCash / M-Pesa / MTN</span>
+          </div>
+          <div class="payout-rail-card" data-rail="crypto_usdt">
+            <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">⚡</div>
+            <strong style="color: #fff; font-size: 0.85rem; display: block;">USDT / USDC Crypto</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">TRC20 / Polygon (Instant)</span>
+          </div>
+          <div class="payout-rail-card" data-rail="paypal">
+            <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">💳</div>
+            <strong style="color: #fff; font-size: 0.85rem; display: block;">PayPal / Wise</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Direct to Email Address</span>
+          </div>
+        </div>
+
+        <form id="payout-request-form" style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 1rem; align-items: end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="payout-amount" style="font-size: 0.75rem;">Withdrawal Amount (USD) *</label>
+            <input type="number" id="payout-amount" class="form-control" value="1000" min="50" max="10000" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="payout-account" style="font-size: 0.75rem;">Account Number / Phone / Wallet Address *</label>
+            <input type="text" id="payout-account" class="form-control" placeholder="e.g. Account 9821-4821 or +27 72 442 5958 or TRC20 Wallet..." required>
+          </div>
+          <button type="submit" class="btn btn-green" style="height: 42px; font-weight: 700; white-space: nowrap;">
+            🚀 Submit Payout Request
+          </button>
+        </form>
+      </div>
+
+      <!-- Escrow Guarantee Box -->
+      <div style="background: rgba(10, 15, 29, 0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.6;">
+        <h4 style="color: var(--gold-primary); margin-bottom: 0.35rem;">🛡️ How Global Dub Plate Escrow Protects Artists</h4>
+        <p style="margin-bottom: 0.5rem;">
+          1. <strong>Guaranteed 25% Deposit:</strong> Sound systems deposit 25% before an order enters your booth queue. You never record on an unbacked promise.<br>
+          2. <strong>25% Watermarked Preview Gate:</strong> The platform Web Audio engine automatically restricts preview playback to 25% of the total duration.<br>
+          3. <strong>Automatic Master Hold:</strong> 100% full-length master audio, split-tracks, stems, and video are strictly locked until the sound system completes the remaining 75% payment.<br>
+          4. <strong>Instant Escrow Settlement:</strong> As soon as the sound system releases the balance, 100% of your earnings clear into your payout balance.
+        </p>
+      </div>
+    </section>
+
+    <!-- ARTIST PANE 4: RATE CARD & STUDIO AVAILABILITY -->
+    <section class="tab-pane" id="tab-pane-artist-rates">
+      <div style="margin-bottom: 1.25rem;">
+        <h2>Rate Card & Studio Availability Manager</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          Set your booking pricing for Dubplates, Jingles, Drop-Ins, Shout Outs, and In-Studio 4K Video Capture.
+        </p>
+      </div>
+
+      <form id="artist-rates-form">
+        <!-- Live Rate Card Inputs Grid -->
+        <div class="rate-card-grid">
+          <div class="rate-card-item">
+            <label for="rate-fee-dubplate">🎵 Dub Plate Special (USD)</label>
+            <input type="number" id="rate-fee-dubplate" class="form-control" value="950" required>
+            <span style="font-size: 0.68rem; color: #64748b;">Full custom clash cut</span>
+          </div>
+
+          <div class="rate-card-item">
+            <label for="rate-fee-jingle">📻 Radio Jingle (USD)</label>
+            <input type="number" id="rate-fee-jingle" class="form-control" value="450" required>
+            <span style="font-size: 0.68rem; color: #64748b;">Station ID / Mixtape cut</span>
+          </div>
+
+          <div class="rate-card-item">
+            <label for="rate-fee-dropin">🔊 Voice Drop-In (USD)</label>
+            <input type="number" id="rate-fee-dropin" class="form-control" value="300" required>
+            <span style="font-size: 0.68rem; color: #64748b;">Short 5-15s sound signature</span>
+          </div>
+
+          <div class="rate-card-item">
+            <label for="rate-fee-shoutout">🎤 Shout Out / Acapella (USD)</label>
+            <input type="number" id="rate-fee-shoutout" class="form-control" value="200" required>
+            <span style="font-size: 0.68rem; color: #64748b;">Dry tempo click vocal</span>
+          </div>
+
+          <div class="rate-card-item">
+            <label for="rate-fee-video">📹 4K Video Capture (USD)</label>
+            <input type="number" id="rate-fee-video" class="form-control" value="120" required>
+            <span style="font-size: 0.68rem; color: #64748b;">In-studio slate proof video</span>
+          </div>
+        </div>
+
+        <!-- Studio Facility & Location Info -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
+          <h4 style="color: #fff; margin-bottom: 1rem;">Studio Facility & Booking Information</h4>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="rate-studio-name">Studio Facility Name *</label>
+              <input type="text" id="rate-studio-name" class="form-control" placeholder="e.g. David House Productions / Maximum Styles Records" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="rate-city">City & Territory *</label>
+              <input type="text" id="rate-city" class="form-control" placeholder="e.g. Kingston, Jamaica / Johannesburg, South Africa" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="rate-session-title">Current Session Broadcast Title *</label>
+            <input type="text" id="rate-session-title" class="form-control" placeholder="e.g. Live Direct Sound Clash Dubplate Voicing Session" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="rate-bio">Artist Bio & Sound Clash Credibility</label>
+            <textarea id="rate-bio" class="form-control" rows="2" placeholder="Tell sound systems about your history, riddims, and clash anthems..."></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-gold btn-block" style="padding: 0.85rem; font-size: 1rem; font-weight: 700;">
+          💾 Save Rate Card & Sync Live Marketplace Pricing
+        </button>
+      </form>
     </section>
 
     <!-- TAB 4: SOUND CLASH CULTURE GUIDE -->
@@ -224,10 +1536,25 @@
       <!-- Center Controls & Progress -->
       <div class="player-center-controls">
         <div class="player-buttons-row">
-          <button class="play-circle-btn" id="player-play-btn" title="Play / Pause">
-            ▶
+          <!-- Companion Start Button -->
+          <button type="button" class="player-action-btn btn-start" id="player-start-btn" title="Start Playback">
+            <span>▶</span>
+            <span>START</span>
           </button>
-          <button class="btn btn-gold btn-sm" id="player-unlock-btn" style="display: none;">
+
+          <!-- Main Start & Stop Circle Button (Toggles Start & Stop) -->
+          <button type="button" class="play-circle-btn is-stopped" id="player-play-btn" title="Click to START playback" aria-label="Start and Stop audio">
+            <span id="player-main-icon" class="main-symbol">▶</span>
+            <span id="player-main-label" class="main-label">START</span>
+          </button>
+
+          <!-- Companion Stop Button -->
+          <button type="button" class="player-action-btn btn-stop" id="player-stop-btn" title="Stop Playback & Reset to 0:00">
+            <span>⏹</span>
+            <span>STOP</span>
+          </button>
+
+          <button type="button" class="btn btn-gold btn-sm" id="player-unlock-btn" style="display: none;">
             Unlock Full Master
           </button>
         </div>
@@ -658,133 +1985,265 @@
     </div>
   </div>
 
-  <!-- MODAL 5: USER PROFILE & SOUND SYSTEM IDENTITY -->
+  <!-- MODAL 5: USER PROFILE & MY REQUEST / SOUND IDENTITY -->
   <div class="modal-overlay" id="user-profile-modal">
-    <div class="modal-content" style="max-width: 720px;">
+    <div class="modal-content" style="max-width: 760px;">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 0.85rem;">
           <div class="profile-header-avatar">
             <span id="profile-modal-avatar-initials">AA</span>
           </div>
           <div>
-            <h3 style="margin-bottom: 0.15rem;">Sound System & Selector Profile</h3>
+            <h3 style="margin-bottom: 0.15rem;">My Request & Sound System Profile</h3>
             <p style="font-size: 0.78rem; color: var(--text-muted);">
-              Manage your contact details, sound crew roster, areas to mention, and dubplate voicing guidelines.
+              Manage your sound specs, forward requests direct to artist vocal booths with 25% escrow, and check your studio inbox.
             </p>
           </div>
         </div>
         <button class="modal-close">&times;</button>
       </div>
 
+      <!-- PROFILE MODAL NAVIGATION TABS -->
+      <div class="profile-modal-tabs">
+        <button type="button" class="profile-tab-btn active" data-profile-tab="request" id="tab-btn-request">
+          <span>📋 My Request</span>
+        </button>
+        <button type="button" class="profile-tab-btn" data-profile-tab="inbox" id="tab-btn-inbox">
+          <span>📬 Profile Inbox</span>
+          <span class="tab-badge" id="profile-inbox-tab-badge">2</span>
+        </button>
+        <button type="button" class="profile-tab-btn" data-profile-tab="account" id="tab-btn-account">
+          <span>👤 Contact & Sound Account</span>
+        </button>
+      </div>
+
       <form id="user-profile-form">
-        <!-- SECTION 1: USER NAME & CONTACT DETAILS -->
-        <div class="profile-section-card">
-          <div class="profile-section-title">
-            <span>👤 User Name & Contact Details</span>
-            <span class="badge badge-info" style="font-size: 0.65rem;">Direct Studio Escrow Verified</span>
-          </div>
+        <!-- ==========================================
+             TAB 1: MY REQUEST (VOICING SPECS & FORWARDING)
+             ========================================== -->
+        <div class="profile-tab-panel" id="tab-panel-request">
+          <!-- SECTION: MY REQUEST -->
+          <div class="profile-section-card">
+            <div class="profile-section-title">
+              <span>🔊 My Request</span>
+              <span class="badge badge-warning" id="profile-voicing-badge" style="font-size: 0.65rem;">🎵 Dub Plate Voicing Specs</span>
+            </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-            <div class="form-group">
-              <label class="form-label" for="profile-full-name">Full Name *</label>
-              <input type="text" id="profile-full-name" class="form-control" placeholder="e.g. Adrian Anesu Mupemhi" required>
+            <!-- 4-Way Mode Toggle: Dub Plate, Jingle, Drop-In & Shout Out -->
+            <div class="profile-mode-toggle-group" id="profile-mode-toggle-group">
+              <button type="button" class="profile-mode-toggle-btn active" data-profile-mode="dubplate" title="Custom sound clash dubplate directions">
+                <span class="mode-icon">🎵</span>
+                <span class="mode-title">Dub Plate</span>
+                <span class="mode-desc">Clash Special</span>
+              </button>
+              <button type="button" class="profile-mode-toggle-btn" data-profile-mode="jingle" title="Radio station ID / Mixtape opener">
+                <span class="mode-icon">📻</span>
+                <span class="mode-title">Jingle</span>
+                <span class="mode-desc">Radio / Mixtape</span>
+              </button>
+              <button type="button" class="profile-mode-toggle-btn" data-profile-mode="dropIn" title="Quick voice signature / name drop">
+                <span class="mode-icon">🔊</span>
+                <span class="mode-title">Drop-In</span>
+                <span class="mode-desc">Voice Signature</span>
+              </button>
+              <button type="button" class="profile-mode-toggle-btn" data-profile-mode="shoutOut" title="Acapella crew shout-out / tempo click">
+                <span class="mode-icon">🎤</span>
+                <span class="mode-title">Shout Out</span>
+                <span class="mode-desc">Dry / Click Acapella</span>
+              </button>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="profile-email">Email Address *</label>
-              <input type="email" id="profile-email" class="form-control" placeholder="e.g. mupemhianesu@gmail.com" required>
-            </div>
-          </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <!-- 1. Sound Name / Radio Name (Editable) -->
             <div class="form-group">
-              <label class="form-label" for="profile-phone">Phone / WhatsApp Number (for Studio Direct) *</label>
-              <input type="text" id="profile-phone" class="form-control" placeholder="e.g. +2772442 5958" required>
+              <label class="form-label" for="profile-sound-name">
+                <strong style="color: var(--gold-primary);" id="profile-sound-label">1. Sound Name / Radio Name (Editable) *</strong>
+              </label>
+              <input type="text" id="profile-sound-name" class="form-control" placeholder="e.g. Jahvisions International Sound / Power 104 FM / Bass Odyssey" required>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;" id="profile-sound-desc">
+                The exact name the artist will call out and immortalize on your dubplate, jingle, or drop-in.
+              </p>
             </div>
+
+            <!-- 2. Crew Members -->
             <div class="form-group">
-              <label class="form-label" for="profile-location">City & Country *</label>
-              <input type="text" id="profile-location" class="form-control" placeholder="e.g. Johannesburg, South Africa" required>
+              <label class="form-label" for="profile-crew-members">
+                <strong style="color: var(--gold-primary);" id="profile-crew-label">2. Crew Members (Selectors, MCs, Engineers)</strong>
+              </label>
+              <input type="text" id="profile-crew-members" class="form-control" placeholder="e.g. Selector Adrian, MC Fireseed, DJ Benjamin, Terence Dub Operator">
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;" id="profile-crew-desc">
+                Names of selectors, MCs, or sound engineers you want mentioned in dubplate intros and outro shout-outs.
+              </p>
+            </div>
+
+            <!-- 3. Areas to Mention -->
+            <div class="form-group">
+              <label class="form-label" for="profile-areas">
+                <strong style="color: var(--gold-primary);" id="profile-areas-label">3. Areas to Mention / Localities to Big Up</strong>
+              </label>
+              <input type="text" id="profile-areas" class="form-control" placeholder="e.g. Johannesburg, Kensington, Harare, Kingston, Brixton, Brooklyn, Tokyo">
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;" id="profile-areas-desc">
+                Cities, neighborhoods, towns, or territories to represent in the lyrics (crucial for local clash dominance).
+              </p>
+            </div>
+
+            <!-- 4. Tag Line -->
+            <div class="form-group">
+              <label class="form-label" for="profile-tagline">
+                <strong style="color: var(--gold-primary);" id="profile-tagline-label">4. Tag Line / Official Slogan</strong>
+              </label>
+              <input type="text" id="profile-tagline" class="form-control" placeholder="e.g. The Undisputed Dubplate Champions • Pure Reggae & Dancehall Pressure">
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;" id="profile-tagline-desc">
+                Your sound system's signature catchphrase, motto, or audio trademark.
+              </p>
+            </div>
+
+            <!-- 5. Suggestions (Extra Info for Dub, Jingle, Drop-In, Shout Out) -->
+            <div class="form-group">
+              <div class="suggestion-header-row">
+                <label class="form-label" for="profile-suggestions" style="margin-bottom: 0;">
+                  <strong style="color: var(--gold-primary);" id="profile-suggestions-label">5. Suggestions & Extra Information (For Dub Plate Special)</strong>
+                </label>
+                <!-- Quick Preset Template Pills -->
+                <div class="suggestion-preset-pills" id="suggestion-presets-container"></div>
+              </div>
+              <textarea id="profile-suggestions" class="form-control" rows="3" placeholder="Special directions sent directly to the artist's studio booth screen..."></textarea>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;" id="profile-suggestions-desc">
+                Special directions sent directly to the artist's studio booth screen before they hit record.
+              </p>
+            </div>
+
+            <!-- LIVE PREVIEW OF HOW SHOUT-OUT READS -->
+            <div class="profile-preview-box" style="margin: 1rem 0; background: #07090e; border: 1px solid var(--border-color); border-left: 4px solid var(--gold-primary); border-radius: 8px; padding: 0.85rem 1rem;">
+              <div style="font-size: 0.74rem; font-weight: 700; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem;">
+                🎙️ Live Artist Studio Slate Preview:
+              </div>
+              <div id="profile-live-slate-preview" style="font-size: 0.82rem; color: #cbd5e1; font-style: italic; line-height: 1.5;">
+                "Big up <span class="gold" id="prev-sound-name">Jahvisions International Sound</span>! Representing <span id="prev-areas">Johannesburg, Kensington</span>! Shouting out <span id="prev-crew">Selector Adrian & MC Fireseed</span>! <span id="prev-tagline">The Undisputed Dubplate Champions</span>!"
+              </div>
+            </div>
+
+            <!-- FORWARD REQUEST DIRECTLY TO ARTIST CARD -->
+            <div class="forward-request-card">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <h4 style="margin: 0; font-size: 0.92rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>🚀 Forward Request to Studio Artist</span>
+                  <span class="badge badge-success" style="font-size: 0.65rem;">25% Escrow Protected</span>
+                </h4>
+                <span class="badge badge-warning" id="forward-cut-badge" style="font-size: 0.68rem;">🎵 Dub Plate Special</span>
+              </div>
+
+              <p style="font-size: 0.74rem; color: #94a3b8; margin-bottom: 0.75rem;">
+                Forward your sound name, crew shouts, territory reps, and custom directions directly to an artist in session. Pay 25% deposit to lock the vocal booth; balance activates full audio & stems.
+              </p>
+
+              <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.75rem; align-items: end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="profile-forward-artist" style="font-size: 0.74rem; font-weight: 700;">
+                    Send Request To Artist:
+                  </label>
+                  <select id="profile-forward-artist" class="form-control" style="border-color: var(--gold-primary); font-size: 0.84rem;">
+                    <!-- Dynamically populated -->
+                  </select>
+                </div>
+
+                <button type="button" class="btn btn-gold" id="btn-forward-request-now" style="white-space: nowrap; height: 42px; font-weight: 700;">
+                  <span class="btn-icon">⚡</span>
+                  <span id="forward-btn-text">Send to Capleton & Pay 25% Deposit ($175)</span>
+                </button>
+              </div>
+
+              <!-- Live Escrow Fee Breakdown Strip -->
+              <div class="forward-fee-strip" id="forward-fee-strip">
+                <div>
+                  <span style="color: #94a3b8;">Total Fee:</span> <strong style="color: #fff;" id="forward-total-fee">$700.00</strong>
+                  <span style="margin: 0 0.4rem; color: #475569;">|</span>
+                  <span style="color: var(--gold-primary); font-weight: 700;">25% Deposit Now:</span> <strong style="color: var(--gold-primary);" id="forward-deposit-fee">$175.00</strong>
+                  <span style="margin: 0 0.4rem; color: #475569;">|</span>
+                  <span style="color: #94a3b8;">75% Balance:</span> <span style="color: #cbd5e1;" id="forward-balance-fee">$525.00</span>
+                </div>
+                <span class="badge badge-info" style="font-size: 0.65rem;">Direct Studio Forward</span>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+              <button type="button" class="btn btn-outline modal-close" style="flex: 1;">Close</button>
+              <button type="submit" class="btn btn-gold" style="flex: 2;" id="btn-save-profile">
+                <i class="icon-save"></i> Save My Request Specs to Profile
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- SECTION 2: SOUND SYSTEM / RADIO SPECIFICS -->
-        <div class="profile-section-card" style="margin-top: 1rem;">
-          <div class="profile-section-title">
-            <span>🔊 Sound System / Radio Station Identity</span>
-            <span class="badge badge-warning" style="font-size: 0.65rem;">Dub & Jingle Voicing Specs</span>
-          </div>
+        <!-- ==========================================
+             TAB 2: PROFILE INBOX & NOTIFICATIONS
+             ========================================== -->
+        <div class="profile-tab-panel" id="tab-panel-inbox" style="display: none;">
+          <div class="profile-section-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+              <div>
+                <h4 style="margin: 0; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>📬 Profile Inbox & Studio Dispatch Feed</span>
+                </h4>
+                <p style="font-size: 0.73rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">
+                  Live studio notifications, artist vocal booth receipts, and 25% audio preview ready alerts.
+                </p>
+              </div>
+              <button type="button" class="btn btn-outline btn-xs" id="btn-mark-all-read" style="font-size: 0.7rem; padding: 0.2rem 0.6rem;">
+                ✓ Mark All Read
+              </button>
+            </div>
 
-          <!-- 1. Sound Name / Radio Name (Editable) -->
-          <div class="form-group">
-            <label class="form-label" for="profile-sound-name">
-              <strong style="color: var(--gold-primary);">1. Sound Name / Radio Name (Editable) *</strong>
-            </label>
-            <input type="text" id="profile-sound-name" class="form-control" placeholder="e.g. Jahvisions International Sound / Power 104 FM / Bass Odyssey" required>
-            <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">
-              The exact name the artist will call out and immortalize on your dubplate, jingle, or drop-in.
-            </p>
-          </div>
+            <!-- Inbox notification list -->
+            <div id="profile-inbox-list" class="profile-inbox-list">
+              <!-- Populated dynamically -->
+            </div>
 
-          <!-- 2. Crew Members -->
-          <div class="form-group">
-            <label class="form-label" for="profile-crew-members">
-              <strong style="color: var(--gold-primary);">2. Crew Members (Selectors, MCs, Engineers)</strong>
-            </label>
-            <input type="text" id="profile-crew-members" class="form-control" placeholder="e.g. Selector Adrian, MC Fireseed, DJ Benjamin, Terence Dub Operator">
-            <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">
-              Names of selectors, MCs, or sound engineers you want mentioned in dubplate intros and outro shout-outs.
-            </p>
-          </div>
-
-          <!-- 3. Areas to Mention -->
-          <div class="form-group">
-            <label class="form-label" for="profile-areas">
-              <strong style="color: var(--gold-primary);">3. Areas to Mention / Localities to Big Up</strong>
-            </label>
-            <input type="text" id="profile-areas" class="form-control" placeholder="e.g. Johannesburg, Kensington, Harare, Kingston, Brixton, Brooklyn, Tokyo">
-            <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">
-              Cities, neighborhoods, towns, or territories to represent in the lyrics (crucial for local clash dominance).
-            </p>
-          </div>
-
-          <!-- 4. Tag Line -->
-          <div class="form-group">
-            <label class="form-label" for="profile-tagline">
-              <strong style="color: var(--gold-primary);">4. Tag Line / Official Slogan</strong>
-            </label>
-            <input type="text" id="profile-tagline" class="form-control" placeholder="e.g. The Undisputed Dubplate Champions • Pure Reggae & Dancehall Pressure">
-            <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">
-              Your sound system's signature catchphrase, motto, or audio trademark.
-            </p>
-          </div>
-
-          <!-- 5. Suggestions (Extra Info for Dub or Jingle) -->
-          <div class="form-group">
-            <label class="form-label" for="profile-suggestions">
-              <strong style="color: var(--gold-primary);">5. Suggestions & Extra Information (For Dubs, Jingles, Drops)</strong>
-            </label>
-            <textarea id="profile-suggestions" class="form-control" rows="3" placeholder="e.g. Pronunciation tips, energy level, rival sounds to call out in clashes, radio clean vs hardcore clash lyrics, dub delay cues..."></textarea>
-            <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem;">
-              Special directions sent directly to the artist's studio booth screen before they hit record.
-            </p>
+            <div style="margin-top: 1rem; text-align: right;">
+              <button type="button" class="btn btn-outline modal-close">Close Inbox</button>
+            </div>
           </div>
         </div>
 
-        <!-- LIVE PREVIEW OF HOW SHOUT-OUT READS -->
-        <div class="profile-preview-box" style="margin: 1.25rem 0; background: #07090e; border: 1px solid var(--border-color); border-left: 4px solid var(--gold-primary); border-radius: 8px; padding: 0.85rem 1rem;">
-          <div style="font-size: 0.74rem; font-weight: 700; color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem;">
-            🎙️ Live Artist Studio Slate Preview:
-          </div>
-          <div id="profile-live-slate-preview" style="font-size: 0.82rem; color: #cbd5e1; font-style: italic; line-height: 1.5;">
-            "Big up <span class="gold" id="prev-sound-name">Jahvisions International Sound</span>! Representing <span id="prev-areas">Johannesburg, Kensington</span>! Shouting out <span id="prev-crew">Selector Adrian & MC Fireseed</span>! <span id="prev-tagline">The Undisputed Dubplate Champions</span>!"
-          </div>
-        </div>
+        <!-- ==========================================
+             TAB 3: CONTACT & SOUND ACCOUNT
+             ========================================== -->
+        <div class="profile-tab-panel" id="tab-panel-account" style="display: none;">
+          <div class="profile-section-card">
+            <div class="profile-section-title">
+              <span>👤 User Name & Contact Details</span>
+              <span class="badge badge-info" style="font-size: 0.65rem;">Direct Studio Escrow Verified</span>
+            </div>
 
-        <div style="display: flex; gap: 0.75rem;">
-          <button type="button" class="btn btn-outline modal-close" style="flex: 1;">Cancel</button>
-          <button type="submit" class="btn btn-gold" style="flex: 2;" id="btn-save-profile">
-            <i class="icon-save"></i> Save Sound System Profile & Identity
-          </button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="profile-full-name">Full Name *</label>
+                <input type="text" id="profile-full-name" class="form-control" placeholder="e.g. Adrian Anesu Mupemhi" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-email">Email Address *</label>
+                <input type="email" id="profile-email" class="form-control" placeholder="e.g. mupemhianesu@gmail.com" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="profile-phone">Phone / WhatsApp Number (for Studio Direct) *</label>
+                <input type="text" id="profile-phone" class="form-control" placeholder="e.g. +2772442 5958" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-location">City & Country *</label>
+                <input type="text" id="profile-location" class="form-control" placeholder="e.g. Johannesburg, South Africa" required>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+              <button type="button" class="btn btn-outline modal-close" style="flex: 1;">Cancel</button>
+              <button type="submit" class="btn btn-gold" style="flex: 2;">
+                <i class="icon-save"></i> Save Account Details
+              </button>
+            </div>
+          </div>
         </div>
       </form>
     </div>

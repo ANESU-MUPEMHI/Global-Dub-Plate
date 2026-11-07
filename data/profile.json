@@ -8,5 +8,12 @@
   "crewMembers": "Selector Adrian, MC Fireseed, DJ Benjamin, Terence Dub Operator",
   "areasToMention": "Johannesburg, Kensington, Harare, Kingston, Brixton, Tokyo",
   "tagLine": "The Undisputed Dubplate Champions • Pure Reggae & Dancehall Pressure",
-  "suggestions": "Please pronounce 'Jahvisions' clearly. For clash cuts, shout out the sound crew and state that no rival sound system can survive this selection. Keep it high energy with dub delay on the drop."
+  "activeMode": "dubplate",
+  "suggestions": "Kill any rival sound system! State that Jahvisions rules the arena from Johannesburg to Kingston. Add heavy dub delay on the chorus hook.",
+  "suggestionsDubplate": "Kill any rival sound system! State that Jahvisions rules the arena from Johannesburg to Kingston. Add heavy dub delay on the chorus hook.",
+  "suggestionsJingle": "High energy radio / mixtape station ID! Start with siren sweep, shout out 'You are locked in live with Jahvisions International Sound, strictly reggae pressure!'",
+  "suggestionsDropIn": "Punchy 5-10 second voice tag: 'Hold tight! You're rocking with the undisputed champions, Jahvisions Sound!'",
+  "suggestionsShoutOut": "Dry tempo click acapella on beat. Shout out Selector Adrian, MC Fireseed, Terence, and Benjamin, and big up the worldwide sound system massive!",
+  "location": "Johannesburg, South Africa",
+  "updatedAt": "2026-11-04T19:42:00.521Z"
 }
