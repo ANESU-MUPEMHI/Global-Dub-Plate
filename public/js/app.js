@@ -2060,8 +2060,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // =========================================================================
 
   let fourTrackAnimId = null;
-  let activeDawTool = 'pointer'; // 'pointer' | 'scissors' | 'curves' | 'slip'
+  let activeDawTool = 'pointer'; // 'pointer' | 'draw' | 'scissors' | 'curves' | 'slip' | 'mute'
   let dawSearchQuery = '';
+  let activeMenuTrackNum = 1;
+  let activeMixerChannelNum = 1;
+  let activeContextClip = null;
+  let lastRightClickPos = { x: 0, y: 0 };
+  let selectedRenameColor = '#3b82f6';
 
   function initFourTrackUI() {
     engine.initFourTrack();
@@ -2075,26 +2080,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupDawAutoHideFlags();
     setupDawToolBar();
     setupDawMixerControls();
+    setupFLStudioTransport();
+    setupFLStudioContextMenus();
+    setupFLStudioModals();
     renderDawDrawerClips(dawSearchQuery);
     initPlaylistAndEditorUI();
   }
 
-  function buildVUMeterLEDs() {
-    // 6 Channels + Master, each with left & right columns
-    const columns = [
-      'mix-vu-1-l', 'mix-vu-1-r',
-      'mix-vu-2-l', 'mix-vu-2-r',
-      'mix-vu-3-l', 'mix-vu-3-r',
-      'mix-vu-4-l', 'mix-vu-4-r',
-      'mix-vu-5-l', 'mix-vu-5-r',
-      'mix-vu-6-l', 'mix-vu-6-r',
-      'mix-vu-master-l', 'mix-vu-master-r'
-    ];
-
-    columns.forEach(colId => {
+  function buildTrackVUMeter(trackNum) {
+    [`mix-vu-${trackNum}-l`, `mix-vu-${trackNum}-r`].forEach(colId => {
       const container = document.getElementById(colId);
       if (container && !container.hasChildNodes()) {
-        // 12 segments: 1 to 7 Green, 8 to 10 Yellow, 11 to 12 Red
+        container.innerHTML = Array.from({ length: 12 }, (_, i) => {
+          const segNum = i + 1;
+          const color = segNum <= 7 ? 'green' : (segNum <= 10 ? 'yellow' : 'red');
+          return `<div class="daw-led-seg ${color}" data-seg="${segNum}"></div>`;
+        }).join('');
+      }
+    });
+  }
+
+  function buildVUMeterLEDs() {
+    // Dynamic tracks from audio engine
+    const trackIds = Object.keys(engine.fourTrack?.tracks || { 1:1, 2:1, 3:1, 4:1, 5:1, 6:1 });
+    trackIds.forEach(id => {
+      buildTrackVUMeter(id);
+    });
+
+    // Master Dual Meter
+    ['mix-vu-master-l', 'mix-vu-master-r'].forEach(colId => {
+      const container = document.getElementById(colId);
+      if (container && !container.hasChildNodes()) {
         container.innerHTML = Array.from({ length: 12 }, (_, i) => {
           const segNum = i + 1;
           const color = segNum <= 7 ? 'green' : (segNum <= 10 ? 'yellow' : 'red');
@@ -2103,7 +2119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // Also support any legacy bar IDs
+    // Legacy bar meters support
     ['vu-bar-trk-1', 'vu-bar-trk-2', 'vu-bar-trk-3', 'vu-bar-trk-4', 'vu-bar-master-L', 'vu-bar-master-R'].forEach(barId => {
       const container = document.getElementById(barId);
       if (container && !container.hasChildNodes()) {
@@ -2131,14 +2147,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const levels = engine.getFourTrackVULevels();
 
-    // Update 6 Multitrack mixer channel dual meters
-    for (let i = 1; i <= 6; i++) {
+    // Update dynamic Multitrack mixer channel dual meters
+    const trackIds = Object.keys(engine.fourTrack?.tracks || {});
+    trackIds.forEach(tKey => {
+      const i = parseInt(tKey);
       const lvl = levels[i] || 0;
       updateVUColumn(`mix-vu-${i}-l`, lvl);
       // stereo phase nuance
       const lvlR = Math.max(0, Math.min(1.0, lvl * (0.88 + Math.sin(Date.now() * 0.008 + i) * 0.12)));
       updateVUColumn(`mix-vu-${i}-r`, lvlR);
-    }
+    });
 
     // Update Master Stereo Meter
     updateVUColumn('mix-vu-master-l', levels.masterL || 0);
@@ -2322,10 +2340,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
-  // DAW WORKSTATION EDITING TOOLS (POINTER, SCISSORS, CURVES, SLIP)
+  // DAW WORKSTATION EDITING TOOLS (POINTER, DRAW, SCISSORS, CURVES, SLIP, MUTE)
+  // Modeled after FL Studio 2026 Playlist tools with keyboard shortcuts
   // =========================================================================
   function setupDawToolBar() {
-    const tools = ['pointer', 'scissors', 'curves', 'slip'];
+    const tools = ['pointer', 'draw', 'scissors', 'curves', 'slip', 'mute'];
     tools.forEach(tool => {
       const btn = document.getElementById(`daw-tool-${tool}`);
       btn?.addEventListener('click', () => {
@@ -2335,22 +2354,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         const timelineCol = document.getElementById('daw-timeline-col');
         const scissorsLine = document.getElementById('daw-scissors-line');
         if (timelineCol) {
+          timelineCol.classList.toggle('tool-pointer-active', tool === 'pointer');
+          timelineCol.classList.toggle('tool-draw-active', tool === 'draw');
           timelineCol.classList.toggle('tool-scissors-active', tool === 'scissors');
           timelineCol.classList.toggle('tool-curves-active', tool === 'curves');
           timelineCol.classList.toggle('tool-slip-active', tool === 'slip');
+          timelineCol.classList.toggle('tool-mute-active', tool === 'mute');
         }
         if (tool !== 'scissors' && scissorsLine) {
           scissorsLine.style.display = 'none';
         }
 
         const msgs = {
-          pointer: '👆 Pointer Tool: Click to select, drag to reposition clips.',
-          scissors: '✂️ Scissors Split Tool: Click any clip block on the timeline to slice!',
-          curves: '📈 Audio Curves Tool: Shape fade-in, fade-out & audio volume curves.',
-          slip: '📐 Slip / Trim Tool: Adjust left & right audio clip boundaries.'
+          pointer: '👆 Pointer Tool (V): Click to select, drag to reposition clips.',
+          draw: '✏️ Pencil / Draw Tool (P): Click any lane to paint/draw new audio take block!',
+          scissors: '✂️ Slice / Razor Tool (C): Click any clip to split at cursor position!',
+          curves: '📈 Audio Curves Tool (E): Shape fade-in, fade-out & audio volume curves.',
+          slip: '📐 Slip / Trim Tool (S): Adjust left & right audio clip boundaries.',
+          mute: '🔇 Mute Tool (T): Click any clip to mute or unmute playback.'
         };
-        showToast(msgs[tool], 'info');
+        showToast(msgs[tool] || `Tool: ${tool}`, 'info');
       });
+    });
+
+    // Keyboard shortcuts for FL Studio tools
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+      const keyMap = {
+        'v': 'pointer', 'V': 'pointer',
+        'p': 'draw', 'P': 'draw',
+        'c': 'scissors', 'C': 'scissors',
+        'e': 'curves', 'E': 'curves',
+        's': 'slip', 'S': 'slip',
+        't': 'mute', 'T': 'mute'
+      };
+      if (keyMap[e.key]) {
+        document.getElementById(`daw-tool-${keyMap[e.key]}`)?.click();
+      }
     });
 
     // Scissors Cursor Movement across timeline
@@ -2392,13 +2432,57 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // Interactive Clip Slicing & Curve Handle listeners
+    // Interactive Clip Slicing, Draw, Mute & Context Menus
     setupTimelineClipInteractions();
   }
 
   function setupTimelineClipInteractions() {
     const timelineCol = document.getElementById('daw-timeline-col');
+    const lanesContainer = document.getElementById('daw-lanes-container');
     if (!timelineCol) return;
+
+    // Attach right-click context menu to all existing clips
+    document.querySelectorAll('.daw-clip-block').forEach(c => setupClipContextMenuOn(c));
+
+    // Lane click for Draw / Pencil tool
+    if (lanesContainer && !lanesContainer._wiredDraw) {
+      lanesContainer._wiredDraw = true;
+      lanesContainer.addEventListener('click', (e) => {
+        if (activeDawTool !== 'draw') return;
+        if (e.target.closest('.daw-clip-block')) return;
+        const laneEl = e.target.closest('.daw-track-lane');
+        if (!laneEl) return;
+        const trkNum = parseInt(laneEl.getAttribute('data-track')) || 1;
+        const rect = laneEl.getBoundingClientRect();
+        const clickRatio = Math.max(0, Math.min(0.85, (e.clientX - rect.left) / rect.width));
+        const leftPct = (clickRatio * 100).toFixed(1);
+
+        const colorClasses = ['blue', 'purple', 'green', 'magenta', 'cyan', 'pink'];
+        const colClass = colorClasses[(trkNum - 1) % colorClasses.length] || 'blue';
+
+        const newClip = document.createElement('div');
+        newClip.className = `daw-clip-block clip-${colClass}`;
+        newClip.style.left = `${leftPct}%`;
+        newClip.style.width = '14%';
+        newClip.innerHTML = `
+          <div class="clip-top-bar">
+            <span class="clip-label">Take ${(Math.random()*100).toFixed(0)}</span>
+          </div>
+          <div class="clip-waveform-svg">
+            <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+              <path d="M0 20 Q5 5 10 20 T20 20 T30 8 T40 20 T50 20 T60 5 T70 20 T80 20 T90 10 T100 20" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="1.8"/>
+            </svg>
+          </div>
+          <div class="clip-curve-handle curve-in" title="Fade In Curve"></div>
+          <div class="clip-curve-handle curve-out" title="Fade Out Curve"></div>
+          <div class="clip-trim-handle trim-left"></div>
+          <div class="clip-trim-handle trim-right"></div>
+        `;
+        laneEl.appendChild(newClip);
+        setupClipContextMenuOn(newClip);
+        showToast(`✏️ Drew new audio take block on Track 0${trkNum}!`, 'success');
+      });
+    }
 
     timelineCol.addEventListener('click', (e) => {
       const clipEl = e.target.closest('.daw-clip-block');
@@ -2426,14 +2510,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (topLabel) topLabel.textContent += ' [Cut]';
 
         parentLane.appendChild(cloned);
+        setupClipContextMenuOn(cloned);
         engine.triggerScissorsCut();
         showToast('✂️ Clip sliced at timeline position into two parts!', 'success');
+      } else if (activeDawTool === 'mute') {
+        e.stopPropagation();
+        const isMuted = clipEl.classList.toggle('clip-muted');
+        showToast(`🔇 Clip ${isMuted ? 'MUTED' : 'UNMUTED'} (Mute Tool)`, 'info');
       } else if (activeDawTool === 'curves') {
         e.stopPropagation();
-        showToast('📈 Audio Curve node selected! Adjust fade and curve slope.', 'info');
+        const hasFade = clipEl.classList.toggle('has-fadein-curve');
+        showToast(`📈 Audio Curve node toggled: ${hasFade ? 'Fade-In Enabled' : 'Linear'}`, 'info');
       } else if (activeDawTool === 'slip') {
         e.stopPropagation();
-        showToast('📐 Clip trim boundary active.', 'info');
+        showToast('📐 Clip trim boundary active. Drag edge to slip.', 'info');
       } else {
         document.querySelectorAll('.daw-clip-block').forEach(c => c.classList.remove('selected'));
         clipEl.classList.add('selected');
@@ -2453,78 +2543,178 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
-  // MIXER CHANNELS (1 TO 6 + MASTER) CONTROLS
+  // MIXER CHANNELS & PLAYLIST TRACK CONTROLS (DYNAMIC TRACKS + MASTER)
   // =========================================================================
-  function setupDawMixerControls() {
-    for (let i = 1; i <= 6; i++) {
-      // Fader
-      const fader = document.getElementById(`mix-fader-${i}`);
-      if (fader) {
-        fader.addEventListener('input', (e) => {
-          const val = parseFloat(e.target.value);
-          engine.setTrackVolume(i, val / 100);
-        });
-      }
-
-      // Pan
-      const pan = document.getElementById(`mix-pan-${i}`);
-      if (pan) {
-        pan.addEventListener('input', (e) => {
-          const val = parseFloat(e.target.value) / 100;
-          engine.setTrackPan(i, val);
-        });
-      }
-
-      // Send A (Delay)
-      const sendA = document.getElementById(`mix-senda-${i}`);
-      if (sendA) {
-        sendA.addEventListener('input', (e) => {
-          const val = parseFloat(e.target.value) / 100;
-          engine.setTrackDelaySend(i, val);
-        });
-      }
-
-      // Solo Button (Mixer Strip & Track Header)
-      const mixSolo = document.getElementById(`mix-btn-s-${i}`);
-      const hdrSolo = document.getElementById(`btn-solo-${i}`);
-      const handleSolo = () => {
-        const isSolo = engine.toggleTrackSolo(i);
-        mixSolo?.classList.toggle('active', isSolo);
-        hdrSolo?.classList.toggle('active', isSolo);
-        showToast(`Track 0${i} Solo: ${isSolo ? 'ON' : 'OFF'}`, 'info');
-      };
-      mixSolo?.addEventListener('click', handleSolo);
-      hdrSolo?.addEventListener('click', handleSolo);
-
-      // Mute Button (Mixer Strip & Track Header)
-      const mixMute = document.getElementById(`mix-btn-m-${i}`);
-      const hdrMute = document.getElementById(`btn-mute-${i}`);
-      const handleMute = () => {
-        const isMuted = engine.toggleTrackMute(i);
-        mixMute?.classList.toggle('active', isMuted);
-        hdrMute?.classList.toggle('active', isMuted);
-        showToast(`Track 0${i} Mute: ${isMuted ? 'MUTED' : 'UNMUTED'}`, 'info');
-      };
-      mixMute?.addEventListener('click', handleMute);
-      hdrMute?.addEventListener('click', handleMute);
-
-      // Rec Arm Button (Mixer Strip & Track Header)
-      const mixRec = document.getElementById(`mix-btn-r-${i}`);
-      const hdrRec = document.getElementById(`btn-rec-${i}`);
-      const handleRec = () => {
-        const isArmed = engine.toggleTrackRecArm(i);
-        mixRec?.classList.toggle('active', isArmed);
-        hdrRec?.classList.toggle('active', isArmed);
-        showToast(`Track 0${i} Record Arm: ${isArmed ? 'ARMED' : 'DISARMED'}`, isArmed ? 'error' : 'info');
-      };
-      mixRec?.addEventListener('click', handleRec);
-      hdrRec?.addEventListener('click', handleRec);
+  function setupTrackChannelControls(i) {
+    // Fader
+    const fader = document.getElementById(`mix-fader-${i}`);
+    if (fader && !fader._wired) {
+      fader._wired = true;
+      fader.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        engine.setTrackVolume(i, val / 100);
+      });
     }
+
+    // Pan
+    const pan = document.getElementById(`mix-pan-${i}`);
+    if (pan && !pan._wired) {
+      pan._wired = true;
+      pan.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value) / 100;
+        engine.setTrackPan(i, val);
+      });
+    }
+
+    // Send A (Delay)
+    const sendA = document.getElementById(`mix-senda-${i}`);
+    if (sendA && !sendA._wired) {
+      sendA._wired = true;
+      sendA.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value) / 100;
+        engine.setTrackDelaySend(i, val);
+      });
+    }
+
+    // Send B (Reverb)
+    const sendB = document.getElementById(`mix-sendb-${i}`);
+    if (sendB && !sendB._wired) {
+      sendB._wired = true;
+      sendB.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value) / 100;
+        if (engine.fourTrack?.tracks[i]) {
+          engine.fourTrack.tracks[i].reverbSend = val;
+        }
+      });
+    }
+
+    // Solo Button (Mixer Strip & Track Header)
+    const mixSolo = document.getElementById(`mix-btn-s-${i}`);
+    const hdrSolo = document.getElementById(`btn-solo-${i}`);
+    const handleSolo = () => {
+      const isSolo = engine.toggleTrackSolo(i);
+      mixSolo?.classList.toggle('active', isSolo);
+      hdrSolo?.classList.toggle('active', isSolo);
+      showToast(`Track 0${i} Solo: ${isSolo ? 'ON' : 'OFF'}`, 'info');
+    };
+    if (mixSolo && !mixSolo._wired) { mixSolo._wired = true; mixSolo.addEventListener('click', handleSolo); }
+    if (hdrSolo && !hdrSolo._wired) { hdrSolo._wired = true; hdrSolo.addEventListener('click', handleSolo); }
+
+    // Mute Button (Mixer Strip & Track Header)
+    const mixMute = document.getElementById(`mix-btn-m-${i}`);
+    const hdrMute = document.getElementById(`btn-mute-${i}`);
+    const handleMute = () => {
+      const isMuted = engine.toggleTrackMute(i);
+      mixMute?.classList.toggle('active', isMuted);
+      hdrMute?.classList.toggle('active', isMuted);
+      document.querySelectorAll(`.fl-mute-led[data-track="${i}"]`).forEach(led => {
+        led.classList.toggle('active', !isMuted);
+      });
+      showToast(`Track 0${i} Mute: ${isMuted ? 'MUTED' : 'UNMUTED'}`, 'info');
+    };
+    if (mixMute && !mixMute._wired) { mixMute._wired = true; mixMute.addEventListener('click', handleMute); }
+    if (hdrMute && !hdrMute._wired) { hdrMute._wired = true; hdrMute.addEventListener('click', handleMute); }
+
+    // Rec Arm Button (Mixer Strip & Track Header)
+    const mixRec = document.getElementById(`mix-btn-r-${i}`);
+    const hdrRec = document.getElementById(`btn-rec-${i}`);
+    const handleRec = () => {
+      const isArmed = engine.toggleTrackRecArm(i);
+      mixRec?.classList.toggle('active', isArmed);
+      hdrRec?.classList.toggle('active', isArmed);
+      document.querySelectorAll(`.fl-arm-disk[data-track="${i}"]`).forEach(arm => {
+        arm.classList.toggle('active', isArmed);
+      });
+      showToast(`Track 0${i} Record Arm: ${isArmed ? 'ARMED' : 'DISARMED'}`, isArmed ? 'error' : 'info');
+    };
+    if (mixRec && !mixRec._wired) { mixRec._wired = true; mixRec.addEventListener('click', handleRec); }
+    if (hdrRec && !hdrRec._wired) { hdrRec._wired = true; hdrRec.addEventListener('click', handleRec); }
+
+    // Green Mute LED (Left-click: mute, Right-click: FL exclusive solo)
+    document.querySelectorAll(`.fl-mute-led[data-track="${i}"]`).forEach(led => {
+      if (!led._wired) {
+        led._wired = true;
+        led.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleMute();
+        });
+        led.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const isSolo = engine.toggleTrackSolo(i);
+          mixSolo?.classList.toggle('active', isSolo);
+          hdrSolo?.classList.toggle('active', isSolo);
+          showToast(`⭐ Track 0${i} Solo (FL Studio Style): ${isSolo ? 'SOLO ACTIVE' : 'ALL ACTIVE'}`, 'info');
+        });
+      }
+    });
+
+    // Red Arm Disk Recording button
+    document.querySelectorAll(`.fl-arm-disk[data-track="${i}"]`).forEach(arm => {
+      if (!arm._wired) {
+        arm._wired = true;
+        arm.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleRec();
+        });
+      }
+    });
+
+    // Track Header Menu Trigger button
+    const hdrMenuTrigger = document.querySelector(`#hdr-trk-${i} .btn-track-menu-trigger`);
+    if (hdrMenuTrigger && !hdrMenuTrigger._wired) {
+      hdrMenuTrigger._wired = true;
+      hdrMenuTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openTrackContextMenu(i, e.clientX, e.clientY);
+      });
+    }
+
+    // Track Header Right-Click
+    const hdrEl = document.getElementById(`hdr-trk-${i}`);
+    if (hdrEl && !hdrEl._wiredContext) {
+      hdrEl._wiredContext = true;
+      hdrEl.addEventListener('contextmenu', (e) => {
+        if (e.target.closest('.fl-mute-led') || e.target.closest('.fl-arm-disk')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        openTrackContextMenu(i, e.clientX, e.clientY);
+      });
+    }
+
+    // Mixer Channel Strip Right-Click & FX button
+    const stripEl = document.querySelector(`.daw-channel-strip[data-track="${i}"]`);
+    if (stripEl && !stripEl._wiredContext) {
+      stripEl._wiredContext = true;
+      stripEl.addEventListener('contextmenu', (e) => {
+        if (e.target.closest('.fl-mute-led') || e.target.closest('.fl-arm-disk')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        openMixerContextMenu(i, e.clientX, e.clientY);
+      });
+
+      stripEl.querySelector('.btn-fx')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openFXRackModal(i);
+      });
+      stripEl.querySelector('.ch-insert-dropdown')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openFXRackModal(i);
+      });
+    }
+  }
+
+  function setupDawMixerControls() {
+    const trackIds = Object.keys(engine.fourTrack?.tracks || { 1:1, 2:1, 3:1, 4:1, 5:1, 6:1 });
+    trackIds.forEach(i => {
+      setupTrackChannelControls(parseInt(i));
+    });
 
     // Master Fader
     const masterFader = document.getElementById('daw-master-fader');
     const masterReadout = document.getElementById('daw-master-fader-val');
-    if (masterFader) {
+    if (masterFader && !masterFader._wired) {
+      masterFader._wired = true;
       masterFader.addEventListener('input', (e) => {
         const val = parseFloat(e.target.value);
         engine.setMasterVolume(val / 100);
@@ -2532,6 +2722,702 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (masterReadout) masterReadout.textContent = `${db > 0 ? '+' : ''}${db.toFixed(1)} dB`;
       });
     }
+  }
+
+  // =========================================================================
+  // FL STUDIO 2026 TRANSPORT BAR & MODE CONTROLS
+  // =========================================================================
+  function setupFLStudioTransport() {
+    // Mode Switcher: PAT vs SONG
+    const btnPat = document.getElementById('fl-btn-pat');
+    const btnSong = document.getElementById('fl-btn-song');
+    btnPat?.addEventListener('click', () => {
+      engine.setTransportMode('pat');
+      btnPat.classList.add('active');
+      btnSong?.classList.remove('active');
+      showToast('🎵 FL Studio Mode: PAT (Audition Active Pattern / Take)', 'info');
+    });
+    btnSong?.addEventListener('click', () => {
+      engine.setTransportMode('song');
+      btnSong.classList.add('active');
+      btnPat?.classList.remove('active');
+      showToast('🎶 FL Studio Mode: SONG (Full Playlist Multitrack Playback)', 'info');
+    });
+
+    // Metronome Toggle
+    const btnMetro = document.getElementById('fl-btn-metronome');
+    btnMetro?.addEventListener('click', () => {
+      const isMetro = engine.toggleMetronome();
+      btnMetro.classList.toggle('active', isMetro);
+      showToast(`🔔 Metronome Click: ${isMetro ? 'ENABLED' : 'MUTED'}`, 'info');
+    });
+
+    // 3-2-1 Countdown Pre-count Toggle
+    const btnPrecount = document.getElementById('fl-btn-precount');
+    btnPrecount?.addEventListener('click', () => {
+      const isPre = engine.togglePrecount();
+      btnPrecount.classList.toggle('active', isPre);
+      showToast(`⏳ 3-2-1 Pre-Count Countdown: ${isPre ? 'ENABLED' : 'DISABLED'}`, 'info');
+    });
+
+    // Grid Snap Selector
+    const snapSelect = document.getElementById('fl-snap-select');
+    snapSelect?.addEventListener('change', (e) => {
+      engine.setSnapMode(e.target.value);
+      const snapNames = { bar: '1 Bar', half: '1/2 Beat', quarter: '1/4 Beat (Cell)', none: 'None' };
+      showToast(`🧲 FL Studio Grid Snap: ${snapNames[e.target.value] || e.target.value}`, 'info');
+    });
+
+    // FL Studio Arm to Record dropdown
+    const recBtn = document.getElementById('daw-btn-rec');
+    const recMenu = document.getElementById('fl-rec-options-menu');
+    recBtn?.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      hideAllFLContextMenus();
+      if (recMenu) recMenu.style.display = recMenu.style.display === 'none' ? 'block' : 'none';
+    });
+
+    recMenu?.querySelectorAll('.fl-rec-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const mode = item.getAttribute('data-rec-mode');
+        recMenu.querySelectorAll('.fl-rec-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        recMenu.style.display = 'none';
+
+        if (mode === 'playlist_audio') {
+          engine.toggleTrackRecArm(2, true);
+          document.querySelectorAll('.fl-arm-disk[data-track="2"]').forEach(d => d.classList.add('active'));
+          document.getElementById('btn-rec-2')?.classList.add('active');
+          document.getElementById('mix-btn-r-2')?.classList.add('active');
+          showToast('🎙️ Target: Audio into Playlist as audio clip (Track 02 Armed)', 'success');
+        } else if (mode === 'edison') {
+          engine.toggleTrackRecArm(2, true);
+          switchTab('artist-recorder');
+          showToast('🎧 Target: Audio into Edison / Sample Editor', 'info');
+        } else if (mode === 'everything') {
+          Object.keys(engine.fourTrack.tracks).forEach(t => {
+            const trkNum = parseInt(t);
+            engine.toggleTrackRecArm(trkNum, true);
+            document.querySelectorAll(`.fl-arm-disk[data-track="${trkNum}"]`).forEach(d => d.classList.add('active'));
+            document.getElementById(`btn-rec-${trkNum}`)?.classList.add('active');
+            document.getElementById(`mix-btn-r-${trkNum}`)?.classList.add('active');
+          });
+          showToast('⚡ Target: All Tracks Armed for Notes, Audio & Automation', 'info');
+        } else if (mode === 'disarm') {
+          Object.keys(engine.fourTrack.tracks).forEach(t => {
+            const trkNum = parseInt(t);
+            engine.toggleTrackRecArm(trkNum, false);
+            document.querySelectorAll(`.fl-arm-disk[data-track="${trkNum}"]`).forEach(d => d.classList.remove('active'));
+            document.getElementById(`btn-rec-${trkNum}`)?.classList.remove('active');
+            document.getElementById(`mix-btn-r-${trkNum}`)?.classList.remove('active');
+          });
+          showToast('⏹ All Tracks Disarmed', 'info');
+        }
+      });
+    });
+  }
+
+  // =========================================================================
+  // FL STUDIO RIGHT-CLICK CONTEXT MENUS (CLIPS, TRACKS, GRID, MIXER)
+  // =========================================================================
+  function showFLContextMenu(menuEl, x, y) {
+    if (!menuEl) return;
+    hideAllFLContextMenus();
+    menuEl.style.display = 'block';
+    const rect = menuEl.getBoundingClientRect();
+    const posX = (x + rect.width > window.innerWidth) ? (window.innerWidth - rect.width - 12) : x;
+    const posY = (y + rect.height > window.innerHeight) ? (window.innerHeight - rect.height - 12) : y;
+    menuEl.style.left = `${Math.max(10, posX)}px`;
+    menuEl.style.top = `${Math.max(10, posY)}px`;
+  }
+
+  function hideAllFLContextMenus() {
+    ['fl-clip-context-menu', 'fl-track-context-menu', 'fl-timeline-context-menu', 'fl-mixer-context-menu', 'fl-rec-options-menu'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+  }
+
+  function setupClipContextMenuOn(clipEl) {
+    if (!clipEl || clipEl._wiredClipContext) return;
+    clipEl._wiredClipContext = true;
+
+    clipEl.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      activeContextClip = clipEl;
+      const title = document.getElementById('fl-ctx-clip-title');
+      const label = clipEl.querySelector('.clip-label')?.textContent || 'Audio Clip';
+      if (title) title.textContent = `Clip: ${label}`;
+      const menu = document.getElementById('fl-clip-context-menu');
+      showFLContextMenu(menu, e.clientX, e.clientY);
+    });
+  }
+
+  function openTrackContextMenu(trackNum, clientX, clientY) {
+    activeMenuTrackNum = trackNum;
+    const menu = document.getElementById('fl-track-context-menu');
+    const title = document.getElementById('fl-ctx-track-title');
+    const trk = engine.fourTrack.tracks[trackNum];
+    if (title) title.textContent = `Playlist Track 0${trackNum} (${trk?.name || ''})`;
+    showFLContextMenu(menu, clientX, clientY);
+  }
+
+  function openMixerContextMenu(trackNum, clientX, clientY) {
+    activeMixerChannelNum = trackNum;
+    const menu = document.getElementById('fl-mixer-context-menu');
+    const title = document.getElementById('fl-ctx-mixer-title');
+    const trk = engine.fourTrack.tracks[trackNum];
+    if (title) title.textContent = `Mixer Insert 0${trackNum} (${trk?.name || ''})`;
+    showFLContextMenu(menu, clientX, clientY);
+  }
+
+  function setupFLStudioContextMenus() {
+    // 1. Audio Clip Context Menu Actions
+    document.getElementById('fl-ctx-clip-slice')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      if (!activeContextClip) return;
+      const currentLeft = parseFloat(activeContextClip.style.left) || 14;
+      const currentWidth = parseFloat(activeContextClip.style.width) || 15;
+      const halfWidth = currentWidth / 2;
+
+      activeContextClip.style.width = `${halfWidth.toFixed(2)}%`;
+      const cloned = activeContextClip.cloneNode(true);
+      cloned.style.left = `${(currentLeft + halfWidth + 0.4).toFixed(2)}%`;
+      cloned.style.width = `${(halfWidth - 0.4).toFixed(2)}%`;
+      activeContextClip.parentElement?.appendChild(cloned);
+      setupClipContextMenuOn(cloned);
+      engine.triggerScissorsCut();
+      showToast('✂️ Clip sliced at cursor position!', 'success');
+    });
+
+    document.getElementById('fl-ctx-clip-duplicate')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      if (!activeContextClip) return;
+      const currentLeft = parseFloat(activeContextClip.style.left) || 14;
+      const currentWidth = parseFloat(activeContextClip.style.width) || 15;
+      const cloned = activeContextClip.cloneNode(true);
+      cloned.style.left = `${(currentLeft + currentWidth + 0.5).toFixed(2)}%`;
+      activeContextClip.parentElement?.appendChild(cloned);
+      setupClipContextMenuOn(cloned);
+      showToast('📋 Duplicated audio clip take!', 'success');
+    });
+
+    document.getElementById('fl-ctx-clip-mute')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      if (!activeContextClip) return;
+      const isMuted = activeContextClip.classList.toggle('clip-muted');
+      showToast(`🔇 Clip ${isMuted ? 'Muted' : 'Unmuted'}`, 'info');
+    });
+
+    document.getElementById('fl-ctx-clip-fadein')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      if (!activeContextClip) return;
+      activeContextClip.classList.toggle('has-fadein-curve');
+      showToast('📈 Applied FL Studio Exponential Fade-In Curve', 'info');
+    });
+
+    document.getElementById('fl-ctx-clip-fadeout')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      if (!activeContextClip) return;
+      activeContextClip.classList.toggle('has-fadeout-curve');
+      showToast('📉 Applied FL Studio Exponential Fade-Out Curve', 'info');
+    });
+
+    document.getElementById('fl-ctx-clip-boost')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      if (!activeContextClip) return;
+      const topBar = activeContextClip.querySelector('.clip-top-bar');
+      if (topBar) {
+        let boostBadge = topBar.querySelector('.boost-badge');
+        if (!boostBadge) {
+          boostBadge = document.createElement('span');
+          boostBadge.className = 'boost-badge';
+          boostBadge.style.color = '#10b981';
+          boostBadge.style.fontSize = '9px';
+          boostBadge.style.marginLeft = '4px';
+          boostBadge.textContent = '+3dB';
+          topBar.appendChild(boostBadge);
+        } else {
+          const cur = parseInt(boostBadge.textContent) || 3;
+          boostBadge.textContent = `+${cur + 3}dB`;
+        }
+      }
+      showToast('🔊 +3 dB Dubplate Gain Boost applied to audio take!', 'success');
+    });
+
+    document.getElementById('fl-ctx-clip-unique')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      if (!activeContextClip) return;
+      const label = activeContextClip.querySelector('.clip-label');
+      if (label) {
+        label.textContent = `${label.textContent} #2`;
+      }
+      showToast('💾 Clip made unique as independent audio take!', 'success');
+    });
+
+    document.getElementById('fl-ctx-clip-delete')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      if (!activeContextClip) return;
+      activeContextClip.remove();
+      activeContextClip = null;
+      showToast('🗑️ Audio clip deleted from playlist lane', 'info');
+    });
+
+    // 2. Track Header Context Menu Actions
+    document.getElementById('fl-menu-rename-track')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      openRenameModal(activeMenuTrackNum);
+    });
+
+    document.getElementById('fl-menu-insert-above')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      addNewPlaylistTrack({ name: 'Dub Stems (Top)', color: '#10b981' });
+    });
+
+    document.getElementById('fl-menu-insert-below')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      addNewPlaylistTrack({ name: 'Dub Stems (Sub)', color: '#06b6d4' });
+    });
+
+    document.getElementById('fl-menu-delete-track')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      deletePlaylistTrack(activeMenuTrackNum);
+    });
+
+    document.getElementById('fl-menu-arm-track')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const isArmed = engine.toggleTrackRecArm(activeMenuTrackNum);
+      document.querySelectorAll(`.fl-arm-disk[data-track="${activeMenuTrackNum}"]`).forEach(d => d.classList.toggle('active', isArmed));
+      document.getElementById(`btn-rec-${activeMenuTrackNum}`)?.classList.toggle('active', isArmed);
+      document.getElementById(`mix-btn-r-${activeMenuTrackNum}`)?.classList.toggle('active', isArmed);
+      showToast(`Track 0${activeMenuTrackNum} Record Arm: ${isArmed ? 'ARMED' : 'DISARMED'}`, isArmed ? 'error' : 'info');
+    });
+
+    document.getElementById('fl-menu-solo-track')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const isSolo = engine.toggleTrackSolo(activeMenuTrackNum);
+      document.getElementById(`btn-solo-${activeMenuTrackNum}`)?.classList.toggle('active', isSolo);
+      document.getElementById(`mix-btn-s-${activeMenuTrackNum}`)?.classList.toggle('active', isSolo);
+      showToast(`Track 0${activeMenuTrackNum} Solo: ${isSolo ? 'ON' : 'OFF'}`, 'info');
+    });
+
+    document.getElementById('fl-menu-mute-track')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const isMuted = engine.toggleTrackMute(activeMenuTrackNum);
+      document.getElementById(`btn-mute-${activeMenuTrackNum}`)?.classList.toggle('active', isMuted);
+      document.getElementById(`mix-btn-m-${activeMenuTrackNum}`)?.classList.toggle('active', isMuted);
+      document.querySelectorAll(`.fl-mute-led[data-track="${activeMenuTrackNum}"]`).forEach(led => led.classList.toggle('active', !isMuted));
+      showToast(`Track 0${activeMenuTrackNum} Mute: ${isMuted ? 'MUTED' : 'UNMUTED'}`, 'info');
+    });
+
+    document.getElementById('fl-menu-link-mixer')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const strip = document.querySelector(`.daw-channel-strip[data-track="${activeMenuTrackNum}"]`);
+      if (strip) {
+        const mixerDock = document.getElementById('daw-mixer-dock');
+        if (mixerDock) mixerDock.classList.add('expanded');
+        strip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        strip.style.boxShadow = '0 0 20px #f59e0b';
+        setTimeout(() => { strip.style.boxShadow = ''; }, 1500);
+        showToast(`🎚️ Track 0${activeMenuTrackNum} routed to Mixer Insert 0${activeMenuTrackNum}`, 'info');
+      }
+    });
+
+    // 3. Empty Timeline Grid Context Menu Actions
+    const lanesContainer = document.getElementById('daw-lanes-container');
+    if (lanesContainer && !lanesContainer._wiredContext) {
+      lanesContainer._wiredContext = true;
+      lanesContainer.addEventListener('contextmenu', (e) => {
+        if (e.target.closest('.daw-clip-block')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        lastRightClickPos = { x: e.clientX, y: e.clientY };
+        const menu = document.getElementById('fl-timeline-context-menu');
+        showFLContextMenu(menu, e.clientX, e.clientY);
+      });
+    }
+
+    document.getElementById('fl-grid-paste')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const ruler = document.getElementById('daw-timeline-ruler');
+      const rulerRect = ruler?.getBoundingClientRect() || { left: 0, width: 1000 };
+      const frac = Math.max(0, Math.min(0.9, (lastRightClickPos.x - rulerRect.left) / rulerRect.width));
+      const pct = (frac * 100).toFixed(1);
+
+      const lane1 = document.getElementById('lane-trk-1');
+      if (lane1) {
+        const newClip = document.createElement('div');
+        newClip.className = 'daw-clip-block clip-blue';
+        newClip.style.left = `${pct}%`;
+        newClip.style.width = '14%';
+        newClip.innerHTML = `
+          <div class="clip-top-bar">
+            <span class="clip-label">Pasted Take</span>
+          </div>
+          <div class="clip-waveform-svg">
+            <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="clip-wave">
+              <path d="M0 20 Q5 5 10 20 T20 20 T30 8 T40 20 T50 20 T60 5 T70 20 T80 20 T90 10 T100 20" stroke="rgba(255,255,255,0.7)" fill="none" stroke-width="1.8"/>
+            </svg>
+          </div>
+          <div class="clip-curve-handle curve-in"></div>
+          <div class="clip-curve-handle curve-out"></div>
+          <div class="clip-trim-handle trim-left"></div>
+          <div class="clip-trim-handle trim-right"></div>
+        `;
+        lane1.appendChild(newClip);
+        setupClipContextMenuOn(newClip);
+        showToast(`📋 Audio clip pasted at Bar position (${pct}%)!`, 'success');
+      }
+    });
+
+    document.getElementById('fl-grid-slice-all')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const ruler = document.getElementById('daw-timeline-ruler');
+      const rulerRect = ruler?.getBoundingClientRect() || { left: 0, width: 1000 };
+      const frac = Math.max(0.05, Math.min(0.95, (lastRightClickPos.x - rulerRect.left) / rulerRect.width));
+      const cutPct = frac * 100;
+
+      let slicedCount = 0;
+      document.querySelectorAll('.daw-clip-block').forEach(clipEl => {
+        const left = parseFloat(clipEl.style.left) || 0;
+        const width = parseFloat(clipEl.style.width) || 10;
+        const right = left + width;
+
+        if (cutPct > left + 1 && cutPct < right - 1) {
+          const leftWidth = cutPct - left;
+          const rightLeft = cutPct + 0.3;
+          const rightWidth = right - cutPct - 0.3;
+
+          clipEl.style.width = `${leftWidth.toFixed(2)}%`;
+          const cloned = clipEl.cloneNode(true);
+          cloned.style.left = `${rightLeft.toFixed(2)}%`;
+          cloned.style.width = `${rightWidth.toFixed(2)}%`;
+          clipEl.parentElement?.appendChild(cloned);
+          setupClipContextMenuOn(cloned);
+          slicedCount++;
+        }
+      });
+      engine.triggerScissorsCut();
+      showToast(`✂️ FL Slice: ${slicedCount} clip(s) cut at playhead/cursor bar!`, 'success');
+    });
+
+    document.getElementById('fl-grid-snap-bar')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const sel = document.getElementById('fl-snap-select');
+      if (sel) { sel.value = 'bar'; sel.dispatchEvent(new Event('change')); }
+    });
+
+    document.getElementById('fl-grid-snap-cell')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const sel = document.getElementById('fl-snap-select');
+      if (sel) { sel.value = 'quarter'; sel.dispatchEvent(new Event('change')); }
+    });
+
+    document.getElementById('fl-grid-set-loop')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      showToast('🔁 FL Studio Loop Region set from Bar 1 to Bar 16!', 'info');
+    });
+
+    // 4. Mixer Context Menu Actions
+    document.getElementById('fl-mix-rename')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      openRenameModal(activeMixerChannelNum);
+    });
+
+    document.getElementById('fl-mix-arm-disk')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const isArmed = engine.toggleTrackRecArm(activeMixerChannelNum);
+      document.querySelectorAll(`.fl-arm-disk[data-track="${activeMixerChannelNum}"]`).forEach(d => d.classList.toggle('active', isArmed));
+      document.getElementById(`btn-rec-${activeMixerChannelNum}`)?.classList.toggle('active', isArmed);
+      document.getElementById(`mix-btn-r-${activeMixerChannelNum}`)?.classList.toggle('active', isArmed);
+      showToast(`🔴 Arm Disk Recording: ${isArmed ? 'ARMED' : 'DISARMED'}`, isArmed ? 'error' : 'info');
+    });
+
+    document.getElementById('fl-mix-solo')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const isSolo = engine.toggleTrackSolo(activeMixerChannelNum);
+      document.getElementById(`mix-btn-s-${activeMixerChannelNum}`)?.classList.toggle('active', isSolo);
+      document.getElementById(`btn-solo-${activeMixerChannelNum}`)?.classList.toggle('active', isSolo);
+      showToast(`Mixer Track 0${activeMixerChannelNum} Solo: ${isSolo ? 'ON' : 'OFF'}`, 'info');
+    });
+
+    document.getElementById('fl-mix-mute')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const isMuted = engine.toggleTrackMute(activeMixerChannelNum);
+      document.getElementById(`mix-btn-m-${activeMixerChannelNum}`)?.classList.toggle('active', isMuted);
+      document.getElementById(`btn-mute-${activeMixerChannelNum}`)?.classList.toggle('active', isMuted);
+      document.querySelectorAll(`.fl-mute-led[data-track="${activeMixerChannelNum}"]`).forEach(led => led.classList.toggle('active', !isMuted));
+      showToast(`Mixer Track 0${activeMixerChannelNum} Mute: ${isMuted ? 'MUTED' : 'UNMUTED'}`, 'info');
+    });
+
+    document.getElementById('fl-mix-reset-fader')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const fader = document.getElementById(`mix-fader-${activeMixerChannelNum}`);
+      if (fader) {
+        fader.value = 85;
+        fader.dispatchEvent(new Event('input'));
+        showToast(`🎛️ Mixer Insert 0${activeMixerChannelNum} Fader reset to Unity (0.0 dB)`, 'info');
+      }
+    });
+
+    document.getElementById('fl-mix-open-fx')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      openFXRackModal(activeMixerChannelNum);
+    });
+
+    document.getElementById('fl-mix-render-wav')?.addEventListener('click', () => {
+      hideAllFLContextMenus();
+      const trk = engine.fourTrack.tracks[activeMixerChannelNum];
+      const trkName = (trk?.name || `Track${activeMixerChannelNum}`).replace(/\s+/g, '-');
+      const blob = engine.generateWavFile({ duration: 30, isSplitTrack: true, trackId: activeMixerChannelNum });
+      engine.downloadDubFile(`Stem-${activeMixerChannelNum}-${trkName}-24bit.wav`, blob);
+      showToast(`💾 Stem WAV exported for Insert 0${activeMixerChannelNum}!`, 'success');
+    });
+
+    // Global Click Listener to close open context menus
+    window.addEventListener('click', (e) => {
+      if (!e.target.closest('.fl-context-menu') && !e.target.closest('.fl-rec-dropdown')) {
+        hideAllFLContextMenus();
+      }
+    });
+  }
+
+  // =========================================================================
+  // DYNAMIC TRACK MANAGEMENT (ADD & REMOVE PLAYLIST TRACKS & MIXER CHANNELS)
+  // =========================================================================
+  function addNewPlaylistTrack(options = {}) {
+    const trackIds = Object.keys(engine.fourTrack?.tracks || {}).map(Number);
+    let newId = 1;
+    while (trackIds.includes(newId)) newId++;
+
+    const defaultColors = ['#10b981', '#06b6d4', '#ec4899', '#f59e0b', '#8b5cf6', '#3b82f6'];
+    const assignedColor = options.color || defaultColors[(newId - 1) % defaultColors.length];
+    const trackName = options.name || `Track ${newId < 10 ? '0' + newId : newId} (Dub)`;
+
+    const newTrack = engine.addTrack({
+      id: newId,
+      name: trackName,
+      color: assignedColor
+    });
+
+    // 1. Add Track Header to #daw-tracks-list
+    const tracksList = document.getElementById('daw-tracks-list');
+    if (tracksList) {
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'daw-track-header trk-custom';
+      headerDiv.id = `hdr-trk-${newId}`;
+      headerDiv.setAttribute('data-track', String(newId));
+      headerDiv.innerHTML = `
+        <div class="trk-hdr-color-strip" style="background: ${assignedColor};"></div>
+        <span class="fl-mute-led active" data-track="${newId}" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+        <span class="fl-arm-disk" data-track="${newId}" title="Arm for Audio Recording (FL Studio style)">⏺</span>
+        <div class="trk-hdr-info">
+          <div class="trk-hdr-title-row">
+            <span class="trk-hdr-num">${newId < 10 ? '0' + newId : newId}</span>
+            <span class="trk-hdr-name">${newTrack.name}</span>
+          </div>
+          <div class="trk-hdr-meta">Dub Audio Bus • Master Bus</div>
+        </div>
+        <div class="trk-hdr-controls">
+          <button type="button" class="trk-btn btn-trk-rec" data-track="${newId}" id="btn-rec-${newId}" title="Arm Record">R</button>
+          <button type="button" class="trk-btn btn-trk-solo" data-track="${newId}" id="btn-solo-${newId}" title="Solo">S</button>
+          <button type="button" class="trk-btn btn-trk-mute" data-track="${newId}" id="btn-mute-${newId}" title="Mute">M</button>
+          <button type="button" class="trk-btn btn-trk-menu btn-track-menu-trigger" data-track="${newId}" title="Track Options">▾</button>
+        </div>
+      `;
+      tracksList.appendChild(headerDiv);
+    }
+
+    // 2. Add Timeline Lane to #daw-lanes-container
+    const lanesContainer = document.getElementById('daw-lanes-container');
+    if (lanesContainer) {
+      const laneDiv = document.createElement('div');
+      laneDiv.className = `daw-track-lane lane-${newId}`;
+      laneDiv.id = `lane-trk-${newId}`;
+      laneDiv.setAttribute('data-track', String(newId));
+      laneDiv.innerHTML = `<div class="timeline-lane-grid"></div>`;
+      lanesContainer.appendChild(laneDiv);
+    }
+
+    // 3. Add Mixer Channel Strip to #daw-mixer-strips-list
+    const mixerStripsList = document.getElementById('daw-mixer-strips-list');
+    if (mixerStripsList) {
+      const stripDiv = document.createElement('div');
+      stripDiv.className = `daw-channel-strip ch-${newId}`;
+      stripDiv.setAttribute('data-track', String(newId));
+      stripDiv.innerHTML = `
+        <div class="ch-strip-top">
+          <span class="fl-mute-led active" data-track="${newId}" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+          <span class="ch-name">${newId < 10 ? '0' + newId : newId} ${newTrack.name}</span>
+          <span class="ch-insert-dropdown">Inserts ▾</span>
+        </div>
+        <div class="ch-pan-send-row">
+          <div class="ch-rotary-unit">
+            <span class="rotary-label">Pan</span>
+            <input type="range" class="rotary-dial" min="-100" max="100" value="0" id="mix-pan-${newId}">
+          </div>
+          <div class="ch-rotary-unit">
+            <span class="rotary-label">Send A</span>
+            <input type="range" class="rotary-dial" min="0" max="100" value="25" id="mix-senda-${newId}">
+          </div>
+          <div class="ch-rotary-unit">
+            <span class="rotary-label">Send B</span>
+            <input type="range" class="rotary-dial" min="0" max="100" value="15" id="mix-sendb-${newId}">
+          </div>
+        </div>
+        <div class="ch-meter-fader-body">
+          <div class="daw-vu-meter-column">
+            <div class="meter-scale-text">
+              <span>0</span>
+              <span>-6</span>
+              <span>-12</span>
+              <span>-18</span>
+              <span>-24</span>
+              <span>-30</span>
+              <span>-44</span>
+            </div>
+            <div class="dual-led-bar" id="mix-vu-${newId}">
+              <div class="led-col left" id="mix-vu-${newId}-l"></div>
+              <div class="led-col right" id="mix-vu-${newId}-r"></div>
+            </div>
+          </div>
+          <div class="ch-fader-track">
+            <input type="range" orient="vertical" min="0" max="120" value="85" class="daw-vertical-fader" id="mix-fader-${newId}" data-track="${newId}">
+          </div>
+        </div>
+        <div class="ch-strip-btns-row">
+          <button type="button" class="mix-btn btn-fx" title="Toggle Channel FX Inserts">FX</button>
+          <button type="button" class="mix-btn btn-s" data-track="${newId}" id="mix-btn-s-${newId}" title="Solo">S</button>
+          <button type="button" class="mix-btn btn-m" data-track="${newId}" id="mix-btn-m-${newId}" title="Mute">M</button>
+          <button type="button" class="mix-btn btn-r" data-track="${newId}" id="mix-btn-r-${newId}" title="Record Arm">R</button>
+        </div>
+      `;
+      mixerStripsList.appendChild(stripDiv);
+    }
+
+    // 4. Build VU meters and wire controls
+    buildTrackVUMeter(newId);
+    setupTrackChannelControls(newId);
+    showToast(`➕ Track 0${newId} ("${newTrack.name}") added to Playlist & Mixer!`, 'success');
+    return newTrack;
+  }
+
+  function deletePlaylistTrack(trackNum) {
+    const trackKeys = Object.keys(engine.fourTrack?.tracks || {});
+    if (trackKeys.length <= 1) {
+      showToast('⚠️ Cannot delete the last remaining track!', 'error');
+      return;
+    }
+    const trk = engine.fourTrack.tracks[trackNum];
+    const name = trk?.name || `Track 0${trackNum}`;
+
+    engine.deleteTrack(trackNum);
+    document.getElementById(`hdr-trk-${trackNum}`)?.remove();
+    document.getElementById(`lane-trk-${trackNum}`)?.remove();
+    document.querySelector(`.daw-channel-strip[data-track="${trackNum}"]`)?.remove();
+    showToast(`🗑️ Removed ${name} from Playlist and Mixer Console`, 'info');
+  }
+
+  // =========================================================================
+  // FL STUDIO MODALS (10-SLOT FX RACK & RENAME/RECOLOR)
+  // =========================================================================
+  function openFXRackModal(trackNum) {
+    activeMixerChannelNum = trackNum;
+    const modal = document.getElementById('fl-fx-rack-modal');
+    const title = document.getElementById('fl-fx-rack-title');
+    const trk = engine.fourTrack.tracks[trackNum];
+    if (title) title.textContent = `Insert 0${trackNum} (${trk?.name || 'Channel'}) — Effects Slots`;
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function openRenameModal(trackNum) {
+    activeMenuTrackNum = trackNum;
+    const modal = document.getElementById('fl-rename-track-modal');
+    const input = document.getElementById('fl-input-track-name');
+    const trk = engine.fourTrack.tracks[trackNum];
+    if (input) input.value = trk?.name || `Track 0${trackNum}`;
+    selectedRenameColor = trk?.color || '#3b82f6';
+    document.querySelectorAll('#fl-color-palette .color-swatch').forEach(s => {
+      s.classList.toggle('active', s.getAttribute('data-color') === selectedRenameColor);
+    });
+    if (modal) modal.style.display = 'flex';
+    input?.focus();
+  }
+
+  function setupFLStudioModals() {
+    // FX Rack Modal Close
+    const fxModal = document.getElementById('fl-fx-rack-modal');
+    document.getElementById('btn-close-fx-rack')?.addEventListener('click', () => {
+      if (fxModal) fxModal.style.display = 'none';
+    });
+    fxModal?.addEventListener('click', (e) => {
+      if (e.target === fxModal) fxModal.style.display = 'none';
+    });
+
+    // FX Slot bypass toggles & sliders
+    document.querySelectorAll('.fl-fx-slot-row .btn-slot-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const row = btn.closest('.fl-fx-slot-row');
+        const led = row?.querySelector('.slot-led');
+        const isOff = btn.classList.toggle('off');
+        btn.textContent = isOff ? 'OFF' : 'ON';
+        led?.classList.toggle('lit', !isOff);
+        row?.classList.toggle('active', !isOff);
+        const slotName = row?.querySelector('.slot-name')?.textContent || 'Effect';
+        showToast(`🎛️ ${slotName}: ${isOff ? 'BYPASSED' : 'ACTIVE'}`, 'info');
+      });
+    });
+
+    // Rename Modal Close & Cancel
+    const renameModal = document.getElementById('fl-rename-track-modal');
+    document.getElementById('btn-close-rename-modal')?.addEventListener('click', () => {
+      if (renameModal) renameModal.style.display = 'none';
+    });
+    document.getElementById('btn-cancel-rename')?.addEventListener('click', () => {
+      if (renameModal) renameModal.style.display = 'none';
+    });
+    renameModal?.addEventListener('click', (e) => {
+      if (e.target === renameModal) renameModal.style.display = 'none';
+    });
+
+    // Color Swatches
+    document.querySelectorAll('#fl-color-palette .color-swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        document.querySelectorAll('#fl-color-palette .color-swatch').forEach(s => s.classList.remove('active'));
+        swatch.classList.add('active');
+        selectedRenameColor = swatch.getAttribute('data-color') || '#3b82f6';
+      });
+    });
+
+    // Save Rename
+    document.getElementById('btn-save-rename')?.addEventListener('click', () => {
+      const input = document.getElementById('fl-input-track-name');
+      const newName = input.value.trim() || `Track 0${activeMenuTrackNum}`;
+      engine.renameTrack(activeMenuTrackNum, newName, selectedRenameColor);
+
+      // Update Header
+      const hdr = document.getElementById(`hdr-trk-${activeMenuTrackNum}`);
+      if (hdr) {
+        const nameEl = hdr.querySelector('.trk-hdr-name');
+        if (nameEl) nameEl.textContent = newName;
+        const strip = hdr.querySelector('.trk-hdr-color-strip');
+        if (strip) strip.style.background = selectedRenameColor;
+      }
+
+      // Update Mixer
+      const ch = document.querySelector(`.daw-channel-strip[data-track="${activeMenuTrackNum}"]`);
+      if (ch) {
+        const chName = ch.querySelector('.ch-name');
+        if (chName) chName.textContent = `${activeMenuTrackNum < 10 ? '0' + activeMenuTrackNum : activeMenuTrackNum} ${newName}`;
+      }
+
+      if (renameModal) renameModal.style.display = 'none';
+      showToast(`🏷️ Track 0${activeMenuTrackNum} updated: "${newName}"`, 'success');
+    });
   }
 
   // =========================================================================
@@ -3778,18 +4664,66 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast('⏹ DAW Playback Stopped', 'info');
     });
 
-    // DAW Transport: Record
+    // DAW Transport: Record (FL Studio Arm & Pre-Count)
     document.getElementById('daw-btn-rec')?.addEventListener('click', () => {
       const ft = engine.fourTrack;
       if (ft && ft.isRecording) {
         engine.stopFourTrack();
         updateFourTrackTransportUI();
-        showToast('⏹ Recording Completed & Stored on Track 02 (Juno 106 Lead Vocal)!', 'success');
+        showToast('⏹ Recording Completed & Stored on Armed Track!', 'success');
+        return;
+      }
+
+      // Check which track is armed; default to Track 2 (Vocal) if none
+      let targetTrack = 2;
+      for (const [tId, tObj] of Object.entries(ft.tracks || {})) {
+        if (tObj.recArmed) { targetTrack = parseInt(tId); break; }
+      }
+      engine.toggleTrackRecArm(targetTrack, true);
+      document.querySelectorAll(`.fl-arm-disk[data-track="${targetTrack}"]`).forEach(d => d.classList.add('active'));
+      document.getElementById(`btn-rec-${targetTrack}`)?.classList.add('active');
+      document.getElementById(`mix-btn-r-${targetTrack}`)?.classList.add('active');
+
+      if (ft && ft.precount) {
+        showToast('⏳ COUNT-IN: 3...', 'info');
+        engine.playMetronomeTick(false);
+        setTimeout(() => {
+          showToast('⏳ COUNT-IN: 2...', 'info');
+          engine.playMetronomeTick(false);
+        }, 500);
+        setTimeout(() => {
+          showToast('⏳ COUNT-IN: 1... GO!', 'info');
+          engine.playMetronomeTick(true);
+        }, 1000);
+        setTimeout(() => {
+          engine.startFourTrack(true);
+          updateFourTrackTransportUI();
+          showToast(`⏺ RECORDING LIVE on Track 0${targetTrack}! Studio Vocal Toast Capture Active!`, 'error');
+        }, 1500);
       } else {
-        engine.toggleTrackRecArm(2);
         engine.startFourTrack(true);
         updateFourTrackTransportUI();
-        showToast('⏺ RECORDING LIVE! Studio Vocal Toast Capture Active on Track 02!', 'error');
+        showToast(`⏺ RECORDING LIVE on Track 0${targetTrack}! Studio Vocal Toast Capture Active!`, 'error');
+      }
+    });
+
+    // FL Studio Add Track Button
+    document.getElementById('btn-daw-add-track')?.addEventListener('click', () => {
+      addNewPlaylistTrack();
+    });
+
+    // Spacebar to Play/Stop in DAW Workstation
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && state.activeTab === 'artist-recorder') {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+        e.preventDefault();
+        const ft = engine.fourTrack;
+        if (ft && ft.isPlaying) {
+          engine.stopFourTrack();
+        } else {
+          engine.startFourTrack(false);
+        }
+        updateFourTrackTransportUI();
       }
     });
 

@@ -408,29 +408,53 @@
           </div>
         </header>
 
-        <!-- 2. TOP TRANSPORT & EDITING TOOLBAR -->
+        <!-- 2. TOP TRANSPORT & EDITING TOOLBAR (FL Studio Emulation) -->
         <div class="daw-transport-bar">
           
-          <!-- Search & Tool Selectors -->
+          <!-- Search & FL Studio Tool Palette -->
           <div class="daw-tools-cluster">
             <div class="daw-search-box">
               <span class="search-icon">🔍</span>
               <input type="text" id="daw-clip-search" placeholder="Search clips, riddims, sound fx..." aria-label="Search audio clips">
             </div>
 
+            <!-- FL Studio Mode Switcher: PAT vs SONG -->
+            <div class="fl-mode-switch-group" role="group" aria-label="Playback Mode">
+              <button type="button" class="fl-mode-btn" id="fl-btn-pat" title="Pattern Mode: Audition selected clip/take">PAT</button>
+              <button type="button" class="fl-mode-btn active" id="fl-btn-song" title="Song Mode: Full playlist multitrack playback">SONG</button>
+            </div>
+
+            <!-- FL Studio Playlist Tools -->
             <div class="daw-edit-tools-group" role="group" aria-label="Audio editing tools">
-              <button type="button" class="tool-btn active" id="daw-tool-pointer" title="Pointer / Selection Tool (V)">
+              <button type="button" class="tool-btn active" id="daw-tool-pointer" title="Select / Pointer Tool (V)">
                 <span>👆</span> Pointer
               </button>
-              <button type="button" class="tool-btn" id="daw-tool-scissors" title="Scissors Split Tool (C) — Slice audio clips on timeline">
-                <span>✂️</span> Scissors
+              <button type="button" class="tool-btn" id="daw-tool-draw" title="Pencil / Draw Tool (P)">
+                <span>✏️</span> Draw
+              </button>
+              <button type="button" class="tool-btn" id="daw-tool-scissors" title="Scissors / Razor Split Tool (C) — Slice audio clips at cursor">
+                <span>✂️</span> Slice
               </button>
               <button type="button" class="tool-btn" id="daw-tool-curves" title="Audio Curves Tool (E) — Shape Fade-in, Fade-out & Gain curves">
                 <span>📈</span> Curves
               </button>
-              <button type="button" class="tool-btn" id="daw-tool-slip" title="Slip / Trim Tool (T) — Top & tail clip boundaries">
-                <span>📐</span> Slip Trim
+              <button type="button" class="tool-btn" id="daw-tool-slip" title="Slip / Trim Tool (S) — Top & tail clip boundaries">
+                <span>📐</span> Slip
               </button>
+              <button type="button" class="tool-btn" id="daw-tool-mute" title="Mute Tool (T) — Click clip to mute/unmute">
+                <span>🔇</span> Mute
+              </button>
+            </div>
+
+            <!-- FL Studio Snap to Grid Selector -->
+            <div class="fl-snap-selector" title="Playlist Grid Snap (FL Studio Style)">
+              <span class="snap-icon">🧲</span>
+              <select id="fl-snap-select" class="fl-snap-dropdown" aria-label="Snap to grid">
+                <option value="bar" selected>Snap: 1 Bar</option>
+                <option value="half">Snap: 1/2 Beat</option>
+                <option value="quarter">Snap: 1/4 Beat (Cell)</option>
+                <option value="none">Snap: (none)</option>
+              </select>
             </div>
           </div>
 
@@ -450,12 +474,24 @@
               <button type="button" class="btn-tap-tempo" id="daw-btn-tap" title="Tap Tempo">TAP</button>
             </div>
 
-            <!-- Transport Buttons -->
+            <!-- FL Studio Transport Metronome & 3-2-1 Countdown Toggles -->
+            <div class="fl-transport-toggles">
+              <button type="button" class="fl-toggle-btn active" id="fl-btn-metronome" title="Metronome Click (Ctrl+M)">
+                <span class="toggle-icon">🔔</span>
+                <span class="toggle-tag">METRO</span>
+              </button>
+              <button type="button" class="fl-toggle-btn" id="fl-btn-precount" title="3-2-1 Countdown Pre-Count before Recording (Ctrl+P)">
+                <span class="toggle-icon">⏳</span>
+                <span class="toggle-tag">3-2-1</span>
+              </button>
+            </div>
+
+            <!-- Transport Buttons with FL Studio Arm Cluster -->
             <div class="daw-transport-buttons">
               <button type="button" class="daw-tr-btn" id="daw-btn-rtz" title="Return to Bar 1 (0:00)">
                 <span>⏮</span>
               </button>
-              <button type="button" class="daw-tr-btn" id="daw-btn-rew" title="Rewind">
+              <button type="button" class="daw-tr-btn" id="daw-btn-rew" title="Rewind 4 Bars">
                 <span>⏪</span>
               </button>
               <button type="button" class="daw-tr-btn daw-tr-play" id="daw-btn-play" title="Start Playback (Space)">
@@ -464,10 +500,47 @@
               <button type="button" class="daw-tr-btn daw-tr-stop" id="daw-btn-stop" title="Stop & Reset">
                 <span>⏹</span>
               </button>
-              <button type="button" class="daw-tr-btn daw-tr-rec" id="daw-btn-rec" title="Record Armed Tracks">
-                <span class="rec-dot"></span>
-              </button>
-              <button type="button" class="daw-tr-btn" id="daw-btn-ff" title="Fast Forward">
+              
+              <!-- FL Studio Arm to Record Button & Mode Dropdown -->
+              <div class="fl-rec-cluster">
+                <button type="button" class="daw-tr-btn daw-tr-rec fl-arm-btn" id="daw-btn-rec" title="Arm to Record (Left Click: Toggle Arm | Right Click: Select Recording Target)">
+                  <span class="rec-dot"></span>
+                  <span class="arm-tag">ARM</span>
+                </button>
+                <div class="fl-rec-dropdown" id="fl-rec-options-menu" style="display: none;">
+                  <div class="fl-rec-header">FL Studio Arm Recording:</div>
+                  <div class="fl-rec-item active" data-rec-mode="playlist_audio">
+                    <span class="fl-item-icon">🎙️</span>
+                    <div class="fl-item-text">
+                      <strong>Audio, into Playlist as audio clip</strong>
+                      <small>Direct capture to armed track</small>
+                    </div>
+                  </div>
+                  <div class="fl-rec-item" data-rec-mode="edison">
+                    <span class="fl-item-icon">🎧</span>
+                    <div class="fl-item-text">
+                      <strong>Audio, into Edison / Sample Editor</strong>
+                      <small>Slice, trim and loop take before placement</small>
+                    </div>
+                  </div>
+                  <div class="fl-rec-item" data-rec-mode="everything">
+                    <span class="fl-item-icon">⚡</span>
+                    <div class="fl-item-text">
+                      <strong>Notes, Audio and Automation</strong>
+                      <small>Arm everything into the session</small>
+                    </div>
+                  </div>
+                  <div class="fl-rec-divider"></div>
+                  <div class="fl-rec-item disarm" data-rec-mode="disarm">
+                    <span class="fl-item-icon">⏹</span>
+                    <div class="fl-item-text">
+                      <strong>Disarm all tracks</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button type="button" class="daw-tr-btn" id="daw-btn-ff" title="Fast Forward 4 Bars">
                 <span>⏩</span>
               </button>
             </div>
@@ -498,7 +571,6 @@
           </div>
 
         </div>
-
         <!-- 3. MAIN WORK AREA: TIMELINE ARRANGEMENT VIEW & TRACKS -->
         <div class="daw-main-arrangement-view">
           
@@ -512,106 +584,136 @@
               </div>
             </div>
 
-            <!-- Track 1 Header -->
-            <div class="daw-track-header trk-blue" data-track="1" id="hdr-trk-1">
-              <div class="trk-hdr-color-strip"></div>
-              <div class="trk-hdr-info">
-                <div class="trk-hdr-title-row">
-                  <span class="trk-hdr-num">01</span>
-                  <span class="trk-hdr-name">TR-808 Music / Riddim</span>
+            <!-- Container for dynamically added/removed playlist track headers -->
+            <div class="daw-tracks-list" id="daw-tracks-list">
+              
+              <!-- Track 1 Header -->
+              <div class="daw-track-header trk-blue" data-track="1" id="hdr-trk-1">
+                <div class="trk-hdr-color-strip"></div>
+                <span class="fl-mute-led active" data-track="1" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                <span class="fl-arm-disk" data-track="1" title="Arm for Audio Recording (FL Studio style)">⏺</span>
+                <div class="trk-hdr-info">
+                  <div class="trk-hdr-title-row">
+                    <span class="trk-hdr-num">01</span>
+                    <span class="trk-hdr-name">TR-808 Music / Riddim</span>
+                  </div>
+                  <div class="trk-hdr-meta">Riddim Stereo • Master Bus</div>
                 </div>
-                <div class="trk-hdr-meta">Riddim Stereo • Master Bus</div>
+                <div class="trk-hdr-controls">
+                  <button type="button" class="trk-btn btn-trk-rec" data-track="1" id="btn-rec-1" title="Arm Record">R</button>
+                  <button type="button" class="trk-btn btn-trk-solo" data-track="1" id="btn-solo-1" title="Solo">S</button>
+                  <button type="button" class="trk-btn btn-trk-mute" data-track="1" id="btn-mute-1" title="Mute">M</button>
+                  <button type="button" class="trk-btn btn-trk-menu btn-track-menu-trigger" data-track="1" title="Track Options (Right Click or Click)">▾</button>
+                </div>
               </div>
-              <div class="trk-hdr-controls">
-                <button type="button" class="trk-btn btn-trk-rec" data-track="1" id="btn-rec-1" title="Arm Record">R</button>
-                <button type="button" class="trk-btn btn-trk-solo" data-track="1" id="btn-solo-1" title="Solo">S</button>
-                <button type="button" class="trk-btn btn-trk-mute" data-track="1" id="btn-mute-1" title="Mute">M</button>
+
+              <!-- Track 2 Header -->
+              <div class="daw-track-header trk-purple" data-track="2" id="hdr-trk-2">
+                <div class="trk-hdr-color-strip"></div>
+                <span class="fl-mute-led active" data-track="2" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                <span class="fl-arm-disk active" data-track="2" title="Arm for Audio Recording (FL Studio style)">⏺</span>
+                <div class="trk-hdr-info">
+                  <div class="trk-hdr-title-row">
+                    <span class="trk-hdr-num">02</span>
+                    <span class="trk-hdr-name">Juno 106 - Lead Vocal</span>
+                  </div>
+                  <div class="trk-hdr-meta">Input 1 (Studio Mic) • Master</div>
+                </div>
+                <div class="trk-hdr-controls">
+                  <button type="button" class="trk-btn btn-trk-rec active" data-track="2" id="btn-rec-2" title="Arm Record">R</button>
+                  <button type="button" class="trk-btn btn-trk-solo" data-track="2" id="btn-solo-2" title="Solo">S</button>
+                  <button type="button" class="trk-btn btn-trk-mute" data-track="2" id="btn-mute-2" title="Mute">M</button>
+                  <button type="button" class="trk-btn btn-trk-menu btn-track-menu-trigger" data-track="2" title="Track Options">▾</button>
+                </div>
               </div>
+
+              <!-- Track 3 Header -->
+              <div class="daw-track-header trk-green" data-track="3" id="hdr-trk-3">
+                <div class="trk-hdr-color-strip"></div>
+                <span class="fl-mute-led active" data-track="3" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                <span class="fl-arm-disk" data-track="3" title="Arm for Audio Recording">⏺</span>
+                <div class="trk-hdr-info">
+                  <div class="trk-hdr-title-row">
+                    <span class="trk-hdr-num">03</span>
+                    <span class="trk-hdr-name">Moog Sub 37 - Backing & Chants</span>
+                  </div>
+                  <div class="trk-hdr-meta">Chant Bus • Master</div>
+                </div>
+                <div class="trk-hdr-controls">
+                  <button type="button" class="trk-btn btn-trk-rec" data-track="3" id="btn-rec-3" title="Arm Record">R</button>
+                  <button type="button" class="trk-btn btn-trk-solo" data-track="3" id="btn-solo-3" title="Solo">S</button>
+                  <button type="button" class="trk-btn btn-trk-mute" data-track="3" id="btn-mute-3" title="Mute">M</button>
+                  <button type="button" class="trk-btn btn-trk-menu btn-track-menu-trigger" data-track="3" title="Track Options">▾</button>
+                </div>
+              </div>
+
+              <!-- Track 4 Header -->
+              <div class="daw-track-header trk-magenta" data-track="4" id="hdr-trk-4">
+                <div class="trk-hdr-color-strip"></div>
+                <span class="fl-mute-led active" data-track="4" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                <span class="fl-arm-disk" data-track="4" title="Arm for Audio Recording">⏺</span>
+                <div class="trk-hdr-info">
+                  <div class="trk-hdr-title-row">
+                    <span class="trk-hdr-num">04</span>
+                    <span class="trk-hdr-name">Korg Minilogue - Synth / Dub FX</span>
+                  </div>
+                  <div class="trk-hdr-meta">Dub Siren & Clash Bus • Master</div>
+                </div>
+                <div class="trk-hdr-controls">
+                  <button type="button" class="trk-btn btn-trk-rec" data-track="4" id="btn-rec-4" title="Arm Record">R</button>
+                  <button type="button" class="trk-btn btn-trk-solo" data-track="4" id="btn-solo-4" title="Solo">S</button>
+                  <button type="button" class="trk-btn btn-trk-mute" data-track="4" id="btn-mute-4" title="Mute">M</button>
+                  <button type="button" class="trk-btn btn-trk-menu btn-track-menu-trigger" data-track="4" title="Track Options">▾</button>
+                </div>
+              </div>
+
+              <!-- Track 5 Header -->
+              <div class="daw-track-header trk-cyan" data-track="5" id="hdr-trk-5">
+                <div class="trk-hdr-color-strip"></div>
+                <span class="fl-mute-led active" data-track="5" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                <span class="fl-arm-disk" data-track="5" title="Arm for Audio Recording">⏺</span>
+                <div class="trk-hdr-info">
+                  <div class="trk-hdr-title-row">
+                    <span class="trk-hdr-num">05</span>
+                    <span class="trk-hdr-name">Yamaha DX7 - Tape Echo & Reverb</span>
+                  </div>
+                  <div class="trk-hdr-meta">Tubby Space Echo Bus • Master</div>
+                </div>
+                <div class="trk-hdr-controls">
+                  <button type="button" class="trk-btn btn-trk-rec" data-track="5" id="btn-rec-5" title="Arm Record">R</button>
+                  <button type="button" class="trk-btn btn-trk-solo" data-track="5" id="btn-solo-5" title="Solo">S</button>
+                  <button type="button" class="trk-btn btn-trk-mute" data-track="5" id="btn-mute-5" title="Mute">M</button>
+                  <button type="button" class="trk-btn btn-trk-menu btn-track-menu-trigger" data-track="5" title="Track Options">▾</button>
+                </div>
+              </div>
+
+              <!-- Track 6 Header -->
+              <div class="daw-track-header trk-pink" data-track="6" id="hdr-trk-6">
+                <div class="trk-hdr-color-strip"></div>
+                <span class="fl-mute-led active" data-track="6" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                <span class="fl-arm-disk" data-track="6" title="Arm for Audio Recording">⏺</span>
+                <div class="trk-hdr-info">
+                  <div class="trk-hdr-title-row">
+                    <span class="trk-hdr-num">06</span>
+                    <span class="trk-hdr-name">Korg MS1 - Sound Clash Drops</span>
+                  </div>
+                  <div class="trk-hdr-meta">Drop In Tag Bus • Master</div>
+                </div>
+                <div class="trk-hdr-controls">
+                  <button type="button" class="trk-btn btn-trk-rec" data-track="6" id="btn-rec-6" title="Arm Record">R</button>
+                  <button type="button" class="trk-btn btn-trk-solo" data-track="6" id="btn-solo-6" title="Solo">S</button>
+                  <button type="button" class="trk-btn btn-trk-mute" data-track="6" id="btn-mute-6" title="Mute">M</button>
+                  <button type="button" class="trk-btn btn-trk-menu btn-track-menu-trigger" data-track="6" title="Track Options">▾</button>
+                </div>
+              </div>
+
             </div>
 
-            <!-- Track 2 Header -->
-            <div class="daw-track-header trk-purple" data-track="2" id="hdr-trk-2">
-              <div class="trk-hdr-color-strip"></div>
-              <div class="trk-hdr-info">
-                <div class="trk-hdr-title-row">
-                  <span class="trk-hdr-num">02</span>
-                  <span class="trk-hdr-name">Juno 106 - Lead Vocal</span>
-                </div>
-                <div class="trk-hdr-meta">Input 1 (Studio Mic) • Master</div>
-              </div>
-              <div class="trk-hdr-controls">
-                <button type="button" class="trk-btn btn-trk-rec active" data-track="2" id="btn-rec-2" title="Arm Record">R</button>
-                <button type="button" class="trk-btn btn-trk-solo" data-track="2" id="btn-solo-2" title="Solo">S</button>
-                <button type="button" class="trk-btn btn-trk-mute" data-track="2" id="btn-mute-2" title="Mute">M</button>
-              </div>
-            </div>
-
-            <!-- Track 3 Header -->
-            <div class="daw-track-header trk-green" data-track="3" id="hdr-trk-3">
-              <div class="trk-hdr-color-strip"></div>
-              <div class="trk-hdr-info">
-                <div class="trk-hdr-title-row">
-                  <span class="trk-hdr-num">03</span>
-                  <span class="trk-hdr-name">Moog Sub 37 - Backing & Chants</span>
-                </div>
-                <div class="trk-hdr-meta">Chant Bus • Master</div>
-              </div>
-              <div class="trk-hdr-controls">
-                <button type="button" class="trk-btn btn-trk-rec" data-track="3" id="btn-rec-3" title="Arm Record">R</button>
-                <button type="button" class="trk-btn btn-trk-solo" data-track="3" id="btn-solo-3" title="Solo">S</button>
-                <button type="button" class="trk-btn btn-trk-mute" data-track="3" id="btn-mute-3" title="Mute">M</button>
-              </div>
-            </div>
-
-            <!-- Track 4 Header -->
-            <div class="daw-track-header trk-magenta" data-track="4" id="hdr-trk-4">
-              <div class="trk-hdr-color-strip"></div>
-              <div class="trk-hdr-info">
-                <div class="trk-hdr-title-row">
-                  <span class="trk-hdr-num">04</span>
-                  <span class="trk-hdr-name">Korg Minilogue - Synth / Dub FX</span>
-                </div>
-                <div class="trk-hdr-meta">Dub Siren & Clash Bus • Master</div>
-              </div>
-              <div class="trk-hdr-controls">
-                <button type="button" class="trk-btn btn-trk-rec" data-track="4" id="btn-rec-4" title="Arm Record">R</button>
-                <button type="button" class="trk-btn btn-trk-solo" data-track="4" id="btn-solo-4" title="Solo">S</button>
-                <button type="button" class="trk-btn btn-trk-mute" data-track="4" id="btn-mute-4" title="Mute">M</button>
-              </div>
-            </div>
-
-            <!-- Track 5 Header -->
-            <div class="daw-track-header trk-cyan" data-track="5" id="hdr-trk-5">
-              <div class="trk-hdr-color-strip"></div>
-              <div class="trk-hdr-info">
-                <div class="trk-hdr-title-row">
-                  <span class="trk-hdr-num">05</span>
-                  <span class="trk-hdr-name">Yamaha DX7 - Tape Echo & Reverb</span>
-                </div>
-                <div class="trk-hdr-meta">Tubby Space Echo Bus • Master</div>
-              </div>
-              <div class="trk-hdr-controls">
-                <button type="button" class="trk-btn btn-trk-rec" data-track="5" id="btn-rec-5" title="Arm Record">R</button>
-                <button type="button" class="trk-btn btn-trk-solo" data-track="5" id="btn-solo-5" title="Solo">S</button>
-                <button type="button" class="trk-btn btn-trk-mute" data-track="5" id="btn-mute-5" title="Mute">M</button>
-              </div>
-            </div>
-
-            <!-- Track 6 Header -->
-            <div class="daw-track-header trk-pink" data-track="6" id="hdr-trk-6">
-              <div class="trk-hdr-color-strip"></div>
-              <div class="trk-hdr-info">
-                <div class="trk-hdr-title-row">
-                  <span class="trk-hdr-num">06</span>
-                  <span class="trk-hdr-name">Korg MS1 - Sound Clash Drops</span>
-                </div>
-                <div class="trk-hdr-meta">Drop In Tag Bus • Master</div>
-              </div>
-              <div class="trk-hdr-controls">
-                <button type="button" class="trk-btn btn-trk-rec" data-track="6" id="btn-rec-6" title="Arm Record">R</button>
-                <button type="button" class="trk-btn btn-trk-solo" data-track="6" id="btn-solo-6" title="Solo">S</button>
-                <button type="button" class="trk-btn btn-trk-mute" data-track="6" id="btn-mute-6" title="Mute">M</button>
-              </div>
+            <!-- FL Studio Add Track Footer Button -->
+            <div class="daw-add-track-footer">
+              <button type="button" class="btn-fl-add-track" id="btn-daw-add-track" title="Add a new playlist audio track & mixer channel (FL Studio style)">
+                <span>➕</span> Add Track
+              </button>
             </div>
 
             <!-- Master Reference Header -->
@@ -626,7 +728,7 @@
               </div>
             </div>
           </div>
-
+          
           <!-- RIGHT: TIMELINE ARRANGEMENT GRID WITH AUDIO CLIPS -->
           <div class="daw-timeline-col" id="daw-timeline-col">
             
@@ -657,7 +759,8 @@
               <div class="scissors-cursor-tag">✂️ Split</div>
             </div>
 
-            <!-- Track 1 Lane: TR-808 Music / Riddim (Blue) -->
+            <div class="daw-lanes-container" id="daw-lanes-container">
+<!-- Track 1 Lane: TR-808 Music / Riddim (Blue) -->
             <div class="daw-track-lane lane-1" data-track="1" id="lane-trk-1">
               <div class="timeline-lane-grid"></div>
               
@@ -887,7 +990,9 @@
               </div>
             </div>
 
-          </div>
+          
+</div>
+</div>
 
         </div>
 
@@ -933,9 +1038,10 @@
           <!-- Channel Strips Chassis (Modeled after user screenshot) -->
           <div class="mixer-strips-chassis" id="mixer-strips-chassis">
             
-            <!-- Channel 1: TR-808 (Music / Riddim) -->
+            <div class="daw-mixer-strips-list" id="daw-mixer-strips-list">
+<!-- Channel 1: TR-808 (Music / Riddim) -->
             <div class="daw-channel-strip ch-1" data-track="1">
-              <div class="ch-strip-top">
+              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="1" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
                 <span class="ch-name">01 TR-808</span>
                 <span class="ch-insert-dropdown">Inserts ▾</span>
               </div>
@@ -985,7 +1091,7 @@
 
             <!-- Channel 2: Juno 106 - Lead Voice -->
             <div class="daw-channel-strip ch-2" data-track="2">
-              <div class="ch-strip-top">
+              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="2" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
                 <span class="ch-name">02 Juno 106</span>
                 <span class="ch-insert-dropdown">Inserts ▾</span>
               </div>
@@ -1033,7 +1139,7 @@
 
             <!-- Channel 3: Moog Sub 37 - Backing & Chants -->
             <div class="daw-channel-strip ch-3" data-track="3">
-              <div class="ch-strip-top">
+              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="3" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
                 <span class="ch-name">03 Moog Sub 37</span>
                 <span class="ch-insert-dropdown">Inserts ▾</span>
               </div>
@@ -1081,7 +1187,7 @@
 
             <!-- Channel 4: Korg Minilogue - Dub FX -->
             <div class="daw-channel-strip ch-4" data-track="4">
-              <div class="ch-strip-top">
+              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="4" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
                 <span class="ch-name">04 Korg Minilog</span>
                 <span class="ch-insert-dropdown">Inserts ▾</span>
               </div>
@@ -1129,7 +1235,7 @@
 
             <!-- Channel 5: Yamaha DX7 - Tape Echo / Reverb -->
             <div class="daw-channel-strip ch-5" data-track="5">
-              <div class="ch-strip-top">
+              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="5" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
                 <span class="ch-name">05 Yamaha DX7</span>
                 <span class="ch-insert-dropdown">Inserts ▾</span>
               </div>
@@ -1177,7 +1283,7 @@
 
             <!-- Channel 6: Korg MS1 - Sound Clash Drops -->
             <div class="daw-channel-strip ch-6" data-track="6">
-              <div class="ch-strip-top">
+              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="6" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
                 <span class="ch-name">06 Korg MS1</span>
                 <span class="ch-insert-dropdown">Inserts ▾</span>
               </div>
@@ -1223,7 +1329,9 @@
               </div>
             </div>
 
-            <!-- Master Channel (Far Right) -->
+            
+</div>
+<!-- Master Channel (Far Right) -->
             <div class="daw-channel-strip ch-master" data-track="master">
               <div class="ch-strip-top">
                 <span class="ch-name gold">Master</span>
@@ -1260,6 +1368,261 @@
           </div>
         </div>
 
+
+        <!-- =========================================================================
+             FL STUDIO EMULATION: CONTEXT MENUS & FX RACK INSPECTOR
+             ========================================================================= -->
+
+        <!-- 1. Right-Click Context Menu for Audio Clips in Playlist -->
+        <div class="fl-context-menu" id="fl-clip-context-menu" style="display: none;">
+          <div class="fl-menu-header" id="fl-ctx-clip-title">Audio Clip</div>
+          <div class="fl-menu-item" id="fl-ctx-clip-slice">
+            <span class="fl-menu-icon">✂️</span> Slice at Cursor (Razor Cut) <span class="fl-shortcut">C</span>
+          </div>
+          <div class="fl-menu-item" id="fl-ctx-clip-duplicate">
+            <span class="fl-menu-icon">📋</span> Duplicate Clip Take <span class="fl-shortcut">Ctrl+B</span>
+          </div>
+          <div class="fl-menu-item" id="fl-ctx-clip-mute">
+            <span class="fl-menu-icon">🔇</span> Mute / Unmute Clip <span class="fl-shortcut">T</span>
+          </div>
+          <div class="fl-menu-divider"></div>
+          <div class="fl-menu-item" id="fl-ctx-clip-fadein">
+            <span class="fl-menu-icon">📈</span> Quick Fade-In (Audio Curve)
+          </div>
+          <div class="fl-menu-item" id="fl-ctx-clip-fadeout">
+            <span class="fl-menu-icon">📉</span> Quick Fade-Out (Audio Curve)
+          </div>
+          <div class="fl-menu-item" id="fl-ctx-clip-boost">
+            <span class="fl-menu-icon">🔊</span> +3 dB Dubplate Gain Boost
+          </div>
+          <div class="fl-menu-divider"></div>
+          <div class="fl-menu-item" id="fl-ctx-clip-unique">
+            <span class="fl-menu-icon">💾</span> Make Unique / Save Audio Take
+          </div>
+          <div class="fl-menu-item danger" id="fl-ctx-clip-delete">
+            <span class="fl-menu-icon">🗑️</span> Delete Clip <span class="fl-shortcut">Del</span>
+          </div>
+        </div>
+
+        <!-- 2. Right-Click Context Menu for Playlist Track Headers -->
+        <div class="fl-context-menu" id="fl-track-context-menu" style="display: none;">
+          <div class="fl-menu-header" id="fl-ctx-track-title">Playlist Track</div>
+          <div class="fl-menu-item" id="fl-menu-rename-track">
+            <span class="fl-menu-icon">🏷️</span> Rename and Recolor... <span class="fl-shortcut">F2</span>
+          </div>
+          <div class="fl-menu-divider"></div>
+          <div class="fl-menu-item" id="fl-menu-insert-above">
+            <span class="fl-menu-icon">➕</span> Insert Track Above
+          </div>
+          <div class="fl-menu-item" id="fl-menu-insert-below">
+            <span class="fl-menu-icon">➕</span> Insert Track Below
+          </div>
+          <div class="fl-menu-item danger" id="fl-menu-delete-track">
+            <span class="fl-menu-icon">🗑️</span> Delete Track
+          </div>
+          <div class="fl-menu-divider"></div>
+          <div class="fl-menu-item" id="fl-menu-arm-track">
+            <span class="fl-menu-icon">🔴</span> Arm for Audio Recording
+          </div>
+          <div class="fl-menu-item" id="fl-menu-solo-track">
+            <span class="fl-menu-icon">⭐</span> Solo Track
+          </div>
+          <div class="fl-menu-item" id="fl-menu-mute-track">
+            <span class="fl-menu-icon">🔇</span> Mute / Unmute Track
+          </div>
+          <div class="fl-menu-divider"></div>
+          <div class="fl-menu-item" id="fl-menu-link-mixer">
+            <span class="fl-menu-icon">🎚️</span> Route to Mixer Channel...
+          </div>
+        </div>
+
+        <!-- 3. Right-Click Context Menu for Empty Timeline Grid -->
+        <div class="fl-context-menu" id="fl-timeline-context-menu" style="display: none;">
+          <div class="fl-menu-header">Timeline Grid</div>
+          <div class="fl-menu-item" id="fl-grid-paste">
+            <span class="fl-menu-icon">📋</span> Paste Audio Clip Here
+          </div>
+          <div class="fl-menu-item" id="fl-grid-slice-all">
+            <span class="fl-menu-icon">✂️</span> Slice All Tracks at This Bar
+          </div>
+          <div class="fl-menu-divider"></div>
+          <div class="fl-menu-item" id="fl-grid-snap-bar">
+            <span class="fl-menu-icon">🧲</span> Set Snap to 1 Bar
+          </div>
+          <div class="fl-menu-item" id="fl-grid-snap-cell">
+            <span class="fl-menu-icon">🧲</span> Set Snap to 1/4 Beat (Cell)
+          </div>
+          <div class="fl-menu-divider"></div>
+          <div class="fl-menu-item" id="fl-grid-set-loop">
+            <span class="fl-menu-icon">🔁</span> Set Loop Region (Start - End)
+          </div>
+        </div>
+
+        <!-- 4. Right-Click Context Menu for Mixer Channel Strips -->
+        <div class="fl-context-menu" id="fl-mixer-context-menu" style="display: none;">
+          <div class="fl-menu-header" id="fl-ctx-mixer-title">Mixer Insert</div>
+          <div class="fl-menu-item" id="fl-mix-rename">
+            <span class="fl-menu-icon">🏷️</span> Rename, Color and Icon... <span class="fl-shortcut">F2</span>
+          </div>
+          <div class="fl-menu-divider"></div>
+          <div class="fl-menu-item" id="fl-mix-arm-disk">
+            <span class="fl-menu-icon">🔴</span> Arm for Disk Recording
+          </div>
+          <div class="fl-menu-item" id="fl-mix-solo">
+            <span class="fl-menu-icon">⭐</span> Solo Track
+          </div>
+          <div class="fl-menu-item" id="fl-mix-mute">
+            <span class="fl-menu-icon">🔇</span> Mute Track
+          </div>
+          <div class="fl-menu-item" id="fl-mix-reset-fader">
+            <span class="fl-menu-icon">🎛️</span> Reset Fader to Unity (0.0 dB)
+          </div>
+          <div class="fl-menu-divider"></div>
+          <div class="fl-menu-item" id="fl-mix-open-fx">
+            <span class="fl-menu-icon">🎚️</span> View FX Insert Slots (1-10)...
+          </div>
+          <div class="fl-menu-item" id="fl-mix-render-wav">
+            <span class="fl-menu-icon">💾</span> Render Track Stems to WAV
+          </div>
+        </div>
+
+        <!-- 5. FL Studio 10-Slot Effects Rack Modal -->
+        <div class="fl-modal-overlay" id="fl-fx-rack-modal" style="display: none;">
+          <div class="fl-fx-rack-box">
+            <div class="fl-fx-rack-header">
+              <div class="rack-header-left">
+                <span class="rack-icon">🎛️</span>
+                <h4 id="fl-fx-rack-title">Insert 01 — Effects Slots</h4>
+              </div>
+              <button type="button" class="btn-close-modal" id="btn-close-fx-rack">✕</button>
+            </div>
+            
+            <div class="fl-fx-slots-list">
+              <!-- Slot 1 -->
+              <div class="fl-fx-slot-row active" data-slot="1">
+                <span class="slot-num">01</span>
+                <span class="slot-led lit"></span>
+                <span class="slot-name">King Tubby Space Echo (Tape Delay)</span>
+                <div class="slot-mix-knob" title="Mix Level: 65%">
+                  <span class="knob-label">MIX</span>
+                  <input type="range" min="0" max="100" value="65" class="fl-mini-slider">
+                </div>
+                <button type="button" class="btn-slot-toggle" title="Bypass Effect">ON</button>
+              </div>
+
+              <!-- Slot 2 -->
+              <div class="fl-fx-slot-row active" data-slot="2">
+                <span class="slot-num">02</span>
+                <span class="slot-led lit"></span>
+                <span class="slot-name">Spring Reverb Tank (Dub Splash)</span>
+                <div class="slot-mix-knob" title="Mix Level: 40%">
+                  <span class="knob-label">MIX</span>
+                  <input type="range" min="0" max="100" value="40" class="fl-mini-slider">
+                </div>
+                <button type="button" class="btn-slot-toggle" title="Bypass Effect">ON</button>
+              </div>
+
+              <!-- Slot 3 -->
+              <div class="fl-fx-slot-row active" data-slot="3">
+                <span class="slot-num">03</span>
+                <span class="slot-led lit"></span>
+                <span class="slot-name">Sound System Dub Siren / Filter Mod</span>
+                <div class="slot-mix-knob" title="Mix Level: 80%">
+                  <span class="knob-label">MIX</span>
+                  <input type="range" min="0" max="100" value="80" class="fl-mini-slider">
+                </div>
+                <button type="button" class="btn-slot-toggle" title="Bypass Effect">ON</button>
+              </div>
+
+              <!-- Slot 4 -->
+              <div class="fl-fx-slot-row active" data-slot="4">
+                <span class="slot-num">04</span>
+                <span class="slot-led lit"></span>
+                <span class="slot-name">Sound Clash Brickwall Limiter & Clipper</span>
+                <div class="slot-mix-knob" title="Mix Level: 100%">
+                  <span class="knob-label">MIX</span>
+                  <input type="range" min="0" max="100" value="100" class="fl-mini-slider">
+                </div>
+                <button type="button" class="btn-slot-toggle" title="Bypass Effect">ON</button>
+              </div>
+
+              <!-- Slot 5 -->
+              <div class="fl-fx-slot-row" data-slot="5">
+                <span class="slot-num">05</span>
+                <span class="slot-led"></span>
+                <span class="slot-name">Parametric Reggae EQ 2 (Warm Sub & Air)</span>
+                <div class="slot-mix-knob" title="Mix Level: 100%">
+                  <span class="knob-label">MIX</span>
+                  <input type="range" min="0" max="100" value="100" class="fl-mini-slider">
+                </div>
+                <button type="button" class="btn-slot-toggle off" title="Bypass Effect">OFF</button>
+              </div>
+
+              <!-- Slot 6..10 Empty Slots -->
+              <div class="fl-fx-slot-row empty" data-slot="6">
+                <span class="slot-num">06</span>
+                <span class="slot-led"></span>
+                <span class="slot-name">(none — click to load effect)</span>
+                <button type="button" class="btn-slot-load">Select...</button>
+              </div>
+              <div class="fl-fx-slot-row empty" data-slot="7">
+                <span class="slot-num">07</span>
+                <span class="slot-led"></span>
+                <span class="slot-name">(none — click to load effect)</span>
+                <button type="button" class="btn-slot-load">Select...</button>
+              </div>
+              <div class="fl-fx-slot-row empty" data-slot="8">
+                <span class="slot-num">08</span>
+                <span class="slot-led"></span>
+                <span class="slot-name">(none — click to load effect)</span>
+                <button type="button" class="btn-slot-load">Select...</button>
+              </div>
+              <div class="fl-fx-slot-row empty" data-slot="9">
+                <span class="slot-num">09</span>
+                <span class="slot-led"></span>
+                <span class="slot-name">(none — click to load effect)</span>
+                <button type="button" class="btn-slot-load">Select...</button>
+              </div>
+              <div class="fl-fx-slot-row empty" data-slot="10">
+                <span class="slot-num">10</span>
+                <span class="slot-led"></span>
+                <span class="slot-name">(none — click to load effect)</span>
+                <button type="button" class="btn-slot-load">Select...</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. FL Studio Rename and Recolor Modal -->
+        <div class="fl-modal-overlay" id="fl-rename-track-modal" style="display: none;">
+          <div class="fl-rename-box">
+            <div class="fl-rename-header">
+              <h4>🏷️ Rename and Recolor Track</h4>
+              <button type="button" class="btn-close-modal" id="btn-close-rename-modal">✕</button>
+            </div>
+            <div class="fl-rename-body">
+              <label class="form-label" for="fl-input-track-name">Track Name:</label>
+              <input type="text" id="fl-input-track-name" class="form-control" placeholder="e.g. Lead Dubplate Vocal">
+              
+              <label class="form-label" style="margin-top: 1rem;">Select FL Studio Color:</label>
+              <div class="fl-color-palette" id="fl-color-palette">
+                <span class="color-swatch active" data-color="#3b82f6" style="background:#3b82f6;"></span>
+                <span class="color-swatch" data-color="#8b5cf6" style="background:#8b5cf6;"></span>
+                <span class="color-swatch" data-color="#10b981" style="background:#10b981;"></span>
+                <span class="color-swatch" data-color="#ec4899" style="background:#ec4899;"></span>
+                <span class="color-swatch" data-color="#9333ea" style="background:#9333ea;"></span>
+                <span class="color-swatch" data-color="#f43f5e" style="background:#f43f5e;"></span>
+                <span class="color-swatch" data-color="#06b6d4" style="background:#06b6d4;"></span>
+                <span class="color-swatch" data-color="#f59e0b" style="background:#f59e0b;"></span>
+                <span class="color-swatch" data-color="#14b8a6" style="background:#14b8a6;"></span>
+              </div>
+            </div>
+            <div class="fl-rename-footer">
+              <button type="button" class="btn btn-outline btn-sm" id="btn-cancel-rename">Cancel</button>
+              <button type="button" class="btn btn-gold btn-sm" id="btn-save-rename">Save Track</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 

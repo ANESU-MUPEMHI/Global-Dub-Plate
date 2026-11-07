@@ -3740,3 +3740,504 @@ body {
   }
 }
 
+/* =========================================================================
+   FL STUDIO 2026 EMULATION STYLING: TRANSPORT, PLAYLIST, MIXER & RIGHT-CLICK
+   ========================================================================= */
+
+/* 1. PAT / SONG Mode Switcher */
+.fl-mode-switch-group {
+  display: flex;
+  background: #090c14;
+  border: 1px solid #1f2738;
+  border-radius: 4px;
+  padding: 1px;
+  gap: 1px;
+}
+
+.fl-mode-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 0.62rem;
+  font-weight: 900;
+  padding: 3px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  font-family: var(--font-mono, monospace);
+}
+
+.fl-mode-btn:hover {
+  color: #fff;
+}
+
+.fl-mode-btn.active {
+  background: #f59e0b;
+  color: #000;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+/* 2. Metronome & Pre-Count Toggles */
+.fl-transport-toggles {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.fl-toggle-btn {
+  background: #141926;
+  border: 1px solid #232c40;
+  color: #94a3b8;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.12s ease;
+}
+
+.fl-toggle-btn:hover {
+  background: #1d2538;
+  color: #fff;
+}
+
+.fl-toggle-btn.active {
+  background: #0d2818;
+  border-color: #10b981;
+  color: #34d399;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+/* 3. Snap to Grid Selector */
+.fl-snap-selector {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: #101420;
+  border: 1px solid #222a3d;
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+
+.fl-snap-dropdown {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+/* 4. FL Studio Arm Record Cluster & Dropdown */
+.fl-rec-cluster {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.fl-arm-btn {
+  position: relative;
+  overflow: visible !important;
+}
+
+.fl-arm-btn.active, .fl-arm-btn.armed {
+  background: #ef4444 !important;
+  border-color: #f87171 !important;
+  color: #fff !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.8) !important;
+  animation: flPulse 1.2s infinite;
+}
+
+@keyframes flPulse {
+  0% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.6); }
+  50% { box-shadow: 0 0 16px rgba(239, 68, 68, 1); }
+  100% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.6); }
+}
+
+.fl-rec-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  width: 260px;
+  background: #101522;
+  border: 1px solid #28334a;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.85);
+  z-index: 100;
+  padding: 6px 0;
+  animation: flFadeDown 0.15s ease-out;
+}
+
+@keyframes flFadeDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fl-rec-header {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  letter-spacing: 0.5px;
+}
+
+.fl-rec-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.fl-rec-item:hover {
+  background: #1a2236;
+}
+
+.fl-rec-item.active {
+  background: rgba(245, 158, 11, 0.12);
+  border-left: 3px solid #f59e0b;
+}
+
+.fl-item-text strong {
+  display: block;
+  font-size: 0.72rem;
+  color: #f8fafc;
+}
+
+.fl-item-text small {
+  font-size: 0.6rem;
+  color: #94a3b8;
+}
+
+.fl-rec-divider {
+  height: 1px;
+  background: #1e2638;
+  margin: 4px 0;
+}
+
+/* 5. FL Studio Playlist Track Mute LED & Arm Disk */
+.fl-mute-led {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #222d42;
+  border: 1px solid #334155;
+  cursor: pointer;
+  margin-right: 4px;
+  transition: all 0.12s ease;
+  flex-shrink: 0;
+}
+
+.fl-mute-led.active {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  border-color: #34d399;
+}
+
+.fl-arm-disk {
+  color: #475569;
+  font-size: 0.7rem;
+  cursor: pointer;
+  margin-right: 4px;
+  transition: all 0.12s ease;
+}
+
+.fl-arm-disk:hover, .fl-arm-disk.active {
+  color: #ef4444;
+  text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+}
+
+.btn-trk-menu {
+  padding: 0 3px !important;
+  font-size: 0.65rem;
+}
+
+/* Add Track Footer Button */
+.daw-add-track-footer {
+  padding: 6px;
+  background: #0d111a;
+  border-bottom: 1px solid #1a2233;
+}
+
+.btn-fl-add-track {
+  width: 100%;
+  background: #161d2d;
+  border: 1px dashed #2f3d57;
+  color: #94a3b8;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-fl-add-track:hover {
+  background: #202b42;
+  color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+/* 6. FL Studio Mixer Arm to Disk Button */
+.fl-mixer-arm-btn {
+  background: transparent;
+  border: none;
+  color: #475569;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  margin-left: 2px;
+  transition: all 0.12s ease;
+}
+
+.fl-mixer-arm-btn:hover, .fl-mixer-arm-btn.active {
+  color: #ef4444;
+  text-shadow: 0 0 6px rgba(239, 68, 68, 0.9);
+}
+
+/* 7. FL Studio Floating Context Menus */
+.fl-context-menu {
+  position: fixed;
+  background: rgba(14, 18, 28, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid #2d3852;
+  border-radius: 6px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85);
+  min-width: 220px;
+  z-index: 9999;
+  padding: 4px 0;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  animation: flFadeDown 0.12s ease-out;
+}
+
+.fl-menu-header {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #94a3b8;
+  padding: 4px 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.fl-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  font-size: 0.74rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.fl-menu-item:hover {
+  background: #f59e0b;
+  color: #000;
+  font-weight: 700;
+}
+
+.fl-menu-item.danger:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.fl-menu-icon {
+  margin-right: 6px;
+  font-size: 0.8rem;
+}
+
+.fl-shortcut {
+  font-size: 0.62rem;
+  font-family: var(--font-mono, monospace);
+  opacity: 0.7;
+}
+
+.fl-menu-divider {
+  height: 1px;
+  background: #1f283d;
+  margin: 3px 0;
+}
+
+/* 8. FL Studio Modals: FX Rack & Rename */
+.fl-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.fl-fx-rack-box, .fl-rename-box {
+  background: #111522;
+  border: 1px solid #2a354c;
+  border-radius: 8px;
+  width: 440px;
+  max-width: 95vw;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+
+.fl-fx-rack-header, .fl-rename-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #171d2e;
+  border-bottom: 1px solid #232c40;
+}
+
+.fl-fx-rack-header h4, .fl-rename-header h4 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.fl-fx-slots-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  gap: 0.35rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.fl-fx-slot-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #161c2b;
+  border: 1px solid #222b3d;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 0.74rem;
+  color: #e2e8f0;
+}
+
+.fl-fx-slot-row.empty {
+  opacity: 0.6;
+}
+
+.slot-num {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  color: #64748b;
+  width: 16px;
+}
+
+.slot-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #252e42;
+  border: 1px solid #334155;
+}
+
+.slot-led.lit {
+  background: #10b981;
+  box-shadow: 0 0 5px #10b981;
+}
+
+.slot-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slot-mix-knob {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6rem;
+  color: #94a3b8;
+}
+
+.fl-mini-slider {
+  width: 50px;
+  height: 4px;
+  accent-color: #f59e0b;
+}
+
+.btn-slot-toggle {
+  background: #1e273b;
+  border: 1px solid #334155;
+  color: #10b981;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.btn-slot-toggle.off {
+  color: #64748b;
+}
+
+.btn-slot-load {
+  background: #1e273b;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  font-size: 0.62rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* Rename Modal Body & Palette */
+.fl-rename-body {
+  padding: 1rem;
+}
+
+.fl-color-palette {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.color-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.12s ease;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch.active {
+  border-color: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+.fl-rename-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #161c2b;
+  border-top: 1px solid #232c40;
+}
+

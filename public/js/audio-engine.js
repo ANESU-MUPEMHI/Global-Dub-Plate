@@ -658,6 +658,10 @@ class GlobalDubAudioEngine {
         tapeSpeed: 1.0,
         dubDelayTime: 0.35,
         dubDelayFeedback: 0.55,
+        metronome: true,
+        precount: false,
+        mode: 'song',
+        snap: 'bar',
         tracks: {
           1: { name: 'TR-808 Music / Riddim', volume: 0.85, pan: 0, muted: false, solo: false, recArmed: false, trim: 1.0, delaySendAmount: 0.3, gain: null, panner: null, analyser: null, delaySendNode: null },
           2: { name: 'Juno 106 - Lead Vocal', volume: 0.90, pan: 0, muted: false, solo: false, recArmed: true, trim: 1.1, delaySendAmount: 0.5, gain: null, panner: null, analyser: null, delaySendNode: null },
@@ -786,6 +790,16 @@ class GlobalDubAudioEngine {
     if (!this.ctx) return;
     const time = this.ctx.currentTime;
     const beatDuration = (60 / this.bpm) / this.fourTrack.tapeSpeed;
+
+    // FL Studio Metronome Click (Every quarter note beat)
+    if (this.fourTrack.metronome && (step % 4 === 0)) {
+      this.playMetronomeTick(step === 0);
+    }
+
+    // In PAT (Pattern) mode, audition individual pattern/take
+    if (this.fourTrack.mode === 'pat') {
+      return;
+    }
 
     const hasSolo = Object.values(this.fourTrack.tracks).some(t => t.solo);
 
@@ -1122,7 +1136,7 @@ class GlobalDubAudioEngine {
   }
 
   getFourTrackVULevels() {
-    const levels = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, masterL: 0, masterR: 0 };
+    const levels = { masterL: 0, masterR: 0 };
     if (!this.fourTrack || (!this.fourTrack.isPlaying && !this.fourTrack.isRecording)) {
       return levels;
     }
@@ -1140,12 +1154,148 @@ class GlobalDubAudioEngine {
       return Math.min(1.0, rms * 2.8);
     };
 
-    for (let i = 1; i <= 6; i++) {
-      levels[i] = calcLevel(this.fourTrack.tracks[i]?.analyser);
-    }
+    Object.keys(this.fourTrack.tracks).forEach(id => {
+      levels[id] = calcLevel(this.fourTrack.tracks[id]?.analyser);
+    });
     levels.masterL = calcLevel(this.fourTrack.master?.analyserL);
     levels.masterR = calcLevel(this.fourTrack.master?.analyserR);
     return levels;
+  }
+
+  // =========================================================================
+  // FL STUDIO EMULATION: METRONOME, TRANSPORT MODES, TRACK ADD/DELETE & ROUTING
+  // =========================================================================
+
+  toggleMetronome() {
+    this.initFourTrack();
+    this.fourTrack.metronome = !this.fourTrack.metronome;
+    return this.fourTrack.metronome;
+  }
+
+  togglePrecount() {
+    this.initFourTrack();
+    this.fourTrack.precount = !this.fourTrack.precount;
+    return this.fourTrack.precount;
+  }
+
+  setTransportMode(mode) {
+    this.initFourTrack();
+    this.fourTrack.mode = mode; // 'pat' or 'song'
+    return this.fourTrack.mode;
+  }
+
+  setSnapMode(snap) {
+    this.initFourTrack();
+    this.fourTrack.snap = snap; // 'bar', 'half', 'quarter', 'none'
+    return this.fourTrack.snap;
+  }
+
+  playMetronomeTick(isAccent = false) {
+    if (!this.ctx) return;
+    const time = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = isAccent ? 'triangle' : 'sine';
+    osc.frequency.setValueAtTime(isAccent ? 1600 : 880, time);
+    osc.frequency.exponentialRampToValueAtTime(100, time + 0.035);
+
+    gain.gain.setValueAtTime(isAccent ? 0.35 : 0.2, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(time);
+    osc.stop(time + 0.045);
+  }
+
+  addTrack(options = {}) {
+    this.initFourTrack();
+    const existingIds = Object.keys(this.fourTrack.tracks).map(Number);
+    const newId = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 1;
+    
+    const palette = ['#3b82f6', '#8b5cf6', '#10b981', '#ec4899', '#9333ea', '#f43f5e', '#06b6d4', '#eab308', '#f97316'];
+    const color = options.color || palette[(newId - 1) % palette.length];
+    const name = options.name || `Track ${newId < 10 ? '0' : ''}${newId} - Audio Lane`;
+
+    const trk = {
+      id: newId,
+      name: name,
+      color: color,
+      volume: 0.80,
+      pan: 0,
+      muted: false,
+      solo: false,
+      recArmed: false,
+      trim: 1.0,
+      delaySendAmount: 0.3,
+      gain: null,
+      panner: null,
+      analyser: null,
+      delaySendNode: null
+    };
+
+    if (this.ctx && this.fourTrack.master && this.fourTrack.master.gain) {
+      const gainNode = this.ctx.createGain();
+      gainNode.gain.value = trk.volume * trk.trim;
+
+      const pannerNode = this.ctx.createStereoPanner ? this.ctx.createStereoPanner() : null;
+      if (pannerNode) pannerNode.pan.value = trk.pan;
+
+      const analyserNode = this.ctx.createAnalyser();
+      analyserNode.fftSize = 64;
+
+      const delaySendNode = this.ctx.createGain();
+      delaySendNode.gain.value = trk.delaySendAmount;
+
+      gainNode.connect(analyserNode);
+      if (pannerNode) {
+        analyserNode.connect(pannerNode);
+        pannerNode.connect(this.fourTrack.master.gain);
+      } else {
+        analyserNode.connect(this.fourTrack.master.gain);
+      }
+
+      if (this.fourTrack.delayBus && this.fourTrack.delayBus.delayNode) {
+        gainNode.connect(delaySendNode);
+        delaySendNode.connect(this.fourTrack.delayBus.delayNode);
+      }
+
+      trk.gain = gainNode;
+      trk.panner = pannerNode;
+      trk.analyser = analyserNode;
+      trk.delaySendNode = delaySendNode;
+    }
+
+    this.fourTrack.tracks[newId] = trk;
+    return trk;
+  }
+
+  deleteTrack(trackNum) {
+    this.initFourTrack();
+    const trk = this.fourTrack.tracks[trackNum];
+    if (!trk) return false;
+
+    try {
+      if (trk.gain) trk.gain.disconnect();
+      if (trk.panner) trk.panner.disconnect();
+      if (trk.analyser) trk.analyser.disconnect();
+      if (trk.delaySendNode) trk.delaySendNode.disconnect();
+    } catch (e) {}
+
+    delete this.fourTrack.tracks[trackNum];
+    return true;
+  }
+
+  renameTrack(trackNum, newName, newColor) {
+    this.initFourTrack();
+    const trk = this.fourTrack.tracks[trackNum];
+    if (trk) {
+      if (newName) trk.name = newName;
+      if (newColor) trk.color = newColor;
+      return true;
+    }
+    return false;
   }
 
   // =========================================================================
