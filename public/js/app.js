@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function init() {
     setupEventListeners();
+    initFourTrackUI();
     await loadInitialData();
     renderArtists();
     renderOrders();
@@ -2436,13 +2437,174 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupTimelineClipInteractions();
   }
 
+  // =========================================================================
+  // PLAYLIST CLIP EVENT DRAGGING, SNAPPING & TIMELINE INTERACTIONS
+  // Enables smooth dragging across bars, track-to-track lane moves, and trim
+  // =========================================================================
+  function setupClipDragAndMove(clipEl) {
+    if (!clipEl || clipEl._wiredDragMove) return;
+    clipEl._wiredDragMove = true;
+
+    // 1. Edge Trim Dragging (Slip / Trim Left and Right boundaries)
+    const trimLeft = clipEl.querySelector('.clip-trim-handle.trim-left');
+    const trimRight = clipEl.querySelector('.clip-trim-handle.trim-right');
+
+    if (trimLeft && !trimLeft._wiredTrim) {
+      trimLeft._wiredTrim = true;
+      trimLeft.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const startX = e.clientX;
+        const currentLane = clipEl.closest('.daw-track-lane');
+        const laneRect = currentLane ? currentLane.getBoundingClientRect() : { width: 1000 };
+        const origLeft = parseFloat(clipEl.style.left) || 0;
+        const origWidth = parseFloat(clipEl.style.width) || 14;
+
+        function onMouseMove(moveEvent) {
+          const deltaX = moveEvent.clientX - startX;
+          const deltaPct = (deltaX / laneRect.width) * 100;
+          let newLeft = origLeft + deltaPct;
+          let newWidth = origWidth - deltaPct;
+          if (newWidth >= 2) {
+            clipEl.style.left = `${newLeft.toFixed(2)}%`;
+            clipEl.style.width = `${newWidth.toFixed(2)}%`;
+          }
+        }
+
+        function onMouseUp() {
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+          showToast(`📐 Trimmed clip left boundary: ${clipEl.style.left}`, 'info');
+        }
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      });
+    }
+
+    if (trimRight && !trimRight._wiredTrim) {
+      trimRight._wiredTrim = true;
+      trimRight.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const startX = e.clientX;
+        const currentLane = clipEl.closest('.daw-track-lane');
+        const laneRect = currentLane ? currentLane.getBoundingClientRect() : { width: 1000 };
+        const origWidth = parseFloat(clipEl.style.width) || 14;
+
+        function onMouseMove(moveEvent) {
+          const deltaX = moveEvent.clientX - startX;
+          const deltaPct = (deltaX / laneRect.width) * 100;
+          let newWidth = Math.max(2, origWidth + deltaPct);
+          clipEl.style.width = `${newWidth.toFixed(2)}%`;
+        }
+
+        function onMouseUp() {
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+          showToast(`📐 Trimmed clip right boundary: ${clipEl.style.width}`, 'info');
+        }
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      });
+    }
+
+    // 2. Main Clip Drag and Move across Timeline & Tracks
+    clipEl.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      if (e.target.closest('.clip-curve-handle') || e.target.closest('.clip-trim-handle')) return;
+      if (activeDawTool === 'scissors' || activeDawTool === 'mute') return;
+
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const origLane = clipEl.closest('.daw-track-lane');
+      let targetLane = origLane;
+      const origLeft = parseFloat(clipEl.style.left) || 0;
+      const clipWidth = parseFloat(clipEl.style.width) || 14;
+      let hasDragged = false;
+
+      // Select this clip
+      document.querySelectorAll('.daw-clip-block').forEach(c => c.classList.remove('selected'));
+      clipEl.classList.add('selected');
+
+      function onMouseMove(moveEvent) {
+        const deltaX = moveEvent.clientX - startX;
+        const deltaY = moveEvent.clientY - startY;
+
+        if (!hasDragged && (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4)) {
+          hasDragged = true;
+          clipEl.classList.add('is-dragging-event');
+        }
+
+        if (!hasDragged) return;
+
+        const laneRect = (targetLane || origLane).getBoundingClientRect();
+        const deltaPct = (deltaX / laneRect.width) * 100;
+        let newLeft = origLeft + deltaPct;
+
+        // Snapping: based on #fl-snap-select
+        const snapSelect = document.getElementById('fl-snap-select');
+        const snapVal = snapSelect ? snapSelect.value : 'bar';
+        let snapUnit = 2.0833; // 1 bar out of 48 bars
+        if (snapVal === 'half') snapUnit = 1.0416;
+        else if (snapVal === 'quarter' || snapVal === 'cell') snapUnit = 0.5208;
+        else if (snapVal === 'none') snapUnit = 0.05;
+
+        newLeft = Math.round(newLeft / snapUnit) * snapUnit;
+        newLeft = Math.max(0, Math.min(100 - clipWidth, newLeft));
+        clipEl.style.left = `${newLeft.toFixed(2)}%`;
+
+        // Vertical track lane targeting
+        const elementsUnder = document.elementsFromPoint(moveEvent.clientX, moveEvent.clientY);
+        const hoveredLane = elementsUnder.find(el => el.classList.contains('daw-track-lane'));
+        
+        document.querySelectorAll('.daw-track-lane').forEach(l => l.classList.remove('drag-target-lane'));
+        if (hoveredLane && hoveredLane !== origLane) {
+          targetLane = hoveredLane;
+          hoveredLane.classList.add('drag-target-lane');
+        } else {
+          targetLane = origLane;
+        }
+      }
+
+      function onMouseUp(upEvent) {
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+
+        clipEl.classList.remove('is-dragging-event');
+        document.querySelectorAll('.daw-track-lane').forEach(l => l.classList.remove('drag-target-lane'));
+
+        if (hasDragged) {
+          if (targetLane && targetLane !== clipEl.parentElement) {
+            targetLane.appendChild(clipEl);
+            const trkNum = targetLane.getAttribute('data-track');
+            showToast(`📍 Clip moved to Track 0${trkNum} (Bar position: ${clipEl.style.left})`, 'success');
+          } else {
+            showToast(`📍 Clip moved to position: ${clipEl.style.left}`, 'info');
+          }
+        }
+      }
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    });
+  }
+
   function setupTimelineClipInteractions() {
     const timelineCol = document.getElementById('daw-timeline-col');
     const lanesContainer = document.getElementById('daw-lanes-container');
     if (!timelineCol) return;
 
-    // Attach right-click context menu to all existing clips
-    document.querySelectorAll('.daw-clip-block').forEach(c => setupClipContextMenuOn(c));
+    // Attach right-click context menu and drag-to-move to all existing clips
+    document.querySelectorAll('.daw-clip-block').forEach(c => {
+      setupClipContextMenuOn(c);
+      setupClipDragAndMove(c);
+    });
 
     // Lane click for Draw / Pencil tool
     if (lanesContainer && !lanesContainer._wiredDraw) {
@@ -2480,6 +2642,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         laneEl.appendChild(newClip);
         setupClipContextMenuOn(newClip);
+        setupClipDragAndMove(newClip);
         showToast(`✏️ Drew new audio take block on Track 0${trkNum}!`, 'success');
       });
     }
@@ -2511,6 +2674,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         parentLane.appendChild(cloned);
         setupClipContextMenuOn(cloned);
+        setupClipDragAndMove(cloned);
         engine.triggerScissorsCut();
         showToast('✂️ Clip sliced at timeline position into two parts!', 'success');
       } else if (activeDawTool === 'mute') {
@@ -2540,6 +2704,193 @@ document.addEventListener('DOMContentLoaded', async () => {
         showToast(`📈 ${isIn ? 'Fade-In' : 'Fade-Out'} Curve shape adjusted!`, 'info');
       });
     });
+
+    // Keyboard arrow keys: Nudge selected playlist clips & Delete
+    if (!window._wiredDawClipKeyboard) {
+      window._wiredDawClipKeyboard = true;
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete', 'Backspace'].includes(e.key)) {
+          const selectedClip = document.querySelector('.daw-clip-block.selected');
+          if (!selectedClip) return;
+
+          const currentLane = selectedClip.closest('.daw-track-lane');
+          const trkNum = parseInt(currentLane?.getAttribute('data-track') || 1);
+          const snapSelect = document.getElementById('fl-snap-select');
+          const snapVal = snapSelect ? snapSelect.value : 'bar';
+          let snapUnit = 2.0833;
+          if (snapVal === 'half') snapUnit = 1.0416;
+          else if (snapVal === 'quarter' || snapVal === 'cell') snapUnit = 0.5208;
+          else if (snapVal === 'none') snapUnit = 0.2;
+
+          let left = parseFloat(selectedClip.style.left) || 0;
+          const width = parseFloat(selectedClip.style.width) || 14;
+
+          if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            left = Math.max(0, left - snapUnit);
+            selectedClip.style.left = `${left.toFixed(2)}%`;
+            showToast(`◀ Nudged clip left: ${selectedClip.style.left}`, 'info');
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            left = Math.min(100 - width, left + snapUnit);
+            selectedClip.style.left = `${left.toFixed(2)}%`;
+            showToast(`▶ Nudged clip right: ${selectedClip.style.left}`, 'info');
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prevLane = document.getElementById(`lane-trk-${trkNum - 1}`);
+            if (prevLane) {
+              prevLane.appendChild(selectedClip);
+              showToast(`▲ Clip moved up to Track 0${trkNum - 1}`, 'info');
+            }
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const nextLane = document.getElementById(`lane-trk-${trkNum + 1}`);
+            if (nextLane) {
+              nextLane.appendChild(selectedClip);
+              showToast(`▼ Clip moved down to Track 0${trkNum + 1}`, 'info');
+            }
+          } else if (e.key === 'Delete' || e.key === 'Backspace') {
+            e.preventDefault();
+            selectedClip.remove();
+            showToast('🗑️ Audio clip deleted from playlist', 'info');
+          }
+        }
+      });
+    }
+  }
+
+  // =========================================================================
+  // ROTARY KNOB DIAL CONTROLLER (PAN, SEND A, SEND B)
+  // Modeled precisely after the circular metallic 3D dial with cyan outer ring
+  // =========================================================================
+  function setupRotaryKnob(container, hiddenInput, controlType) {
+    if (!container || !hiddenInput) return;
+    if (container._wiredRotary) return;
+    container._wiredRotary = true;
+
+    const dialEl = container.querySelector('.rotary-knob-dial') || container;
+    const indicatorEl = dialEl.querySelector('.rotary-knob-indicator');
+
+    function updateRotation(val) {
+      let angle = 0;
+      if (controlType === 'pan') {
+        // Pan: -100 to +100 -> -135deg to +135deg (0 is dead center 0deg)
+        angle = (val / 100) * 135;
+        const text = val === 0 ? 'Center (C)' : (val < 0 ? `${Math.abs(val)}% L` : `${val}% R`);
+        container.setAttribute('title', `Pan: ${text} • Drag up/down, dbl-click to center`);
+      } else {
+        // Send A / Send B: 0 to 100 -> -135deg to +135deg
+        angle = -135 + (val / 100) * 270;
+        const sendName = controlType === 'senda' ? 'Send A (Delay)' : 'Send B (Reverb)';
+        container.setAttribute('title', `${sendName}: ${Math.round(val)}% • Drag up/down, dbl-click to reset`);
+      }
+
+      if (indicatorEl) {
+        indicatorEl.style.transform = `rotate(${angle.toFixed(1)}deg)`;
+      }
+    }
+
+    // Initialize rotation based on input value
+    const initVal = parseFloat(hiddenInput.value) || 0;
+    updateRotation(initVal);
+
+    // Sync if hiddenInput changed by other scripts
+    hiddenInput.addEventListener('input', () => {
+      updateRotation(parseFloat(hiddenInput.value) || 0);
+    });
+
+    let isDragging = false;
+    let startY = 0;
+    let startVal = 0;
+    let tooltipEl = null;
+
+    function showTooltip(val) {
+      if (!tooltipEl) {
+        tooltipEl = document.createElement('div');
+        tooltipEl.className = 'rotary-knob-tooltip';
+        container.appendChild(tooltipEl);
+      }
+      if (controlType === 'pan') {
+        const text = val === 0 ? 'PAN: C' : (val < 0 ? `PAN: ${Math.abs(val)}% L` : `PAN: ${val}% R`);
+        tooltipEl.textContent = text;
+      } else {
+        const name = controlType === 'senda' ? 'SEND A' : 'SEND B';
+        tooltipEl.textContent = `${name}: ${val}%`;
+      }
+      tooltipEl.style.display = 'block';
+    }
+
+    function hideTooltip() {
+      if (tooltipEl) {
+        tooltipEl.style.display = 'none';
+      }
+    }
+
+    container.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      isDragging = true;
+      startY = e.clientY;
+      startVal = parseFloat(hiddenInput.value) || 0;
+      container.classList.add('is-dragging');
+
+      const minVal = parseFloat(hiddenInput.min) || (controlType === 'pan' ? -100 : 0);
+      const maxVal = parseFloat(hiddenInput.max) || 100;
+      const totalRange = maxVal - minVal;
+      showTooltip(Math.round(startVal));
+
+      function onMouseMove(moveEvent) {
+        if (!isDragging) return;
+        const deltaY = startY - moveEvent.clientY; // upward drag increases
+        const sensitivity = (totalRange / 130) * (moveEvent.shiftKey ? 0.2 : 1.0);
+        let newVal = Math.round(startVal + deltaY * sensitivity);
+        newVal = Math.max(minVal, Math.min(maxVal, newVal));
+
+        if (parseFloat(hiddenInput.value) !== newVal) {
+          hiddenInput.value = newVal;
+          updateRotation(newVal);
+          showTooltip(newVal);
+          hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+
+      function onMouseUp() {
+        if (!isDragging) return;
+        isDragging = false;
+        container.classList.remove('is-dragging');
+        hideTooltip();
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      }
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    });
+
+    // Double-click to reset to default
+    container.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      const defaultVal = controlType === 'pan' ? 0 : (controlType === 'senda' ? 30 : 20);
+      hiddenInput.value = defaultVal;
+      updateRotation(defaultVal);
+      hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+      showToast(`${controlType.toUpperCase()} reset to ${defaultVal}`, 'info');
+    });
+
+    // Mouse wheel support
+    container.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const minVal = parseFloat(hiddenInput.min) || (controlType === 'pan' ? -100 : 0);
+      const maxVal = parseFloat(hiddenInput.max) || 100;
+      const step = (e.deltaY < 0 ? 1 : -1) * (e.shiftKey ? 1 : 4);
+      let newVal = Math.max(minVal, Math.min(maxVal, (parseFloat(hiddenInput.value) || 0) + step));
+      hiddenInput.value = newVal;
+      updateRotation(newVal);
+      hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }, { passive: false });
   }
 
   // =========================================================================
@@ -2556,7 +2907,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // Pan
+    // Pan (Rotary Dial + Hidden Input)
     const pan = document.getElementById(`mix-pan-${i}`);
     if (pan && !pan._wired) {
       pan._wired = true;
@@ -2565,8 +2916,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         engine.setTrackPan(i, val);
       });
     }
+    const panKnob = document.getElementById(`knob-pan-${i}`) || pan?.closest('.rotary-knob-container');
+    if (panKnob && pan) setupRotaryKnob(panKnob, pan, 'pan');
 
-    // Send A (Delay)
+    // Send A (Delay) (Rotary Dial + Hidden Input)
     const sendA = document.getElementById(`mix-senda-${i}`);
     if (sendA && !sendA._wired) {
       sendA._wired = true;
@@ -2575,8 +2928,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         engine.setTrackDelaySend(i, val);
       });
     }
+    const sendAKnob = document.getElementById(`knob-senda-${i}`) || sendA?.closest('.rotary-knob-container');
+    if (sendAKnob && sendA) setupRotaryKnob(sendAKnob, sendA, 'senda');
 
-    // Send B (Reverb)
+    // Send B (Reverb) (Rotary Dial + Hidden Input)
     const sendB = document.getElementById(`mix-sendb-${i}`);
     if (sendB && !sendB._wired) {
       sendB._wired = true;
@@ -2587,6 +2942,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     }
+    const sendBKnob = document.getElementById(`knob-sendb-${i}`) || sendB?.closest('.rotary-knob-container');
+    if (sendBKnob && sendB) setupRotaryKnob(sendBKnob, sendB, 'sendb');
 
     // Solo Button (Mixer Strip & Track Header)
     const mixSolo = document.getElementById(`mix-btn-s-${i}`);
@@ -2841,7 +3198,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function setupClipContextMenuOn(clipEl) {
-    if (!clipEl || clipEl._wiredClipContext) return;
+    if (!clipEl) return;
+    setupClipDragAndMove(clipEl);
+    if (clipEl._wiredClipContext) return;
     clipEl._wiredClipContext = true;
 
     clipEl.addEventListener('contextmenu', (e) => {
@@ -3255,17 +3614,32 @@ document.addEventListener('DOMContentLoaded', async () => {
           <span class="ch-insert-dropdown">Inserts ▾</span>
         </div>
         <div class="ch-pan-send-row">
-          <div class="ch-rotary-unit">
+          <div class="ch-rotary-unit" data-control="pan" data-track="${newId}">
             <span class="rotary-label">Pan</span>
-            <input type="range" class="rotary-dial" min="-100" max="100" value="0" id="mix-pan-${newId}">
+            <div class="rotary-knob-container" id="knob-pan-${newId}" data-val="0" title="Pan (Click & Drag Up/Down)">
+              <div class="rotary-knob-dial">
+                <div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div>
+              </div>
+              <input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0" id="mix-pan-${newId}">
+            </div>
           </div>
-          <div class="ch-rotary-unit">
+          <div class="ch-rotary-unit" data-control="senda" data-track="${newId}">
             <span class="rotary-label">Send A</span>
-            <input type="range" class="rotary-dial" min="0" max="100" value="25" id="mix-senda-${newId}">
+            <div class="rotary-knob-container" id="knob-senda-${newId}" data-val="30" title="Send A (Click & Drag Up/Down)">
+              <div class="rotary-knob-dial">
+                <div class="rotary-knob-indicator" style="transform: rotate(-54deg);"></div>
+              </div>
+              <input type="range" class="rotary-dial-hidden" min="0" max="100" value="30" id="mix-senda-${newId}">
+            </div>
           </div>
-          <div class="ch-rotary-unit">
+          <div class="ch-rotary-unit" data-control="sendb" data-track="${newId}">
             <span class="rotary-label">Send B</span>
-            <input type="range" class="rotary-dial" min="0" max="100" value="15" id="mix-sendb-${newId}">
+            <div class="rotary-knob-container" id="knob-sendb-${newId}" data-val="20" title="Send B (Click & Drag Up/Down)">
+              <div class="rotary-knob-dial">
+                <div class="rotary-knob-indicator" style="transform: rotate(-81deg);"></div>
+              </div>
+              <input type="range" class="rotary-dial-hidden" min="0" max="100" value="20" id="mix-sendb-${newId}">
+            </div>
           </div>
         </div>
         <div class="ch-meter-fader-body">
@@ -4651,7 +5025,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // DAW Transport: Play
-    document.getElementById('daw-btn-play')?.addEventListener('click', () => {
+    document.getElementById('daw-btn-play')?.addEventListener('click', async () => {
+      if (engine.ctx && engine.ctx.state === 'suspended') {
+        try { await engine.ctx.resume(); } catch (e) {}
+      }
       engine.startFourTrack(false);
       updateFourTrackTransportUI();
       showToast('▶ DAW Playback Active (6 Channels Live)', 'info');
@@ -4665,7 +5042,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // DAW Transport: Record (FL Studio Arm & Pre-Count)
-    document.getElementById('daw-btn-rec')?.addEventListener('click', () => {
+    document.getElementById('daw-btn-rec')?.addEventListener('click', async () => {
+      if (engine.ctx && engine.ctx.state === 'suspended') {
+        try { await engine.ctx.resume(); } catch (e) {}
+      }
       const ft = engine.fourTrack;
       if (ft && ft.isRecording) {
         engine.stopFourTrack();
@@ -4713,7 +5093,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Spacebar to Play/Stop in DAW Workstation
-    window.addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', async (e) => {
       if (e.code === 'Space' && state.activeTab === 'artist-recorder') {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
         e.preventDefault();
@@ -4721,6 +5101,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ft && ft.isPlaying) {
           engine.stopFourTrack();
         } else {
+          if (engine.ctx && engine.ctx.state === 'suspended') {
+            try { await engine.ctx.resume(); } catch (err) {}
+          }
           engine.startFourTrack(false);
         }
         updateFourTrackTransportUI();

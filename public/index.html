@@ -750,7 +750,7 @@
             </div>
 
             <!-- Playhead Vertical Scrubber Line -->
-            <div class="daw-playhead-line" id="daw-playhead" style="left: 54%;">
+            <div class="daw-playhead-line" id="daw-playhead" style="left: 0%;">
               <div class="playhead-cap"></div>
             </div>
 
@@ -1035,310 +1035,17 @@
             </div>
           </div>
 
-          <!-- Channel Strips Chassis (Modeled after user screenshot) -->
+          <!-- Channel Strips Chassis (Modeled after user layout with Master on far left) -->
           <div class="mixer-strips-chassis" id="mixer-strips-chassis">
             
-            <div class="daw-mixer-strips-list" id="daw-mixer-strips-list">
-<!-- Channel 1: TR-808 (Music / Riddim) -->
-            <div class="daw-channel-strip ch-1" data-track="1">
-              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="1" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
-                <span class="ch-name">01 TR-808</span>
-                <span class="ch-insert-dropdown">Inserts ▾</span>
-              </div>
-              <div class="ch-pan-send-row">
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Pan</span>
-                  <input type="range" class="rotary-dial" min="-100" max="100" value="0" id="mix-pan-1">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send A</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="30" id="mix-senda-1">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send B</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="20" id="mix-sendb-1">
-                </div>
-              </div>
-              <!-- Fader & LED Meter Section -->
-              <div class="ch-meter-fader-body">
-                <div class="daw-vu-meter-column">
-                  <div class="meter-scale-text">
-                    <span>0</span>
-                    <span>-6</span>
-                    <span>-12</span>
-                    <span>-18</span>
-                    <span>-24</span>
-                    <span>-30</span>
-                    <span>-44</span>
-                  </div>
-                  <div class="dual-led-bar" id="mix-vu-1">
-                    <div class="led-col left" id="mix-vu-1-l"></div>
-                    <div class="led-col right" id="mix-vu-1-r"></div>
-                  </div>
-                </div>
-                <div class="ch-fader-track">
-                  <input type="range" orient="vertical" min="0" max="120" value="85" class="daw-vertical-fader" id="mix-fader-1" data-track="1">
-                </div>
-              </div>
-              <!-- Strip Buttons: FX, S, M, R -->
-              <div class="ch-strip-btns-row">
-                <button type="button" class="mix-btn btn-fx" title="Toggle Channel FX Inserts">FX</button>
-                <button type="button" class="mix-btn btn-s" data-track="1" id="mix-btn-s-1" title="Solo">S</button>
-                <button type="button" class="mix-btn btn-m" data-track="1" id="mix-btn-m-1" title="Mute">M</button>
-                <button type="button" class="mix-btn btn-r" data-track="1" id="mix-btn-r-1" title="Record Arm">R</button>
-              </div>
-            </div>
-
-            <!-- Channel 2: Juno 106 - Lead Voice -->
-            <div class="daw-channel-strip ch-2" data-track="2">
-              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="2" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
-                <span class="ch-name">02 Juno 106</span>
-                <span class="ch-insert-dropdown">Inserts ▾</span>
-              </div>
-              <div class="ch-pan-send-row">
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Pan</span>
-                  <input type="range" class="rotary-dial" min="-100" max="100" value="0" id="mix-pan-2">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send A</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="50" id="mix-senda-2">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send B</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="40" id="mix-sendb-2">
-                </div>
-              </div>
-              <div class="ch-meter-fader-body">
-                <div class="daw-vu-meter-column">
-                  <div class="meter-scale-text">
-                    <span>0</span>
-                    <span>-6</span>
-                    <span>-12</span>
-                    <span>-18</span>
-                    <span>-24</span>
-                    <span>-30</span>
-                    <span>-44</span>
-                  </div>
-                  <div class="dual-led-bar" id="mix-vu-2">
-                    <div class="led-col left" id="mix-vu-2-l"></div>
-                    <div class="led-col right" id="mix-vu-2-r"></div>
-                  </div>
-                </div>
-                <div class="ch-fader-track">
-                  <input type="range" orient="vertical" min="0" max="120" value="90" class="daw-vertical-fader" id="mix-fader-2" data-track="2">
-                </div>
-              </div>
-              <div class="ch-strip-btns-row">
-                <button type="button" class="mix-btn btn-fx">FX</button>
-                <button type="button" class="mix-btn btn-s" data-track="2" id="mix-btn-s-2">S</button>
-                <button type="button" class="mix-btn btn-m" data-track="2" id="mix-btn-m-2">M</button>
-                <button type="button" class="mix-btn btn-r active" data-track="2" id="mix-btn-r-2">R</button>
-              </div>
-            </div>
-
-            <!-- Channel 3: Moog Sub 37 - Backing & Chants -->
-            <div class="daw-channel-strip ch-3" data-track="3">
-              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="3" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
-                <span class="ch-name">03 Moog Sub 37</span>
-                <span class="ch-insert-dropdown">Inserts ▾</span>
-              </div>
-              <div class="ch-pan-send-row">
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Pan</span>
-                  <input type="range" class="rotary-dial" min="-100" max="100" value="-25" id="mix-pan-3">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send A</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="45" id="mix-senda-3">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send B</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="25" id="mix-sendb-3">
-                </div>
-              </div>
-              <div class="ch-meter-fader-body">
-                <div class="daw-vu-meter-column">
-                  <div class="meter-scale-text">
-                    <span>0</span>
-                    <span>-6</span>
-                    <span>-12</span>
-                    <span>-18</span>
-                    <span>-24</span>
-                    <span>-30</span>
-                    <span>-44</span>
-                  </div>
-                  <div class="dual-led-bar" id="mix-vu-3">
-                    <div class="led-col left" id="mix-vu-3-l"></div>
-                    <div class="led-col right" id="mix-vu-3-r"></div>
-                  </div>
-                </div>
-                <div class="ch-fader-track">
-                  <input type="range" orient="vertical" min="0" max="120" value="78" class="daw-vertical-fader" id="mix-fader-3" data-track="3">
-                </div>
-              </div>
-              <div class="ch-strip-btns-row">
-                <button type="button" class="mix-btn btn-fx">FX</button>
-                <button type="button" class="mix-btn btn-s" data-track="3" id="mix-btn-s-3">S</button>
-                <button type="button" class="mix-btn btn-m" data-track="3" id="mix-btn-m-3">M</button>
-                <button type="button" class="mix-btn btn-r" data-track="3" id="mix-btn-r-3">R</button>
-              </div>
-            </div>
-
-            <!-- Channel 4: Korg Minilogue - Dub FX -->
-            <div class="daw-channel-strip ch-4" data-track="4">
-              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="4" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
-                <span class="ch-name">04 Korg Minilog</span>
-                <span class="ch-insert-dropdown">Inserts ▾</span>
-              </div>
-              <div class="ch-pan-send-row">
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Pan</span>
-                  <input type="range" class="rotary-dial" min="-100" max="100" value="25" id="mix-pan-4">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send A</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="80" id="mix-senda-4">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send B</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="60" id="mix-sendb-4">
-                </div>
-              </div>
-              <div class="ch-meter-fader-body">
-                <div class="daw-vu-meter-column">
-                  <div class="meter-scale-text">
-                    <span>0</span>
-                    <span>-6</span>
-                    <span>-12</span>
-                    <span>-18</span>
-                    <span>-24</span>
-                    <span>-30</span>
-                    <span>-44</span>
-                  </div>
-                  <div class="dual-led-bar" id="mix-vu-4">
-                    <div class="led-col left" id="mix-vu-4-l"></div>
-                    <div class="led-col right" id="mix-vu-4-r"></div>
-                  </div>
-                </div>
-                <div class="ch-fader-track">
-                  <input type="range" orient="vertical" min="0" max="120" value="75" class="daw-vertical-fader" id="mix-fader-4" data-track="4">
-                </div>
-              </div>
-              <div class="ch-strip-btns-row">
-                <button type="button" class="mix-btn btn-fx">FX</button>
-                <button type="button" class="mix-btn btn-s" data-track="4" id="mix-btn-s-4">S</button>
-                <button type="button" class="mix-btn btn-m" data-track="4" id="mix-btn-m-4">M</button>
-                <button type="button" class="mix-btn btn-r" data-track="4" id="mix-btn-r-4">R</button>
-              </div>
-            </div>
-
-            <!-- Channel 5: Yamaha DX7 - Tape Echo / Reverb -->
-            <div class="daw-channel-strip ch-5" data-track="5">
-              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="5" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
-                <span class="ch-name">05 Yamaha DX7</span>
-                <span class="ch-insert-dropdown">Inserts ▾</span>
-              </div>
-              <div class="ch-pan-send-row">
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Pan</span>
-                  <input type="range" class="rotary-dial" min="-100" max="100" value="-15" id="mix-pan-5">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send A</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="50" id="mix-senda-5">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send B</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="70" id="mix-sendb-5">
-                </div>
-              </div>
-              <div class="ch-meter-fader-body">
-                <div class="daw-vu-meter-column">
-                  <div class="meter-scale-text">
-                    <span>0</span>
-                    <span>-6</span>
-                    <span>-12</span>
-                    <span>-18</span>
-                    <span>-24</span>
-                    <span>-30</span>
-                    <span>-44</span>
-                  </div>
-                  <div class="dual-led-bar" id="mix-vu-5">
-                    <div class="led-col left" id="mix-vu-5-l"></div>
-                    <div class="led-col right" id="mix-vu-5-r"></div>
-                  </div>
-                </div>
-                <div class="ch-fader-track">
-                  <input type="range" orient="vertical" min="0" max="120" value="70" class="daw-vertical-fader" id="mix-fader-5" data-track="5">
-                </div>
-              </div>
-              <div class="ch-strip-btns-row">
-                <button type="button" class="mix-btn btn-fx">FX</button>
-                <button type="button" class="mix-btn btn-s" data-track="5" id="mix-btn-s-5">S</button>
-                <button type="button" class="mix-btn btn-m" data-track="5" id="mix-btn-m-5">M</button>
-                <button type="button" class="mix-btn btn-r" data-track="5" id="mix-btn-r-5">R</button>
-              </div>
-            </div>
-
-            <!-- Channel 6: Korg MS1 - Sound Clash Drops -->
-            <div class="daw-channel-strip ch-6" data-track="6">
-              <div class="ch-strip-top"><span class="fl-mute-led active" data-track="6" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
-                <span class="ch-name">06 Korg MS1</span>
-                <span class="ch-insert-dropdown">Inserts ▾</span>
-              </div>
-              <div class="ch-pan-send-row">
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Pan</span>
-                  <input type="range" class="rotary-dial" min="-100" max="100" value="15" id="mix-pan-6">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send A</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="20" id="mix-senda-6">
-                </div>
-                <div class="ch-rotary-unit">
-                  <span class="rotary-label">Send B</span>
-                  <input type="range" class="rotary-dial" min="0" max="100" value="10" id="mix-sendb-6">
-                </div>
-              </div>
-              <div class="ch-meter-fader-body">
-                <div class="daw-vu-meter-column">
-                  <div class="meter-scale-text">
-                    <span>0</span>
-                    <span>-6</span>
-                    <span>-12</span>
-                    <span>-18</span>
-                    <span>-24</span>
-                    <span>-30</span>
-                    <span>-44</span>
-                  </div>
-                  <div class="dual-led-bar" id="mix-vu-6">
-                    <div class="led-col left" id="mix-vu-6-l"></div>
-                    <div class="led-col right" id="mix-vu-6-r"></div>
-                  </div>
-                </div>
-                <div class="ch-fader-track">
-                  <input type="range" orient="vertical" min="0" max="120" value="82" class="daw-vertical-fader" id="mix-fader-6" data-track="6">
-                </div>
-              </div>
-              <div class="ch-strip-btns-row">
-                <button type="button" class="mix-btn btn-fx">FX</button>
-                <button type="button" class="mix-btn btn-s" data-track="6" id="mix-btn-s-6">S</button>
-                <button type="button" class="mix-btn btn-m" data-track="6" id="mix-btn-m-6">M</button>
-                <button type="button" class="mix-btn btn-r" data-track="6" id="mix-btn-r-6">R</button>
-              </div>
-            </div>
-
-            
-</div>
-<!-- Master Channel (Far Right) -->
+            <!-- Master Channel (Far Left, Pinned) -->
             <div class="daw-channel-strip ch-master" data-track="master">
               <div class="ch-strip-top">
                 <span class="ch-name gold">Master</span>
                 <span class="ch-insert-dropdown">Limiter ▾</span>
               </div>
               <div class="ch-pan-send-row master-pan-row">
-                <span class="master-bus-label">Stereo Buss</span>
+                <span class="master-bus-label">STEREO BUSS</span>
               </div>
               <div class="ch-meter-fader-body">
                 <div class="daw-vu-meter-column">
@@ -1365,6 +1072,399 @@
               </div>
             </div>
 
+            <!-- Vertical Separator Divider between Master & Channels -->
+            <div class="mixer-master-divider"></div>
+
+            <!-- Dynamic Channels Container (Tracks 1..6+) -->
+            <div class="daw-mixer-strips-list" id="daw-mixer-strips-list">
+
+              <!-- Channel 1: TR-808 (Music / Riddim) -->
+              <div class="daw-channel-strip ch-1" data-track="1">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="1" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                  <span class="ch-name">01 TR-808</span>
+                  <span class="ch-insert-dropdown">Inserts ▾</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit" data-control="pan" data-track="1">
+                    <span class="rotary-label">Pan</span>
+                    <div class="rotary-knob-container" id="knob-pan-1" data-val="0" title="Pan (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0" id="mix-pan-1">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="senda" data-track="1">
+                    <span class="rotary-label">Send A</span>
+                    <div class="rotary-knob-container" id="knob-senda-1" data-val="30" title="Send A (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(-54deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="30" id="mix-senda-1">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="sendb" data-track="1">
+                    <span class="rotary-label">Send B</span>
+                    <div class="rotary-knob-container" id="knob-sendb-1" data-val="20" title="Send B (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(-81deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="20" id="mix-sendb-1">
+                    </div>
+                  </div>
+                </div>
+                <!-- Fader & LED Meter Section -->
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column">
+                    <div class="meter-scale-text">
+                      <span>0</span>
+                      <span>-6</span>
+                      <span>-12</span>
+                      <span>-18</span>
+                      <span>-24</span>
+                      <span>-30</span>
+                      <span>-44</span>
+                    </div>
+                    <div class="dual-led-bar" id="mix-vu-1">
+                      <div class="led-col left" id="mix-vu-1-l"></div>
+                      <div class="led-col right" id="mix-vu-1-r"></div>
+                    </div>
+                  </div>
+                  <div class="ch-fader-track">
+                    <input type="range" orient="vertical" min="0" max="120" value="85" class="daw-vertical-fader" id="mix-fader-1" data-track="1">
+                  </div>
+                </div>
+                <!-- Strip Buttons: FX, S, M, R -->
+                <div class="ch-strip-btns-row">
+                  <button type="button" class="mix-btn btn-fx" title="Toggle Channel FX Inserts">FX</button>
+                  <button type="button" class="mix-btn btn-s" data-track="1" id="mix-btn-s-1" title="Solo">S</button>
+                  <button type="button" class="mix-btn btn-m" data-track="1" id="mix-btn-m-1" title="Mute">M</button>
+                  <button type="button" class="mix-btn btn-r" data-track="1" id="mix-btn-r-1" title="Record Arm">R</button>
+                </div>
+              </div>
+
+              <!-- Channel 2: Juno 106 - Lead Voice -->
+              <div class="daw-channel-strip ch-2" data-track="2">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="2" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                  <span class="ch-name">02 Juno 106</span>
+                  <span class="ch-insert-dropdown">Inserts ▾</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit" data-control="pan" data-track="2">
+                    <span class="rotary-label">Pan</span>
+                    <div class="rotary-knob-container" id="knob-pan-2" data-val="0" title="Pan (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0" id="mix-pan-2">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="senda" data-track="2">
+                    <span class="rotary-label">Send A</span>
+                    <div class="rotary-knob-container" id="knob-senda-2" data-val="50" title="Send A (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="50" id="mix-senda-2">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="sendb" data-track="2">
+                    <span class="rotary-label">Send B</span>
+                    <div class="rotary-knob-container" id="knob-sendb-2" data-val="40" title="Send B (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(-27deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="40" id="mix-sendb-2">
+                    </div>
+                  </div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column">
+                    <div class="meter-scale-text">
+                      <span>0</span>
+                      <span>-6</span>
+                      <span>-12</span>
+                      <span>-18</span>
+                      <span>-24</span>
+                      <span>-30</span>
+                      <span>-44</span>
+                    </div>
+                    <div class="dual-led-bar" id="mix-vu-2">
+                      <div class="led-col left" id="mix-vu-2-l"></div>
+                      <div class="led-col right" id="mix-vu-2-r"></div>
+                    </div>
+                  </div>
+                  <div class="ch-fader-track">
+                    <input type="range" orient="vertical" min="0" max="120" value="90" class="daw-vertical-fader" id="mix-fader-2" data-track="2">
+                  </div>
+                </div>
+                <div class="ch-strip-btns-row">
+                  <button type="button" class="mix-btn btn-fx">FX</button>
+                  <button type="button" class="mix-btn btn-s" data-track="2" id="mix-btn-s-2">S</button>
+                  <button type="button" class="mix-btn btn-m" data-track="2" id="mix-btn-m-2">M</button>
+                  <button type="button" class="mix-btn btn-r active" data-track="2" id="mix-btn-r-2" title="Armed for Vocal Dub Recording">R</button>
+                </div>
+              </div>
+
+              <!-- Channel 3: Moog Sub 37 - Backing & Chants -->
+              <div class="daw-channel-strip ch-3" data-track="3">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="3" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                  <span class="ch-name">03 Moog Sub 37</span>
+                  <span class="ch-insert-dropdown">Inserts ▾</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit" data-control="pan" data-track="3">
+                    <span class="rotary-label">Pan</span>
+                    <div class="rotary-knob-container" id="knob-pan-3" data-val="-25" title="Pan (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(-33.7deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="-100" max="100" value="-25" id="mix-pan-3">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="senda" data-track="3">
+                    <span class="rotary-label">Send A</span>
+                    <div class="rotary-knob-container" id="knob-senda-3" data-val="45" title="Send A (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(-13.5deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="45" id="mix-senda-3">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="sendb" data-track="3">
+                    <span class="rotary-label">Send B</span>
+                    <div class="rotary-knob-container" id="knob-sendb-3" data-val="25" title="Send B (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(-67.5deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="25" id="mix-sendb-3">
+                    </div>
+                  </div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column">
+                    <div class="meter-scale-text">
+                      <span>0</span>
+                      <span>-6</span>
+                      <span>-12</span>
+                      <span>-18</span>
+                      <span>-24</span>
+                      <span>-30</span>
+                      <span>-44</span>
+                    </div>
+                    <div class="dual-led-bar" id="mix-vu-3">
+                      <div class="led-col left" id="mix-vu-3-l"></div>
+                      <div class="led-col right" id="mix-vu-3-r"></div>
+                    </div>
+                  </div>
+                  <div class="ch-fader-track">
+                    <input type="range" orient="vertical" min="0" max="120" value="78" class="daw-vertical-fader" id="mix-fader-3" data-track="3">
+                  </div>
+                </div>
+                <div class="ch-strip-btns-row">
+                  <button type="button" class="mix-btn btn-fx">FX</button>
+                  <button type="button" class="mix-btn btn-s" data-track="3" id="mix-btn-s-3">S</button>
+                  <button type="button" class="mix-btn btn-m" data-track="3" id="mix-btn-m-3">M</button>
+                  <button type="button" class="mix-btn btn-r" data-track="3" id="mix-btn-r-3">R</button>
+                </div>
+              </div>
+
+              <!-- Channel 4: Korg Minilogue - Dub FX -->
+              <div class="daw-channel-strip ch-4" data-track="4">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="4" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                  <span class="ch-name">04 Korg Minilog</span>
+                  <span class="ch-insert-dropdown">Inserts ▾</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit" data-control="pan" data-track="4">
+                    <span class="rotary-label">Pan</span>
+                    <div class="rotary-knob-container" id="knob-pan-4" data-val="25" title="Pan (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(33.7deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="-100" max="100" value="25" id="mix-pan-4">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="senda" data-track="4">
+                    <span class="rotary-label">Send A</span>
+                    <div class="rotary-knob-container" id="knob-senda-4" data-val="80" title="Send A (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(81deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="80" id="mix-senda-4">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="sendb" data-track="4">
+                    <span class="rotary-label">Send B</span>
+                    <div class="rotary-knob-container" id="knob-sendb-4" data-val="60" title="Send B (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(27deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="60" id="mix-sendb-4">
+                    </div>
+                  </div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column">
+                    <div class="meter-scale-text">
+                      <span>0</span>
+                      <span>-6</span>
+                      <span>-12</span>
+                      <span>-18</span>
+                      <span>-24</span>
+                      <span>-30</span>
+                      <span>-44</span>
+                    </div>
+                    <div class="dual-led-bar" id="mix-vu-4">
+                      <div class="led-col left" id="mix-vu-4-l"></div>
+                      <div class="led-col right" id="mix-vu-4-r"></div>
+                    </div>
+                  </div>
+                  <div class="ch-fader-track">
+                    <input type="range" orient="vertical" min="0" max="120" value="75" class="daw-vertical-fader" id="mix-fader-4" data-track="4">
+                  </div>
+                </div>
+                <div class="ch-strip-btns-row">
+                  <button type="button" class="mix-btn btn-fx">FX</button>
+                  <button type="button" class="mix-btn btn-s" data-track="4" id="mix-btn-s-4">S</button>
+                  <button type="button" class="mix-btn btn-m" data-track="4" id="mix-btn-m-4">M</button>
+                  <button type="button" class="mix-btn btn-r" data-track="4" id="mix-btn-r-4">R</button>
+                </div>
+              </div>
+
+              <!-- Channel 5: Yamaha DX7 - Tape Echo / Reverb -->
+              <div class="daw-channel-strip ch-5" data-track="5">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="5" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                  <span class="ch-name">05 Yamaha DX7</span>
+                  <span class="ch-insert-dropdown">Inserts ▾</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit" data-control="pan" data-track="5">
+                    <span class="rotary-label">Pan</span>
+                    <div class="rotary-knob-container" id="knob-pan-5" data-val="-15" title="Pan (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(-20.2deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="-100" max="100" value="-15" id="mix-pan-5">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="senda" data-track="5">
+                    <span class="rotary-label">Send A</span>
+                    <div class="rotary-knob-container" id="knob-senda-5" data-val="50" title="Send A (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="50" id="mix-senda-5">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="sendb" data-track="5">
+                    <span class="rotary-label">Send B</span>
+                    <div class="rotary-knob-container" id="knob-sendb-5" data-val="70" title="Send B (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(54deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="70" id="mix-sendb-5">
+                    </div>
+                  </div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column">
+                    <div class="meter-scale-text">
+                      <span>0</span>
+                      <span>-6</span>
+                      <span>-12</span>
+                      <span>-18</span>
+                      <span>-24</span>
+                      <span>-30</span>
+                      <span>-44</span>
+                    </div>
+                    <div class="dual-led-bar" id="mix-vu-5">
+                      <div class="led-col left" id="mix-vu-5-l"></div>
+                      <div class="led-col right" id="mix-vu-5-r"></div>
+                    </div>
+                  </div>
+                  <div class="ch-fader-track">
+                    <input type="range" orient="vertical" min="0" max="120" value="70" class="daw-vertical-fader" id="mix-fader-5" data-track="5">
+                  </div>
+                </div>
+                <div class="ch-strip-btns-row">
+                  <button type="button" class="mix-btn btn-fx">FX</button>
+                  <button type="button" class="mix-btn btn-s" data-track="5" id="mix-btn-s-5">S</button>
+                  <button type="button" class="mix-btn btn-m" data-track="5" id="mix-btn-m-5">M</button>
+                  <button type="button" class="mix-btn btn-r" data-track="5" id="mix-btn-r-5">R</button>
+                </div>
+              </div>
+
+              <!-- Channel 6: Korg MS1 - Sound Clash Drops -->
+              <div class="daw-channel-strip ch-6" data-track="6">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="6" title="Left Click: Mute/Unmute | Right Click: Solo"></span>
+                  <span class="ch-name">06 Korg MS1</span>
+                  <span class="ch-insert-dropdown">Inserts ▾</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit" data-control="pan" data-track="6">
+                    <span class="rotary-label">Pan</span>
+                    <div class="rotary-knob-container" id="knob-pan-6" data-val="15" title="Pan (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(20.2deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="-100" max="100" value="15" id="mix-pan-6">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="senda" data-track="6">
+                    <span class="rotary-label">Send A</span>
+                    <div class="rotary-knob-container" id="knob-senda-6" data-val="20" title="Send A (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(-81deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="20" id="mix-senda-6">
+                    </div>
+                  </div>
+                  <div class="ch-rotary-unit" data-control="sendb" data-track="6">
+                    <span class="rotary-label">Send B</span>
+                    <div class="rotary-knob-container" id="knob-sendb-6" data-val="10" title="Send B (Click & Drag Up/Down)">
+                      <div class="rotary-knob-dial">
+                        <div class="rotary-knob-indicator" style="transform: rotate(-108deg);"></div>
+                      </div>
+                      <input type="range" class="rotary-dial-hidden" min="0" max="100" value="10" id="mix-sendb-6">
+                    </div>
+                  </div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column">
+                    <div class="meter-scale-text">
+                      <span>0</span>
+                      <span>-6</span>
+                      <span>-12</span>
+                      <span>-18</span>
+                      <span>-24</span>
+                      <span>-30</span>
+                      <span>-44</span>
+                    </div>
+                    <div class="dual-led-bar" id="mix-vu-6">
+                      <div class="led-col left" id="mix-vu-6-l"></div>
+                      <div class="led-col right" id="mix-vu-6-r"></div>
+                    </div>
+                  </div>
+                  <div class="ch-fader-track">
+                    <input type="range" orient="vertical" min="0" max="120" value="82" class="daw-vertical-fader" id="mix-fader-6" data-track="6">
+                  </div>
+                </div>
+                <div class="ch-strip-btns-row">
+                  <button type="button" class="mix-btn btn-fx">FX</button>
+                  <button type="button" class="mix-btn btn-s" data-track="6" id="mix-btn-s-6">S</button>
+                  <button type="button" class="mix-btn btn-m" data-track="6" id="mix-btn-m-6">M</button>
+                  <button type="button" class="mix-btn btn-r" data-track="6" id="mix-btn-r-6">R</button>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
 

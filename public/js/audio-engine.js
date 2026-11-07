@@ -766,6 +766,9 @@ class GlobalDubAudioEngine {
 
   startFourTrack(isRecording = false) {
     this.initFourTrack();
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
     if (this.fourTrack.isPlaying) return;
 
     this.fourTrack.isPlaying = true;
@@ -805,29 +808,130 @@ class GlobalDubAudioEngine {
 
     const isTrackAudible = (num) => {
       const t = this.fourTrack.tracks[num];
+      if (!t) return false;
       if (t.muted) return false;
       if (hasSolo && !t.solo) return false;
       return true;
     };
 
-    // TRACK 1: MUSIC / RIDDIM (Drums, Bass, Skank)
-    if (isTrackAudible(1) && this.fourTrack.tracks[1].gain) {
+    // TRACK 1: MUSIC / RIDDIM (TR-808 Drums & Bass)
+    if (isTrackAudible(1) && this.fourTrack.tracks[1]?.gain) {
       this.playMusicStep(step, time, beatDuration, this.fourTrack.tracks[1].gain);
     }
 
-    // TRACK 2: LEAD VOICE (Vocal melody / clash toasting)
-    if (isTrackAudible(2) && this.fourTrack.tracks[2].gain) {
+    // TRACK 2: LEAD VOICE (Juno 106 Vocal Lead / Toasting)
+    if (isTrackAudible(2) && this.fourTrack.tracks[2]?.gain) {
       this.playLeadVoiceStep(step, time, beatDuration, this.fourTrack.tracks[2].gain);
     }
 
-    // TRACK 3: BACKING VOCALS / HARMONY
-    if (isTrackAudible(3) && this.fourTrack.tracks[3].gain) {
+    // TRACK 3: BACKING VOCALS / CHANTS (Moog Sub 37)
+    if (isTrackAudible(3) && this.fourTrack.tracks[3]?.gain) {
       this.playBackingHarmonyStep(step, time, beatDuration, this.fourTrack.tracks[3].gain);
     }
 
-    // TRACK 4: DUBBING FX / SPACE ECHO
-    if (isTrackAudible(4) && this.fourTrack.tracks[4].gain) {
+    // TRACK 4: DUBBING FX / SPACE ECHO (Korg Minilogue Dub Siren)
+    if (isTrackAudible(4) && this.fourTrack.tracks[4]?.gain) {
       this.playDubbingFxStep(step, time, beatDuration, this.fourTrack.tracks[4].gain);
+    }
+
+    // TRACK 5: TAPE ECHO & REVERB (Yamaha DX7 FM Arp & Reverb Splash)
+    if (isTrackAudible(5) && this.fourTrack.tracks[5]?.gain) {
+      this.playDX7Step(step, time, beatDuration, this.fourTrack.tracks[5].gain);
+    }
+
+    // TRACK 6: SOUND CLASH DROPS (Korg MS1 Anthem Drop & Sub Punch)
+    if (isTrackAudible(6) && this.fourTrack.tracks[6]?.gain) {
+      this.playMS1Step(step, time, beatDuration, this.fourTrack.tracks[6].gain);
+    }
+
+    // DYNAMIC TRACKS (7+)
+    Object.keys(this.fourTrack.tracks).forEach(idStr => {
+      const id = parseInt(idStr);
+      if (id > 6 && isTrackAudible(id) && this.fourTrack.tracks[id]?.gain) {
+        this.playCustomTrackStep(id, step, time, beatDuration, this.fourTrack.tracks[id].gain);
+      }
+    });
+  }
+
+  playDX7Step(step, time, beatDur, targetNode) {
+    if (step % 4 === 2) {
+      const chords = [
+        [329.63, 392.00, 493.88], // Em
+        [293.66, 369.99, 440.00], // D
+        [261.63, 329.63, 392.00], // C
+        [246.94, 311.13, 369.99]  // B
+      ];
+      const curT = this.fourTrack.currentTime || 0;
+      const barIdx = Math.floor(curT / (beatDur * 4)) % chords.length;
+      const notes = chords[barIdx] || chords[0];
+
+      notes.forEach((freq, idx) => {
+        const carrier = this.ctx.createOscillator();
+        const mod = this.ctx.createOscillator();
+        const modGain = this.ctx.createGain();
+        const mainGain = this.ctx.createGain();
+
+        carrier.type = 'sine';
+        carrier.frequency.setValueAtTime(freq, time);
+
+        mod.type = 'triangle';
+        mod.frequency.setValueAtTime(freq * 2.0, time);
+        modGain.gain.setValueAtTime(120, time);
+        modGain.gain.exponentialRampToValueAtTime(0.1, time + (beatDur * 0.9));
+
+        mainGain.gain.setValueAtTime(0.18, time + idx * 0.02);
+        mainGain.gain.exponentialRampToValueAtTime(0.001, time + (beatDur * 1.2));
+
+        mod.connect(carrier.frequency);
+        carrier.connect(mainGain);
+        mainGain.connect(targetNode);
+
+        mod.start(time);
+        carrier.start(time);
+        mod.stop(time + (beatDur * 1.3));
+        carrier.stop(time + (beatDur * 1.3));
+      });
+    }
+  }
+
+  playMS1Step(step, time, beatDur, targetNode) {
+    if (step === 0 || step === 8) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(75, time);
+      osc.frequency.exponentialRampToValueAtTime(34, time + 0.32);
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(260, time);
+      filter.frequency.exponentialRampToValueAtTime(55, time + 0.32);
+
+      gain.gain.setValueAtTime(0.38, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(targetNode);
+
+      osc.start(time);
+      osc.stop(time + 0.38);
+    }
+  }
+
+  playCustomTrackStep(trackId, step, time, beatDur, targetNode) {
+    if (step % 2 === 1) {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(320 + (trackId * 40), time);
+      gain.gain.setValueAtTime(0.12, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.08);
+
+      osc.connect(gain);
+      gain.connect(targetNode);
+      osc.start(time);
+      osc.stop(time + 0.09);
     }
   }
 
