@@ -5172,31 +5172,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnExitToPortal = document.getElementById('btn-exit-to-portal');
     const heroImg = document.getElementById('landing-hero-img');
 
-    // Logo image paths for the 3 generated concepts
-    const logoSources = {
-      opt1: '/images/logo-opt1-vinyl-emblem.jpg',
-      opt2: '/images/logo-opt2-studio-arena.jpg',
-      opt3: '/images/logo-opt3-lion-monogram.jpg'
-    };
-
-    // 1. Logo Option Theme Switcher
-    document.querySelectorAll('.logo-option-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const logoKey = btn.getAttribute('data-logo');
-        if (logoSources[logoKey] && heroImg) {
-          heroImg.src = logoSources[logoKey];
-        }
-        document.querySelectorAll('.logo-option-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        localStorage.setItem('GDP_PREFERRED_LOGO', logoKey);
-      });
-    });
-
-    // Restore saved logo preference (Option 1 default)
-    const savedLogo = localStorage.getItem('GDP_PREFERRED_LOGO') || 'opt1';
-    if (savedLogo && logoSources[savedLogo]) {
-      const activeBtn = document.querySelector(`.logo-option-btn[data-logo="${savedLogo}"]`);
-      if (activeBtn) activeBtn.click();
+    // Permanent Master Brand Artwork (Option 1 Golden Vinyl Emblem)
+    if (heroImg) {
+      heroImg.src = '/images/logo-opt1-vinyl-emblem.jpg';
     }
 
     // Modal helpers
