@@ -4983,4 +4983,755 @@ body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
+/* =========================================================================
+   LANDING PORTAL PAGE & AUTHENTICATION MODAL
+   Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+   ========================================================================= */
+
+/* Fullscreen Landing Portal Container */
+#landing-portal-page {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: radial-gradient(circle at 50% 25%, #182030 0%, #0b0f17 55%, #05070a 100%);
+  color: #f1f5f9;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+#landing-portal-page.portal-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.02);
+  visibility: hidden;
+}
+
+/* Background Atmosphere (Vinyl Grooves & Amber Studio Glow) */
+.landing-bg-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.landing-glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.25;
+}
+
+.landing-glow-orb.gold {
+  width: 550px;
+  height: 550px;
+  background: #f59e0b;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -20%);
+}
+
+.landing-glow-orb.cyan {
+  width: 400px;
+  height: 400px;
+  background: #06b6d4;
+  bottom: 15%;
+  right: 10%;
+}
+
+.landing-glow-orb.green {
+  width: 350px;
+  height: 350px;
+  background: #10b981;
+  bottom: 20%;
+  left: 8%;
+}
+
+/* Animated concentric vinyl rings watermark */
+.landing-vinyl-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 820px;
+  height: 820px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow: 
+    0 0 0 40px rgba(255, 255, 255, 0.015),
+    0 0 0 90px rgba(255, 255, 255, 0.01),
+    0 0 0 150px rgba(255, 255, 255, 0.012),
+    0 0 0 220px rgba(255, 255, 255, 0.008),
+    0 0 0 300px rgba(255, 255, 255, 0.006);
+  animation: vinylSpinSlow 80s linear infinite;
+}
+
+@keyframes vinylSpinSlow {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Landing Page Top Navigation */
+.landing-top-bar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(11, 15, 23, 0.7);
+  backdrop-filter: blur(12px);
+}
+
+.landing-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.landing-brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #b45309);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+  font-size: 1.2rem;
+}
+
+.landing-brand-title {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+.landing-brand-tag {
+  font-size: 0.65rem;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.landing-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+/* Logo Theme Switcher Pill */
+.logo-theme-switcher {
+  display: flex;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.logo-option-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.logo-option-btn:hover {
+  color: #fff;
+}
+
+.logo-option-btn.active {
+  background: #f59e0b;
+  color: #0b0f17;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+.btn-landing-login-nav {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.5rem 1.1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.2s ease;
+}
+
+.btn-landing-login-nav:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+/* Landing Hero Section */
+.landing-hero {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1.5rem 2rem 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Live Session Status Badge */
+.landing-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
+}
+
+.landing-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: pulseRecDot 1.4s infinite;
+}
+
+/* Dominant Center Logo Display */
+.landing-logo-container {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  margin: 0 auto 1.5rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-logo-glow-aura {
+  position: absolute;
+  inset: -15px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0) 70%);
+  filter: blur(15px);
+  animation: auraPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes auraPulse {
+  0% { transform: scale(0.95); opacity: 0.6; }
+  100% { transform: scale(1.08); opacity: 0.95; }
+}
+
+.landing-logo-display {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow: 
+    0 12px 36px rgba(0, 0, 0, 0.8),
+    0 0 25px rgba(245, 158, 11, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d121c;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.landing-logo-display:hover {
+  transform: scale(1.04) rotate(2deg);
+  box-shadow: 
+    0 18px 48px rgba(0, 0, 0, 0.9),
+    0 0 35px rgba(245, 158, 11, 0.7);
+}
+
+.landing-logo-display img,
+.landing-logo-display svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Hero Typography */
+.landing-title {
+  font-family: var(--font-heading);
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #ffffff 30%, #fbbf24 80%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 4px 18px rgba(0,0,0,0.8);
+  line-height: 1.1;
+}
+
+.landing-subtitle {
+  font-size: 1.15rem;
+  color: #cbd5e1;
+  max-width: 680px;
+  margin: 0 auto 1.25rem auto;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.landing-flags-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.landing-flags-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* High-Impact ENTER Button */
+.btn-enter-arena {
+  position: relative;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  color: #0b0f17;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  padding: 1.1rem 2.75rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  box-shadow: 
+    0 10px 30px rgba(245, 158, 11, 0.5),
+    0 0 20px rgba(245, 158, 11, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.btn-enter-arena:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 
+    0 16px 40px rgba(245, 158, 11, 0.7),
+    0 0 35px rgba(245, 158, 11, 0.6),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  color: #000;
+}
+
+.btn-enter-arena:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.enter-btn-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.btn-enter-arena:hover .enter-btn-glow {
+  opacity: 1;
+}
+
+.enter-btn-arrow {
+  font-size: 1.3rem;
+  transition: transform 0.2s ease;
+}
+
+.btn-enter-arena:hover .enter-btn-arrow {
+  transform: translateX(4px);
+}
+
+/* Secondary Actions on Landing */
+.landing-secondary-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.btn-landing-sub {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.55rem 1.15rem;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.btn-landing-sub:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+/* Landing Pillars / Feature Row */
+.landing-pillars-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.landing-pillar-card {
+  background: rgba(18, 24, 38, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: left;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.landing-pillar-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.pillar-icon {
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.pillar-title {
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: #fff;
+  margin: 0 0 0.35rem 0;
+}
+
+.pillar-desc {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Landing Footer */
+.landing-footer {
+  position: relative;
+  z-index: 10;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(6, 9, 14, 0.85);
+  text-align: center;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.landing-footer-attribution {
+  max-width: 840px;
+  margin: 0 auto 0.75rem auto;
+  background: rgba(0,0,0,0.4);
+  padding: 0.65rem 1rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+/* =========================================================================
+   STANDARD AUTH LOGIN MODAL STYLES (GOOGLE + EMAIL + FORGOT EMAIL)
+   ========================================================================= */
+
+.auth-modal-card {
+  max-width: 480px;
+  width: 95%;
+  background: #111622;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(245, 158, 11, 0.15);
+  overflow: hidden;
+}
+
+.auth-tabs-bar {
+  display: flex;
+  border-bottom: 1px solid #1e2638;
+  background: #0c101a;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.auth-tab-btn:hover {
+  color: #fff;
+}
+
+.auth-tab-btn.active {
+  color: #fbbf24;
+  border-bottom-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.auth-modal-body {
+  padding: 1.5rem;
+}
+
+/* Official Google Sign In Button */
+.btn-google-auth {
+  width: 100%;
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.btn-google-auth:hover {
+  background: #f8fafc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-google-auth:active {
+  transform: translateY(1px);
+}
+
+.google-g-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Auth Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.25rem 0;
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #1e2638;
+}
+
+.auth-divider span {
+  padding: 0 0.75rem;
+}
+
+/* Password Toggle Wrapper */
+.auth-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-password-wrap input {
+  padding-right: 2.75rem;
+}
+
+.btn-toggle-pwd {
+  position: absolute;
+  right: 0.6rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-toggle-pwd:hover {
+  color: #fff;
+}
+
+/* Auth Action Links Row */
+.auth-links-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.75rem 0 1.25rem 0;
+  font-size: 0.75rem;
+}
+
+.auth-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.btn-forgot-email {
+  background: transparent;
+  border: none;
+  color: #fbbf24;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.btn-forgot-email:hover {
+  color: #f59e0b;
+}
+
+/* Forgot Email / Password Panel */
+.forgot-recovery-panel {
+  display: none;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.forgot-recovery-panel.active {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Quick Access / Demo Selector Bypass */
+.auth-quick-access-box {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #1e2638;
+  text-align: center;
+}
+
+.btn-quick-selector {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-quick-selector:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #fff;
+}
+
+/* Logged-in Header Badge in Main App */
+.user-auth-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  color: #34d399;
+  font-weight: 700;
+}
+
+.btn-exit-portal {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+}
+
+.btn-exit-portal:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #f87171;
+}
+
+
 

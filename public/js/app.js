@@ -5158,7 +5158,193 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 4500);
   }
 
+  // =========================================================================
+  // LANDING PORTAL & AUTHENTICATION MANAGER (GOOGLE, EMAIL & FORGOT EMAIL)
+  // Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+  // =========================================================================
+  function initLandingAndAuth() {
+    const portalPage = document.getElementById('landing-portal-page');
+    const authModal = document.getElementById('auth-login-modal');
+    const btnEnter = document.getElementById('btn-portal-enter');
+    const btnLandingSignIn = document.getElementById('btn-landing-signin-btn');
+    const btnLandingTrigger = document.getElementById('btn-landing-login-trigger');
+    const btnCloseAuth = document.getElementById('btn-close-auth-modal');
+    const btnExitToPortal = document.getElementById('btn-exit-to-portal');
+    const heroImg = document.getElementById('landing-hero-img');
+
+    // Logo image paths for the 3 generated concepts
+    const logoSources = {
+      opt1: '/images/logo-opt1-vinyl-emblem.jpg',
+      opt2: '/images/logo-opt2-studio-arena.jpg',
+      opt3: '/images/logo-opt3-lion-monogram.jpg'
+    };
+
+    // 1. Logo Option Theme Switcher
+    document.querySelectorAll('.logo-option-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const logoKey = btn.getAttribute('data-logo');
+        if (logoSources[logoKey] && heroImg) {
+          heroImg.src = logoSources[logoKey];
+        }
+        document.querySelectorAll('.logo-option-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        localStorage.setItem('GDP_PREFERRED_LOGO', logoKey);
+      });
+    });
+
+    // Restore saved logo preference
+    const savedLogo = localStorage.getItem('GDP_PREFERRED_LOGO');
+    if (savedLogo && logoSources[savedLogo]) {
+      const activeBtn = document.querySelector(`.logo-option-btn[data-logo="${savedLogo}"]`);
+      if (activeBtn) activeBtn.click();
+    }
+
+    // Modal helpers
+    const openAuthModal = () => {
+      if (authModal) authModal.classList.add('active');
+    };
+    const closeAuthModal = () => {
+      if (authModal) authModal.classList.remove('active');
+    };
+
+    btnEnter?.addEventListener('click', openAuthModal);
+    btnLandingSignIn?.addEventListener('click', openAuthModal);
+    btnLandingTrigger?.addEventListener('click', openAuthModal);
+    btnCloseAuth?.addEventListener('click', closeAuthModal);
+    authModal?.addEventListener('click', (e) => {
+      if (e.target === authModal) closeAuthModal();
+    });
+
+    // Enter App Animation & Transition
+    function unlockAndEnterApp(userName = 'Adrian Anesu Mupemhi', soundName = 'Jahvisions International Sound') {
+      localStorage.setItem('GDP_LOGGED_IN', 'true');
+      localStorage.setItem('GDP_AUTH_USER', userName);
+      localStorage.setItem('GDP_AUTH_SOUND', soundName);
+
+      closeAuthModal();
+
+      // Trigger siren sound effect for authentic Sound Clash entrance
+      try {
+        engine.initContext();
+        engine.triggerDubSiren(1.2);
+      } catch (e) {}
+
+      // Fade out landing portal
+      if (portalPage) {
+        portalPage.classList.add('portal-hidden');
+      }
+
+      showToast(`🔊 Sound Clash Arena Unlocked! Welcome ${userName} (${soundName})`, 'success');
+    }
+
+    // Exit to Landing Portal
+    btnExitToPortal?.addEventListener('click', () => {
+      localStorage.removeItem('GDP_LOGGED_IN');
+      if (portalPage) {
+        portalPage.classList.remove('portal-hidden');
+      }
+      showToast('🚪 Returned to Global Dub Plate Landing Portal', 'info');
+    });
+
+    // Quick Guest Access
+    document.getElementById('btn-landing-guest-btn')?.addEventListener('click', () => {
+      unlockAndEnterApp('Guest Selector', 'Worldwide Sound System Guest');
+    });
+
+    document.getElementById('btn-quick-jahvisions')?.addEventListener('click', () => {
+      unlockAndEnterApp('Adrian Anesu Mupemhi', 'Jahvisions International Sound');
+    });
+
+    // Google Sign-In
+    document.getElementById('btn-google-signin')?.addEventListener('click', () => {
+      showToast('Connecting to Google Identity Services...', 'info');
+      setTimeout(() => {
+        unlockAndEnterApp('Adrian Anesu Mupemhi', 'Jahvisions International Sound');
+      }, 600);
+    });
+
+    // Email Sign-In Form
+    const signinForm = document.getElementById('auth-signin-form');
+    signinForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('auth-email')?.value || 'mupemhianesu@gmail.com';
+      unlockAndEnterApp('Adrian Anesu Mupemhi', 'Jahvisions International Sound');
+    });
+
+    // Sign-Up Form
+    const signupForm = document.getElementById('auth-signup-form');
+    signupForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const sName = document.getElementById('reg-sound-name')?.value || 'New Sound System';
+      const fName = document.getElementById('reg-full-name')?.value || 'Sound Selector';
+      unlockAndEnterApp(fName, sName);
+    });
+
+    // Password Show/Hide Toggle
+    const togglePwdBtn = document.getElementById('btn-toggle-auth-pwd');
+    const pwdInput = document.getElementById('auth-password');
+    togglePwdBtn?.addEventListener('click', () => {
+      if (pwdInput) {
+        const isPwd = pwdInput.type === 'password';
+        pwdInput.type = isPwd ? 'text' : 'password';
+        togglePwdBtn.textContent = isPwd ? '🔒' : '👁️';
+      }
+    });
+
+    // Forgot Password/Email Panel Toggle
+    const forgotPanel = document.getElementById('auth-forgot-panel');
+    const btnToggleForgot = document.getElementById('btn-toggle-forgot');
+    const btnCancelRecovery = document.getElementById('btn-cancel-recovery');
+    const btnSendRecovery = document.getElementById('btn-send-recovery');
+
+    btnToggleForgot?.addEventListener('click', () => {
+      forgotPanel?.classList.toggle('active');
+      if (forgotPanel?.classList.contains('active')) {
+        document.getElementById('recovery-input')?.focus();
+      }
+    });
+
+    btnCancelRecovery?.addEventListener('click', () => {
+      forgotPanel?.classList.remove('active');
+    });
+
+    btnSendRecovery?.addEventListener('click', () => {
+      const recVal = document.getElementById('recovery-input')?.value || 'mupemhianesu@gmail.com';
+      showToast(`📩 Recovery verification code & login pass sent to ${recVal}!`, 'success');
+      setTimeout(() => {
+        forgotPanel?.classList.remove('active');
+      }, 1500);
+    });
+
+    // Auth Modal Tab Switcher (Sign In ⇄ Sign Up)
+    const tabSignIn = document.getElementById('tab-auth-signin');
+    const tabSignUp = document.getElementById('tab-auth-signup');
+
+    tabSignIn?.addEventListener('click', () => {
+      tabSignIn.classList.add('active');
+      tabSignUp?.classList.remove('active');
+      if (signinForm) signinForm.style.display = 'block';
+      if (signupForm) signupForm.style.display = 'none';
+      if (forgotPanel) forgotPanel.classList.remove('active');
+    });
+
+    tabSignUp?.addEventListener('click', () => {
+      tabSignUp.classList.add('active');
+      tabSignIn?.classList.remove('active');
+      if (signinForm) signinForm.style.display = 'none';
+      if (signupForm) signupForm.style.display = 'block';
+      if (forgotPanel) forgotPanel.classList.remove('active');
+    });
+
+    // Check login state on initial load
+    const isLoggedIn = localStorage.getItem('GDP_LOGGED_IN') === 'true';
+    if (isLoggedIn && portalPage) {
+      portalPage.classList.add('portal-hidden');
+    }
+  }
+
   function setupEventListeners() {
+    initLandingAndAuth();
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const tab = e.currentTarget.getAttribute('data-tab');
