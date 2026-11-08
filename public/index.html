@@ -3025,7 +3025,7 @@
 
   <!-- MODAL 5: USER PROFILE & MY REQUEST / SOUND IDENTITY -->
   <div class="modal-overlay" id="user-profile-modal">
-    <div class="modal-content" style="max-width: 760px;">
+    <div class="modal-content" style="max-width: 840px;">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 0.85rem;">
           <div class="profile-header-avatar">
@@ -3049,6 +3049,10 @@
         <button type="button" class="profile-tab-btn" data-profile-tab="inbox" id="tab-btn-inbox">
           <span>📬 Profile Inbox</span>
           <span class="tab-badge" id="profile-inbox-tab-badge">2</span>
+        </button>
+        <button type="button" class="profile-tab-btn" data-profile-tab="files" id="tab-btn-files" title="My Completed & Received Dubplates, Jingles, Drop-Ins & Shout-Outs">
+          <span>📁 My Folder Files</span>
+          <span class="tab-badge" id="profile-files-tab-badge">8</span>
         </button>
         <button type="button" class="profile-tab-btn" data-profile-tab="account" id="tab-btn-account">
           <span>👤 Contact & Sound Account</span>
@@ -3239,6 +3243,86 @@
 
             <div style="margin-top: 1rem; text-align: right;">
               <button type="button" class="btn btn-outline modal-close">Close Inbox</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB: MY FOLDER FILES (COMPLETED & RECEIVED CUTS)
+             Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+             ========================================== -->
+        <div class="profile-tab-panel" id="tab-panel-files" style="display: none;">
+          <div class="profile-section-card">
+            <!-- Folder Top Bar -->
+            <div class="folder-header-bar">
+              <div class="folder-header-left">
+                <div class="folder-icon-large">📁</div>
+                <div>
+                  <h3 class="folder-title">My Folder Files &amp; Vault</h3>
+                  <div class="folder-breadcrumb">
+                    <span>Vault</span> / <span id="folder-crumb-sound" style="font-weight: 600;">Jahvisions International Sound</span> / <span id="folder-crumb-active" style="color: var(--gold-primary); font-weight: 700;">All Files</span>
+                  </div>
+                </div>
+              </div>
+              <div class="folder-header-actions">
+                <div class="folder-search-box">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" id="folder-search-input" placeholder="Search cut, artist, BPM..." class="folder-search-field">
+                </div>
+              </div>
+            </div>
+
+            <!-- SUB FOLDERS NAVIGATION PILLS -->
+            <div class="subfolders-pills-bar" id="subfolders-pills-bar">
+              <button type="button" class="subfolder-pill-btn active" data-subfolder="all">
+                <span class="subfolder-pill-icon">📂</span>
+                <span class="subfolder-pill-name">All Files</span>
+                <span class="subfolder-pill-count" id="count-subfolder-all">8</span>
+              </button>
+              <button type="button" class="subfolder-pill-btn" data-subfolder="dubplate">
+                <span class="subfolder-pill-icon">📀</span>
+                <span class="subfolder-pill-name">Dubplates / Specials</span>
+                <span class="subfolder-pill-count" id="count-subfolder-dubplate">2</span>
+              </button>
+              <button type="button" class="subfolder-pill-btn" data-subfolder="jingle">
+                <span class="subfolder-pill-icon">📻</span>
+                <span class="subfolder-pill-name">Jingles</span>
+                <span class="subfolder-pill-count" id="count-subfolder-jingle">2</span>
+              </button>
+              <button type="button" class="subfolder-pill-btn" data-subfolder="drop_in">
+                <span class="subfolder-pill-icon">⚡</span>
+                <span class="subfolder-pill-name">Drop-Ins</span>
+                <span class="subfolder-pill-count" id="count-subfolder-dropin">2</span>
+              </button>
+              <button type="button" class="subfolder-pill-btn" data-subfolder="shout_out">
+                <span class="subfolder-pill-icon">📢</span>
+                <span class="subfolder-pill-name">Shout-Outs</span>
+                <span class="subfolder-pill-count" id="count-subfolder-shoutout">2</span>
+              </button>
+            </div>
+
+            <!-- Active Subfolder Directory Banner -->
+            <div class="subfolder-banner" id="subfolder-active-banner">
+              <div class="subfolder-banner-icon" id="subfolder-banner-icon">📂</div>
+              <div class="subfolder-banner-text">
+                <h4 id="subfolder-banner-title">All Completed &amp; Received Audio Files</h4>
+                <p id="subfolder-banner-desc">Master 24-bit WAVs, Sound Clash Split-Tracks (L: Vocal / R: Riddim), and multitrack stems unlocked with 100% Escrow release.</p>
+              </div>
+              <div class="subfolder-storage-badge" id="subfolder-storage-badge">
+                <span>🔒 100% Full Audio Unlocked</span>
+              </div>
+            </div>
+
+            <!-- List of Audio Files in the Active Subfolder -->
+            <div class="folder-files-list" id="folder-files-list">
+              <!-- Dynamically populated via renderMyFolderFiles() in app.js -->
+            </div>
+
+            <div style="margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.85rem;">
+              <span style="font-size: 0.78rem; color: #94a3b8;">
+                💡 <em>Click <strong>"Load into Playlist"</strong> on any cut to immediately send vocal &amp; riddim stems into the FL Studio arrangement grid and mixer channels.</em>
+              </span>
+              <button type="button" class="btn btn-outline modal-close">Close Vault</button>
             </div>
           </div>
         </div>

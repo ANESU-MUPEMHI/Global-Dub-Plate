@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       populateForwardArtistSelect();
       updateNotificationBadges();
       renderProfileInbox();
+      renderMyFolderFiles();
       updateArtistHeaderStats();
     } catch (err) {
       console.error('Failed to load initial data:', err);
@@ -532,14 +533,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const panelRequest = document.getElementById('tab-panel-request');
     const panelInbox = document.getElementById('tab-panel-inbox');
+    const panelFiles = document.getElementById('tab-panel-files');
     const panelAccount = document.getElementById('tab-panel-account');
 
     if (panelRequest) panelRequest.style.display = tabName === 'request' ? 'block' : 'none';
     if (panelInbox) panelInbox.style.display = tabName === 'inbox' ? 'block' : 'none';
+    if (panelFiles) panelFiles.style.display = tabName === 'files' ? 'block' : 'none';
     if (panelAccount) panelAccount.style.display = tabName === 'account' ? 'block' : 'none';
 
     if (tabName === 'inbox') {
       renderProfileInbox();
+    } else if (tabName === 'files') {
+      renderMyFolderFiles();
     }
   }
 
@@ -706,6 +711,288 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
       return 'Recent';
     }
+  }
+
+  // =========================================================================
+  // MY FOLDER FILES & AUDIO VAULT (SUBFOLDERS: DUBS, JINGLES, DROPS, SHOUTS)
+  // Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+  // =========================================================================
+  const SUBFOLDER_METAS = {
+    all: {
+      title: 'All Completed & Received Audio Files',
+      desc: 'Master 24-bit WAVs, Sound Clash Split-Tracks (L: Vocal / R: Riddim), and multitrack stems unlocked with 100% Escrow release.',
+      icon: '📂',
+      crumb: 'All Files'
+    },
+    dubplate: {
+      title: 'Dubplates & Sound Clash Specials Subfolder',
+      desc: 'Custom dubplate specials voiced by legendary artists over custom and catalog riddims with booth directions.',
+      icon: '📀',
+      crumb: 'Dubplates & Specials'
+    },
+    jingle: {
+      title: 'Radio & Mixtape Jingles Subfolder',
+      desc: 'Signature sound system station IDs, promotional intro drops, and radio sweeps with full production.',
+      icon: '📻',
+      crumb: 'Jingles'
+    },
+    drop_in: {
+      title: 'DJ Drop-Ins & Voiceovers Subfolder',
+      desc: 'Dry acapellas and rapid vocal tags designed for instant firing during live sound clash sets.',
+      icon: '⚡',
+      crumb: 'DJ Drop-Ins'
+    },
+    shout_out: {
+      title: 'Artist Salutes & Shout-Outs Subfolder',
+      desc: 'Direct artist endorsements, selector salutes, and sound system champion testimonials.',
+      icon: '📢',
+      crumb: 'Shout-Outs'
+    }
+  };
+
+  function renderMyFolderFiles() {
+    const listEl = document.getElementById('folder-files-list');
+    if (!listEl) return;
+
+    state.activeSubfolder = state.activeSubfolder || 'all';
+    state.folderSearchQuery = state.folderSearchQuery || '';
+
+    // Filter completed or 100% paid orders
+    const completedOrders = (state.orders || []).filter(o => {
+      return o.status === 'completed' || o.pricing?.percentPaid === 100;
+    });
+
+    // Counts for subfolder badges
+    const countAll = completedOrders.length;
+    const countDub = completedOrders.filter(o => o.recordingType === 'dubplate').length;
+    const countJingle = completedOrders.filter(o => o.recordingType === 'jingle').length;
+    const countDropIn = completedOrders.filter(o => o.recordingType === 'drop_in').length;
+    const countShoutOut = completedOrders.filter(o => o.recordingType === 'shout_out').length;
+
+    const elCountAll = document.getElementById('count-subfolder-all');
+    const elCountDub = document.getElementById('count-subfolder-dubplate');
+    const elCountJingle = document.getElementById('count-subfolder-jingle');
+    const elCountDropIn = document.getElementById('count-subfolder-dropin');
+    const elCountShoutOut = document.getElementById('count-subfolder-shoutout');
+    const elTabBadge = document.getElementById('profile-files-tab-badge');
+
+    if (elCountAll) elCountAll.textContent = countAll;
+    if (elCountDub) elCountDub.textContent = countDub;
+    if (elCountJingle) elCountJingle.textContent = countJingle;
+    if (elCountDropIn) elCountDropIn.textContent = countDropIn;
+    if (elCountShoutOut) elCountShoutOut.textContent = countShoutOut;
+    if (elTabBadge) elTabBadge.textContent = countAll;
+
+    // Update Active Banner Info
+    const meta = SUBFOLDER_METAS[state.activeSubfolder] || SUBFOLDER_METAS.all;
+    const bannerIcon = document.getElementById('subfolder-banner-icon');
+    const bannerTitle = document.getElementById('subfolder-banner-title');
+    const bannerDesc = document.getElementById('subfolder-banner-desc');
+    const crumbActive = document.getElementById('folder-crumb-active');
+    const crumbSound = document.getElementById('folder-crumb-sound');
+
+    if (bannerIcon) bannerIcon.textContent = meta.icon;
+    if (bannerTitle) bannerTitle.textContent = meta.title;
+    if (bannerDesc) bannerDesc.textContent = meta.desc;
+    if (crumbActive) crumbActive.textContent = meta.crumb;
+    if (crumbSound && state.userProfile?.soundSystem) {
+      crumbSound.textContent = state.userProfile.soundSystem;
+    }
+
+    // Update active subfolder button styling
+    document.querySelectorAll('.subfolder-pill-btn').forEach(btn => {
+      const sub = btn.getAttribute('data-subfolder');
+      if (sub === state.activeSubfolder) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    // Filter by active subfolder
+    let filtered = completedOrders;
+    if (state.activeSubfolder !== 'all') {
+      filtered = filtered.filter(o => o.recordingType === state.activeSubfolder);
+    }
+
+    // Text search filter
+    if (state.folderSearchQuery && state.folderSearchQuery.trim()) {
+      const q = state.folderSearchQuery.toLowerCase().trim();
+      filtered = filtered.filter(o => 
+        (o.artistName && o.artistName.toLowerCase().includes(q)) ||
+        (o.catalogSong && o.catalogSong.toLowerCase().includes(q)) ||
+        (o.audioTitle && o.audioTitle.toLowerCase().includes(q)) ||
+        (o.customLyrics && o.customLyrics.toLowerCase().includes(q)) ||
+        (o.recordingType && o.recordingType.toLowerCase().includes(q))
+      );
+    }
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div style="text-align: center; padding: 2.5rem 1rem; color: #94a3b8; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+          <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📂</div>
+          <h4 style="color: #fff; margin-bottom: 0.25rem;">No files found in this subfolder</h4>
+          <p style="font-size: 0.8rem; margin: 0;">Completed dubs, jingles, drop-ins, and shout-outs delivered to your sound system will automatically appear here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(order => {
+      const typeBadgeClass = order.recordingType || 'dubplate';
+      let typeLabel = 'Dub Plate Special';
+      let typeEmoji = '📀';
+      if (order.recordingType === 'jingle') {
+        typeLabel = 'Radio Jingle';
+        typeEmoji = '📻';
+      } else if (order.recordingType === 'drop_in') {
+        typeLabel = 'DJ Drop-In';
+        typeEmoji = '⚡';
+      } else if (order.recordingType === 'shout_out') {
+        typeLabel = 'Shout-Out';
+        typeEmoji = '📢';
+      }
+
+      const flag = order.artistFlag || '🇯🇲';
+      const durationMin = Math.floor((order.audioDuration || 60) / 60);
+      const durationSec = Math.floor((order.audioDuration || 60) % 60).toString().padStart(2, '0');
+      const bpm = order.tempoBpm || 85;
+      const lyricsSnippet = order.customLyrics ? `"${order.customLyrics.slice(0, 115)}${order.customLyrics.length > 115 ? '...' : ''}"` : '';
+
+      return `
+        <div class="folder-file-card" data-order-id="${order.id}">
+          <div class="folder-file-header">
+            <div class="folder-file-title-wrap">
+              <div class="folder-file-artist-avatar" title="${order.artistName}">${flag}</div>
+              <div>
+                <div class="folder-file-title">${order.audioTitle || `${order.artistName} - ${order.catalogSong}`}</div>
+                <div style="font-size: 0.72rem; color: #94a3b8;">
+                  Voiced for <strong>${order.soundSystem || 'Jahvisions International'}</strong> • Rec'd ${formatRelativeTime(order.createdAt)}
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="folder-file-type-badge ${typeBadgeClass}">${typeEmoji} ${typeLabel}</span>
+              <span class="badge badge-success" style="font-size: 0.65rem;">🔒 100% Cleared</span>
+            </div>
+          </div>
+
+          <div class="folder-file-meta-row">
+            <span>⏱️ <strong>${durationMin}:${durationSec}</strong></span>
+            <span>🥁 <strong>${bpm} BPM</strong></span>
+            <span>🎚️ <strong>24-bit 48kHz WAV</strong></span>
+            <span>📦 <strong>${(order.deliveryFormat || 'split_track').toUpperCase().replace('_', ' ')}</strong></span>
+          </div>
+
+          ${lyricsSnippet ? `<div class="folder-file-quote">${lyricsSnippet}</div>` : ''}
+
+          <div class="folder-file-actions-row">
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
+              <button type="button" class="btn-file-action btn-file-audition btn-folder-play" data-order-id="${order.id}" title="Audition Master Cut">
+                <span>▶️</span> Audition Cut
+              </button>
+              <button type="button" class="btn-file-action btn-file-daw btn-folder-daw" data-order-id="${order.id}" title="Send Stems to FL Studio Arrangement Playlist &amp; Mixer">
+                <span>🎛️</span> Load into Playlist
+              </button>
+            </div>
+            <div style="display: flex; gap: 0.4rem; align-items: center;">
+              <button type="button" class="btn-file-action btn-file-download btn-folder-wav" data-order-id="${order.id}" title="Download 24-bit Master Stereo WAV">
+                <span>💾</span> Master WAV
+              </button>
+              <button type="button" class="btn-file-action btn-file-download btn-folder-stems" data-order-id="${order.id}" title="Download Multitrack Stems Pack">
+                <span>📦</span> Stems Pack
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Audition Button Listener
+    listEl.querySelectorAll('.btn-folder-play').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const orderId = btn.getAttribute('data-order-id');
+        const order = state.orders.find(o => o.id === orderId);
+        if (order) {
+          loadOrderIntoPlayer(order);
+          engine.play();
+          showToast(`▶️ Auditioning ${order.audioTitle} from My Folder Files`, 'info');
+        }
+      });
+    });
+
+    // Load into Playlist & Mixer
+    listEl.querySelectorAll('.btn-folder-daw').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const orderId = btn.getAttribute('data-order-id');
+        const order = state.orders.find(o => o.id === orderId);
+        if (order) {
+          loadOrderIntoPlaylistAndDaw(order);
+        }
+      });
+    });
+
+    // Download handlers
+    listEl.querySelectorAll('.btn-folder-wav').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const orderId = btn.getAttribute('data-order-id');
+        downloadOrderAudio(orderId, 'master');
+      });
+    });
+
+    listEl.querySelectorAll('.btn-folder-stems').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const orderId = btn.getAttribute('data-order-id');
+        downloadOrderAudio(orderId, 'stems');
+      });
+    });
+  }
+
+  function loadOrderIntoPlaylistAndDaw(order) {
+    if (!order) return;
+    const profileModal = document.getElementById('user-profile-modal');
+    if (profileModal) profileModal.classList.remove('active');
+
+    // Switch to FL Studio DAW arrangement tab
+    switchTab('daw');
+
+    // Load into engine player & add track to playlist
+    loadOrderIntoPlayer(order);
+
+    const clipId = `clip-${order.id.toLowerCase()}`;
+    const existingClip = engine.getClip(clipId);
+    if (!existingClip) {
+      engine.playlistClips.unshift({
+        id: clipId,
+        title: `${order.artistName} - ${order.catalogSong} (${(order.recordingType || 'DUB').toUpperCase()})`,
+        track: 1,
+        color: order.recordingType === 'jingle' ? '#a855f7' : (order.recordingType === 'drop_in' ? '#3b82f6' : (order.recordingType === 'shout_out' ? '#10b981' : '#f59e0b')),
+        startBeat: 1,
+        durationBeats: Math.min(32, Math.max(8, Math.round((order.audioDuration || 60) / 2))),
+        audioBuffer: engine.masterBuffer,
+        waveform: Array.from({ length: 48 }, () => Math.random() * 0.75 + 0.25),
+        trimStart: 0,
+        trimEnd: order.audioDuration || 60,
+        cutPosition: 0
+      });
+    }
+
+    activeClipId = clipId;
+    if (typeof renderPlaylistClips === 'function') {
+      renderPlaylistClips('all');
+    }
+    if (typeof loadClipIntoEditor === 'function') {
+      loadClipIntoEditor(clipId);
+    }
+    if (typeof updateTrackAssignedBadges === 'function') {
+      updateTrackAssignedBadges();
+    }
+
+    showToast(`🎛️ "${order.audioTitle}" loaded into FL Studio Playlist & Track 1!`, 'success');
   }
 
   async function handleMarkAllNotificationsRead() {
@@ -5548,6 +5835,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         const mode = btn.getAttribute('data-profile-mode');
         if (mode) switchProfileMode(mode, true);
       });
+    });
+
+    // Subfolders Navigation (All Files, Dubplates, Jingles, Drop-Ins, Shout-Outs)
+    document.querySelectorAll('.subfolder-pill-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const subfolder = e.currentTarget.getAttribute('data-subfolder');
+        if (subfolder) {
+          state.activeSubfolder = subfolder;
+          renderMyFolderFiles();
+        }
+      });
+    });
+
+    // Real-Time Search in My Folder Files
+    document.getElementById('folder-search-input')?.addEventListener('input', (e) => {
+      state.folderSearchQuery = e.target.value;
+      renderMyFolderFiles();
     });
 
     // Live preview reactive updates on typing in profile fields
