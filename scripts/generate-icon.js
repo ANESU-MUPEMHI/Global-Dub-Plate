@@ -150,15 +150,23 @@ function makeDubplateIcon(size) {
 }
 
 function buildIcns() {
-  console.log('📀 Generating 1024x1024 Dubplate Master Artwork...');
+  console.log('📀 Preparing 1024x1024 Dubplate Master Artwork (Option 1 Golden Vinyl Emblem)...');
   const buildDir = path.join(__dirname, '..', 'build');
   const iconsetDir = path.join(buildDir, 'icon.iconset');
   fs.mkdirSync(iconsetDir, { recursive: true });
 
   const masterPngPath = path.join(buildDir, 'icon-1024.png');
-  const masterPng = makeDubplateIcon(1024);
-  fs.writeFileSync(masterPngPath, masterPng);
-  console.log(`✓ Master PNG created: ${masterPngPath}`);
+  const opt1JpgPath = path.join(__dirname, '..', 'public', 'images', 'logo-opt1-vinyl-emblem.jpg');
+
+  if (fs.existsSync(opt1JpgPath)) {
+    console.log(`📸 Converting master Option 1 artwork from ${opt1JpgPath}...`);
+    execSync(`/usr/bin/sips -s format png "${opt1JpgPath}" --out "${masterPngPath}" > /dev/null 2>&1`);
+  } else if (!fs.existsSync(masterPngPath)) {
+    console.log('Synthesizing procedural dubplate icon fallback...');
+    const masterPng = makeDubplateIcon(1024);
+    fs.writeFileSync(masterPngPath, masterPng);
+  }
+  console.log(`✓ Master PNG verified: ${masterPngPath}`);
 
   // Required macOS icon sizes
   const sizes = [
