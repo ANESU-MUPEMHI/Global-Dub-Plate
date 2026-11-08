@@ -2489,6 +2489,11 @@ body {
   overflow: hidden;
   margin-bottom: 2rem;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px);
+  min-height: 580px;
+  max-height: 840px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: #f1f5f9;
 }
@@ -2884,8 +2889,11 @@ body {
   grid-template-columns: 240px 1fr;
   position: relative;
   background: #0d1017;
-  overflow: hidden;
-  min-height: 440px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 35px;
 }
 
 /* Track Header Left Column */
@@ -3377,32 +3385,78 @@ body {
   border-color: #60a5fa;
 }
 
-/* 5. BOTTOM DOCK: MIXER CONSOLE WITH AUTO-HIDE */
+/* 5. FLOATING MIXER CONSOLE DIRECTLY ON TOP OF PLAYLIST */
 .daw-mixer-dock {
-  background: #0d1017;
-  border-top: 2px solid #1f2533;
-  box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.7);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-  z-index: 40;
-}
-
-/* AUTO-HIDE MODE BEHAVIOR */
-.daw-mixer-dock.autohide-mode {
-  position: sticky;
+  position: absolute;
   bottom: 0;
-  transform: translateY(calc(100% - 34px));
+  left: 0;
+  right: 0;
+  z-index: 85;
+  background: rgba(11, 14, 21, 0.98);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 2px solid #283348;
+  box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(0, 0, 0, 0.8);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, max-height 0.28s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  max-height: 275px;
+  display: flex;
+  flex-direction: column;
 }
 
-.daw-mixer-dock.autohide-mode:hover,
-.daw-mixer-dock.autohide-mode.expanded {
-  transform: translateY(0);
-  box-shadow: 0 -12px 35px rgba(0, 0, 0, 0.95);
-}
-
+/* Floating Bottom Dock: Open / Expanded */
+.daw-mixer-dock.floating-open,
+.daw-mixer-dock.expanded,
 .daw-mixer-dock.pinned-mode {
   transform: translateY(0) !important;
-  position: relative;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto;
+}
+
+/* Floating Bottom Dock: Auto-Hide / Collapsed */
+.daw-mixer-dock.autohide-mode:not(.expanded):not(.floating-open) {
+  transform: translateY(calc(100% - 32px));
+}
+
+.daw-mixer-dock.autohide-mode:not(.expanded):not(.floating-open):hover {
+  transform: translateY(0);
+  box-shadow: 0 -16px 45px rgba(0, 0, 0, 0.98);
+}
+
+/* Hidden state (when closed with ✕) */
+.daw-mixer-dock.mixer-closed {
+  transform: translateY(105%) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none;
+}
+
+/* DETACHED FLOATING WINDOW MODE (FL Studio Movable Window) */
+.daw-mixer-dock.mode-detached {
+  position: absolute !important;
+  bottom: auto !important;
+  right: auto !important;
+  top: 100px;
+  left: calc(50% - min(48%, 560px));
+  width: min(96%, 1120px);
+  max-width: 1120px;
+  border-radius: 8px;
+  border: 2px solid #38bdf8;
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.95), 0 0 35px rgba(56, 189, 248, 0.3);
+  transform: none !important;
+  z-index: 120 !important;
+}
+
+@media (max-width: 1200px) {
+  .daw-mixer-dock.mode-detached {
+    left: 2%;
+    width: 96%;
+  }
+}
+
+.daw-mixer-dock.mode-detached.mixer-closed {
+  display: none !important;
 }
 
 /* Mixer Handle Bar */
@@ -3413,18 +3467,21 @@ body {
   background: #161922;
   border-bottom: 1px solid #232a3b;
   padding: 0.35rem 1rem;
-  cursor: pointer;
+  cursor: move;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .dock-handle-left {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .dock-handle-icon {
   font-size: 0.85rem;
+  display: flex;
+  align-items: center;
 }
 
 .dock-title {
@@ -3432,6 +3489,19 @@ body {
   font-weight: 800;
   color: #f1f5f9;
   letter-spacing: 0.05em;
+}
+
+.dock-mode-badge {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono, monospace);
+  text-transform: uppercase;
 }
 
 .dock-hint {
@@ -3443,7 +3513,52 @@ body {
 .dock-handle-right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
+}
+
+.btn-mixer-win-ctrl {
+  background: #1a2230;
+  border: 1px solid #2d3b52;
+  color: #94a3b8;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-mixer-win-ctrl:hover {
+  background: #232f44;
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+.btn-mixer-close {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 800;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.btn-mixer-close:hover {
+  background: #dc2626;
+  border-color: #ef4444;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
 }
 
 .autohide-checkbox-label {

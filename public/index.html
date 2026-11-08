@@ -1050,25 +1050,47 @@
           </div>
         </div>
 
-        <!-- 5. BOTTOM DOCK: MIXER CONSOLE WITH AUTO-HIDE -->
+        <!-- 5. FLOATING MIXER CONSOLE ON TOP OF PLAYLIST (FL Studio Emulation) -->
         <div class="daw-mixer-dock autohide-mode" id="daw-mixer-dock">
           
-          <!-- Dock Handle & Auto-Hide Control Bar -->
-          <div class="mixer-dock-handle-bar" id="mixer-dock-handle-bar">
+          <!-- Floating Window Handle & Control Bar -->
+          <div class="mixer-dock-handle-bar" id="mixer-dock-handle-bar" title="Drag to reposition floating mixer or click buttons">
             <div class="dock-handle-left">
-              <span class="dock-handle-icon">🎚️</span>
+              <span class="dock-handle-icon">
+                <svg class="fl-win-icon" style="width: 16px; height: 16px; vertical-align: middle;" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <line x1="11" y1="4" x2="11" y2="28" stroke="#a5f3fc" stroke-width="2" stroke-linecap="round"/>
+                  <rect x="7" y="10.5" width="8" height="9" rx="1.2" fill="#1b212b" stroke="#e2e8f0" stroke-width="1.8"/>
+                  <line x1="7" y1="15" x2="9" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
+                  <line x1="13" y1="15" x2="15" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
+                  <line x1="21" y1="4" x2="21" y2="28" stroke="#a5f3fc" stroke-width="2" stroke-linecap="round"/>
+                  <rect x="17" y="10.5" width="8" height="9" rx="1.2" fill="#1b212b" stroke="#e2e8f0" stroke-width="1.8"/>
+                  <line x1="17" y1="15" x2="19" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
+                  <line x1="23" y1="15" x2="25" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
+                </svg>
+              </span>
               <strong class="dock-title">MIXER CONSOLE</strong>
-              <span class="dock-hint" id="dock-status-hint">Auto-Hide Active (Hover or Click to Expand)</span>
+              <span class="dock-mode-badge" id="dock-mode-badge">FLOATING ON PLAYLIST</span>
+              <span class="dock-hint" id="dock-status-hint">Always on top • Zero scroll required (F9)</span>
             </div>
 
             <div class="dock-handle-right">
-              <label class="autohide-checkbox-label">
-                <input type="checkbox" id="chk-mixer-autohide" checked>
-                <span>Auto-Hide Channels</span>
-              </label>
-              <button type="button" class="btn-dock-toggle" id="btn-dock-manual-toggle" title="Toggle Mixer Open/Closed">
-                <span id="dock-caret-symbol">▲</span> <span id="dock-btn-text">Expand Mixer</span>
+              <!-- Detach / Dock Window Mode Toggle -->
+              <button type="button" class="btn-mixer-win-ctrl" id="btn-mixer-detach-toggle" title="Toggle Detached Floating Window vs Docked Bottom Overlay">
+                <span id="mixer-detach-icon">🗗</span> <span id="mixer-detach-text">Detach Window</span>
               </button>
+
+              <label class="autohide-checkbox-label" title="When checked, mixer collapses to a compact bar when not in use">
+                <input type="checkbox" id="chk-mixer-autohide">
+                <span>Auto-Hide</span>
+              </label>
+
+              <!-- Minimize / Expand -->
+              <button type="button" class="btn-dock-toggle" id="btn-dock-manual-toggle" title="Toggle Mixer Expand / Minimize (F9)">
+                <span id="dock-caret-symbol">▼</span> <span id="dock-btn-text">Collapse</span>
+              </button>
+
+              <!-- Close Button -->
+              <button type="button" class="btn-mixer-close" id="btn-mixer-close-win" title="Close Floating Mixer (Press F9 or Toolbar Mixer Icon to Re-open)">✕</button>
             </div>
           </div>
 

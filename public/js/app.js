@@ -2296,27 +2296,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     const caret = document.getElementById('dock-caret-symbol');
     const btnText = document.getElementById('dock-btn-text');
     const dockStatusHint = document.getElementById('dock-status-hint');
+    const dockBadge = document.getElementById('dock-mode-badge');
     const chkAuto = document.getElementById('chk-mixer-autohide');
     if (!mixerDock) return;
 
-    const isBroughtOut = mixerDock.classList.contains('expanded') || 
-                         (mixerDock.classList.contains('pinned-mode') && !mixerDock.classList.contains('autohide-mode'));
-    const shouldOpen = forceState !== undefined ? forceState : !isBroughtOut;
+    const isClosed = mixerDock.classList.contains('mixer-closed');
+    const isCollapsed = mixerDock.classList.contains('autohide-mode') && 
+                        !mixerDock.classList.contains('expanded') && 
+                        !mixerDock.classList.contains('floating-open');
+    const isCurrentlyVisible = !isClosed && !isCollapsed;
+
+    const shouldOpen = forceState !== undefined ? forceState : !isCurrentlyVisible;
 
     if (shouldOpen) {
-      // Bring out mixer into pinned/expanded prominent view!
-      mixerDock.classList.remove('autohide-mode');
-      mixerDock.classList.add('pinned-mode', 'expanded');
+      // Bring out mixer floating directly on top of the playlist!
+      mixerDock.classList.remove('mixer-closed', 'autohide-mode');
+      mixerDock.classList.add('floating-open', 'expanded', 'pinned-mode');
       btnMixer?.classList.add('active');
       btnTopToggle?.classList.remove('autohide-active');
-      if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Mixer <span class="badge-status">OPEN</span>';
-      if (dockStatusHint) dockStatusHint.textContent = 'Mixer Brought Out (F9)';
+      if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Mixer <span class="badge-status">FLOATING</span>';
+      
+      const isDetached = mixerDock.classList.contains('mode-detached');
+      if (dockBadge) dockBadge.textContent = isDetached ? 'DETACHED WINDOW' : 'FLOATING ON PLAYLIST';
+      if (dockStatusHint) dockStatusHint.textContent = isDetached ? 'FL Studio Movable Window (F9)' : 'Floating on top of Playlist (F9)';
       if (caret) caret.textContent = '▼';
-      if (btnText) btnText.textContent = 'Collapse Mixer';
+      if (btnText) btnText.textContent = 'Collapse';
       if (chkAuto) chkAuto.checked = false;
-
-      // Smooth scroll to mixer console
-      mixerDock.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
       // Visual flash pulse on the mixer strips chassis
       const chassis = document.getElementById('mixer-strips-chassis');
@@ -2324,19 +2329,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         chassis.classList.add('mixer-focus-flash');
         setTimeout(() => chassis.classList.remove('mixer-focus-flash'), 800);
       }
-      showToast('🎚️ Mixer Console Brought Out! (F9)', 'info');
+      showToast('🎚️ Mixer Floating on Top of Playlist! (F9)', 'info');
     } else {
-      // Collapse mixer down into auto-hide mode
-      mixerDock.classList.remove('expanded', 'pinned-mode');
-      mixerDock.classList.add('autohide-mode');
+      // Collapse or close floating mixer to reveal full playlist view
+      if (mixerDock.classList.contains('mode-detached')) {
+        mixerDock.classList.add('mixer-closed');
+      } else {
+        mixerDock.classList.remove('floating-open', 'expanded', 'pinned-mode');
+        mixerDock.classList.add('autohide-mode');
+      }
       btnMixer?.classList.remove('active');
       btnTopToggle?.classList.add('autohide-active');
-      if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Auto-Hide Mixer <span class="badge-status">ON</span>';
-      if (dockStatusHint) dockStatusHint.textContent = 'Auto-Hide Active (Hover or Click F9 to Expand)';
+      if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Mixer: Auto-Hide ON';
+      if (dockStatusHint) dockStatusHint.textContent = 'Collapsed at bottom (Press F9 to Bring Out)';
       if (caret) caret.textContent = '▲';
-      if (btnText) btnText.textContent = 'Expand Mixer';
+      if (btnText) btnText.textContent = 'Expand';
       if (chkAuto) chkAuto.checked = true;
-      showToast('🎚️ Mixer Console Collapsed to Dock (F9)', 'info');
+      showToast('🎚️ Mixer Collapsed to Reveal Full Playlist (F9)', 'info');
     }
   }
 
@@ -2346,34 +2355,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mixerDock = document.getElementById('daw-mixer-dock');
     if (!playlistView) return;
 
-    const isVisible = playlistView.style.display !== 'none';
-    const shouldShow = forceState !== undefined ? forceState : true;
+    btnPlaylist?.classList.add('active');
 
-    if (shouldShow) {
-      playlistView.style.display = 'grid';
-      btnPlaylist?.classList.add('active');
-
-      // If mixer was expanded high and covering, collapse it to give playlist full stage
-      if (mixerDock && mixerDock.classList.contains('expanded')) {
-        mixerDock.classList.remove('expanded', 'pinned-mode');
-        mixerDock.classList.add('autohide-mode');
-        document.getElementById('btn-fl-toggle-mixer')?.classList.remove('active');
-      }
-
-      // Smooth scroll up to playlist
-      playlistView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      // Visual focus pulse on playlist
-      playlistView.classList.add('playlist-focus-flash');
-      setTimeout(() => playlistView.classList.remove('playlist-focus-flash'), 800);
-
-      showToast('📋 Playlist Arrangement Brought Out & Focused! (F5)', 'info');
+    // If mixer was floating open and covering, collapse it so the entire playlist has full focus
+    if (mixerDock && (mixerDock.classList.contains('expanded') || mixerDock.classList.contains('floating-open'))) {
+      mixerDock.classList.remove('floating-open', 'expanded', 'pinned-mode');
+      mixerDock.classList.add('autohide-mode');
+      document.getElementById('btn-fl-toggle-mixer')?.classList.remove('active');
+      showToast('📋 Playlist Unobstructed (Mixer Collapsed to Bottom) (F5)', 'info');
     } else {
-      // Toggle off / minimize
-      playlistView.style.display = 'none';
-      btnPlaylist?.classList.remove('active');
-      showToast('📋 Playlist Minimized (F5)', 'info');
+      showToast('📋 Playlist Arrangement Focused (F5)', 'info');
     }
+
+    playlistView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    playlistView.classList.add('playlist-focus-flash');
+    setTimeout(() => playlistView.classList.remove('playlist-focus-flash'), 800);
   }
 
   function setupFLStudioWindowToggles() {
@@ -2431,16 +2427,53 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
-  // AUTO-HIDE MIXER LOGIC & PIN TOGGLE
+  // AUTO-HIDE MIXER LOGIC & FLOATING WINDOW DRAGGING
   // =========================================================================
   function setupDawAutoHideFlags() {
     const chkAuto = document.getElementById('chk-mixer-autohide');
     const btnTopToggle = document.getElementById('btn-toggle-autohide-mixer');
     const btnManualToggle = document.getElementById('btn-dock-manual-toggle');
+    const btnDetachToggle = document.getElementById('btn-mixer-detach-toggle');
+    const btnCloseWin = document.getElementById('btn-mixer-close-win');
     const mixerDock = document.getElementById('daw-mixer-dock');
     const handleBar = document.getElementById('mixer-dock-handle-bar');
+    const dockBadge = document.getElementById('dock-mode-badge');
+    const detachIcon = document.getElementById('mixer-detach-icon');
+    const detachText = document.getElementById('mixer-detach-text');
 
     if (!mixerDock) return;
+
+    // Detach / Dock Floating Window Mode Toggle
+    btnDetachToggle?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isDetached = mixerDock.classList.toggle('mode-detached');
+      if (isDetached) {
+        mixerDock.classList.remove('autohide-mode');
+        mixerDock.classList.add('floating-open');
+        mixerDock.style.top = '100px';
+        mixerDock.style.left = 'calc(50% - min(48%, 560px))';
+        if (detachIcon) detachIcon.textContent = '⚓';
+        if (detachText) detachText.textContent = 'Dock Bottom';
+        if (dockBadge) dockBadge.textContent = 'DETACHED WINDOW';
+        showToast('🗗 Mixer detached as floating window over playlist (Drag by header)', 'info');
+      } else {
+        mixerDock.style.top = '';
+        mixerDock.style.left = '';
+        mixerDock.style.transform = '';
+        if (detachIcon) detachIcon.textContent = '🗗';
+        if (detachText) detachText.textContent = 'Detach Window';
+        if (dockBadge) dockBadge.textContent = 'FLOATING ON PLAYLIST';
+        showToast('⚓ Mixer docked floating over bottom of playlist', 'info');
+      }
+    });
+
+    // Close Floating Window Button (✕)
+    btnCloseWin?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMixerConsole(false);
+      mixerDock.classList.add('mixer-closed');
+      showToast('🎚️ Floating mixer closed (Press F9 or Toolbar Mixer Icon to Reopen)', 'info');
+    });
 
     chkAuto?.addEventListener('change', (e) => {
       if (e.target.checked) {
@@ -2464,6 +2497,58 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (e.target.closest('input') || e.target.closest('button') || e.target.closest('label')) return;
       toggleMixerConsole();
     });
+
+    // Draggable Floating Window when in mode-detached
+    if (handleBar && !handleBar._wiredDrag) {
+      handleBar._wiredDrag = true;
+      let isDragging = false;
+      let startX = 0, startY = 0;
+      let initialLeft = 0, initialTop = 0;
+
+      handleBar.addEventListener('mousedown', (e) => {
+        if (e.target.closest('button') || e.target.closest('input') || e.target.closest('label')) return;
+        if (!mixerDock.classList.contains('mode-detached')) return;
+
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+
+        const rect = mixerDock.getBoundingClientRect();
+        const chassis = document.querySelector('.daw-workstation-chassis');
+        const chassisRect = chassis ? chassis.getBoundingClientRect() : { left: 0, top: 0, width: 1200, height: 800 };
+        initialLeft = rect.left - chassisRect.left;
+        initialTop = rect.top - chassisRect.top;
+        handleBar.style.cursor = 'grabbing';
+
+        function onMouseMove(moveEvent) {
+          if (!isDragging) return;
+          const deltaX = moveEvent.clientX - startX;
+          const deltaY = moveEvent.clientY - startY;
+
+          let newLeft = initialLeft + deltaX;
+          let newTop = initialTop + deltaY;
+
+          const maxLeft = chassisRect.width - rect.width;
+          const maxTop = chassisRect.height - 80;
+          newLeft = Math.max(0, Math.min(maxLeft, newLeft));
+          newTop = Math.max(35, Math.min(maxTop, newTop));
+
+          mixerDock.style.left = `${newLeft}px`;
+          mixerDock.style.top = `${newTop}px`;
+        }
+
+        function onMouseUp() {
+          if (!isDragging) return;
+          isDragging = false;
+          handleBar.style.cursor = 'move';
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+        }
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      });
+    }
   }
 
   // =========================================================================
