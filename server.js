@@ -699,27 +699,32 @@ const server = http.createServer(async (req, res) => {
 });
 
 function startServer(portToTry) {
-  server.listen(portToTry, () => {
+  const onListening = () => {
+    server.removeListener('error', onError);
     console.log(`=======================================================`);
     console.log(`🎶 Global Dub Plate Platform is LIVE on:`);
     console.log(`👉 http://localhost:${portToTry}`);
     console.log(`=======================================================`);
-  });
-}
+  };
 
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    const nextPorts = [3000, 8080, 5000, 3333, 8888];
-    const currentPort = server.address() ? server.address().port : PORT;
-    const nextPort = nextPorts.find(p => p > currentPort) || (currentPort + 1);
-    console.log(`⚠️ Port ${currentPort} is currently occupied. Auto-switching to port ${nextPort}...`);
-    setTimeout(() => {
-      startServer(nextPort);
-    }, 200);
-  } else {
-    console.error('Server error:', err);
-  }
-});
+  const onError = (err) => {
+    server.removeListener('listening', onListening);
+    if (err.code === 'EADDRINUSE') {
+      const nextPorts = [3000, 8080, 3333, 5000, 8888];
+      const nextPort = nextPorts.find(p => p > portToTry) || (portToTry + 1);
+      console.log(`⚠️ Port ${portToTry} is currently occupied. Auto-switching to port ${nextPort}...`);
+      setTimeout(() => {
+        startServer(nextPort);
+      }, 150);
+    } else {
+      console.error('Server error:', err);
+    }
+  };
+
+  server.once('listening', onListening);
+  server.once('error', onError);
+  server.listen(portToTry);
+}
 
 const defaultPort = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 startServer(defaultPort);
