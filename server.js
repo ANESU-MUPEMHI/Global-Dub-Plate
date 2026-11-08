@@ -89,6 +89,24 @@ function sendJson(res, statusCode, data) {
   res.end(JSON.stringify(data));
 }
 
+// Download file helper (DMG & Windows Portable Zip)
+function sendDownloadFile(res, filePath, filename, mimeType) {
+  if (!fs.existsSync(filePath)) {
+    res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+    return res.end(JSON.stringify({ success: false, error: 'Download package not found on server' }));
+  }
+  const stat = fs.statSync(filePath);
+  res.writeHead(200, {
+    'Content-Type': mimeType || 'application/octet-stream',
+    'Content-Disposition': `attachment; filename="${filename}"`,
+    'Content-Length': stat.size,
+    'Cache-Control': 'no-cache',
+    'Access-Control-Allow-Origin': '*'
+  });
+  const stream = fs.createReadStream(filePath);
+  stream.pipe(res);
+}
+
 // Static file handler
 function serveStaticFile(req, res, pathname) {
   let safePath = pathname === '/' ? '/index.html' : pathname;
@@ -162,6 +180,46 @@ const server = http.createServer(async (req, res) => {
       'Access-Control-Allow-Headers': 'Content-Type, Authorization'
     });
     return res.end();
+  }
+
+  // Desktop Application Downloads (Mac DMG & Windows ZIP)
+  if (pathname === '/download/mac' || pathname === '/api/download/mac') {
+    const dmgPath = path.join(__dirname, 'dist', 'Global-Dub-Plate-1.0.0.dmg');
+    return sendDownloadFile(res, dmgPath, 'Global-Dub-Plate-1.0.0.dmg', 'application/x-apple-diskimage');
+  }
+
+  if (pathname === '/download/windows' || pathname === '/api/download/windows') {
+    const zipPath = path.join(__dirname, 'dist', 'Global-Dub-Plate-Windows-Portable.zip');
+    return sendDownloadFile(res, zipPath, 'Global-Dub-Plate-Windows-Portable.zip', 'application/zip');
+  }
+
+  if (pathname === '/api/download/info' && method === 'GET') {
+    const dmgPath = path.join(__dirname, 'dist', 'Global-Dub-Plate-1.0.0.dmg');
+    const zipPath = path.join(__dirname, 'dist', 'Global-Dub-Plate-Windows-Portable.zip');
+    const dmgExists = fs.existsSync(dmgPath);
+    const zipExists = fs.existsSync(zipPath);
+    const dmgSize = dmgExists ? (fs.statSync(dmgPath).size / (1024 * 1024)).toFixed(2) + ' MB' : '1.30 MB';
+    const zipSize = zipExists ? (fs.statSync(zipPath).size / 1024).toFixed(0) + ' KB' : '146 KB';
+
+    return sendJson(res, 200, {
+      success: true,
+      mac: {
+        platform: 'macOS',
+        version: '1.0.0',
+        filename: 'Global-Dub-Plate-1.0.0.dmg',
+        size: dmgSize,
+        compatibility: 'macOS 10.15 Catalina or later (Intel & Apple Silicon M1/M2/M3/M4)',
+        downloadUrl: '/api/download/mac'
+      },
+      windows: {
+        platform: 'Windows',
+        version: '1.0.0',
+        filename: 'Global-Dub-Plate-Windows-Portable.zip',
+        size: zipSize,
+        compatibility: 'Windows 10 & 11 (64-bit) Portable Edition',
+        downloadUrl: '/api/download/windows'
+      }
+    });
   }
 
   // API Routes

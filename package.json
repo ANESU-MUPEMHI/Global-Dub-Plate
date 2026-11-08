@@ -9,6 +9,7 @@
     "test": "node test-api.js",
     "build:icon": "node scripts/generate-icon.js",
     "build:dmg": "node scripts/build-dmg.js",
+    "build:windows": "node scripts/build-windows.js",
     "electron": "electron electron/main.js",
     "dist:mac": "electron-builder --mac dmg"
   },

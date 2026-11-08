@@ -80,6 +80,11 @@
 
       <!-- Navigation Actions -->
       <div class="nav-actions">
+        <button class="btn btn-outline btn-sm nav-download-btn" id="btn-nav-download" title="Download Desktop App for Mac & Windows">
+          <span style="font-size: 0.95rem;">💻</span>
+          <span>Download App</span>
+          <span class="desktop-badge-pill">Mac / Win</span>
+        </button>
         <button class="btn btn-outline btn-sm nav-inbox-btn" id="btn-nav-inbox" title="Profile Inbox & Studio Notifications">
           <span class="nav-inbox-icon">🔔</span>
           <span class="nav-inbox-label">Inbox</span>
@@ -391,6 +396,7 @@
               <span class="menu-item">Create</span>
               <span class="menu-item" id="menu-view-playlist" title="Bring out Playlist (F5)">Playlist (F5)</span>
               <span class="menu-item" id="menu-view-mixer" title="Bring out Mixer (F9)">Mixer (F9)</span>
+              <span class="menu-item" id="menu-download-desktop" title="Download Global Dub Plate Desktop App (Mac / Win)" style="color: var(--gold-primary); font-weight: 700; cursor: pointer;">⬇ Desktop App (Mac/Win)</span>
               <span class="menu-item">Options</span>
               <span class="menu-item active">Dubplate Tools</span>
             </nav>
@@ -3160,6 +3166,114 @@
           </div>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       DESKTOP APPLICATION DOWNLOAD MODAL (MACOS & WINDOWS)
+       Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+       ========================================================================= -->
+  <div class="modal-overlay" id="desktop-download-modal">
+    <div class="modal-card download-modal-card" style="max-width: 780px;">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <span style="font-size: 1.6rem;">💻</span>
+          <div>
+            <h3>Download Global Dub Plate Desktop</h3>
+            <small style="color: var(--gold-primary);">Standalone Studio Editions for macOS &amp; Windows • Zero-Latency Audio • FL Studio Windows</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" id="btn-close-download-modal">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.25rem;">
+        <!-- Banner -->
+        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+          <div style="font-size: 2.4rem;">🎛️</div>
+          <div>
+            <h4 style="margin: 0 0 0.25rem 0; color: #fff; font-size: 1rem;">Fast Desktop Audio Engine &amp; Dedicated Floating Mixer</h4>
+            <p style="margin: 0; font-size: 0.8rem; color: #94a3b8; line-height: 1.45;">
+              Install Global Dub Plate directly onto your Mac or Windows PC for dedicated 60fps hardware acceleration, CoreAudio low-latency tape processing, offline studio playback, and floating FL Studio windows (<kbd>F5</kbd> Playlist / <kbd>F9</kbd> Mixer).
+            </p>
+          </div>
+        </div>
+
+        <!-- Two Download Cards: Mac and Windows -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          
+          <!-- macOS Card -->
+          <div class="desktop-download-card" style="background: #151b26; border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="font-size: 2.2rem;">🍏</span>
+                <span class="badge badge-info" style="font-size: 0.7rem; font-weight: 700;">macOS .DMG</span>
+              </div>
+              <h4 style="margin: 0 0 0.35rem 0; color: #fff; font-size: 1.05rem;">Apple macOS</h4>
+              <p style="font-size: 0.75rem; color: #94a3b8; margin: 0 0 0.75rem 0;">
+                Official Apple Disk Image with drag-and-drop installer into <code>/Applications</code>.
+              </p>
+              <ul style="font-size: 0.73rem; color: #cbd5e1; margin: 0 0 1rem 1rem; padding: 0; line-height: 1.6;">
+                <li>Apple Silicon (M1/M2/M3/M4) &amp; Intel 64-bit</li>
+                <li>macOS 10.15 Catalina or later</li>
+                <li>Low-latency CoreAudio hardware pipeline</li>
+                <li>Compressed installer size: <strong>1.30 MB</strong></li>
+              </ul>
+            </div>
+            <a href="/api/download/mac" download="Global-Dub-Plate-1.0.0.dmg" class="btn btn-gold btn-block" style="font-weight: 800; text-align: center; text-decoration: none; padding: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 0 15px rgba(245, 158, 11, 0.35);">
+              <span>🍏</span>
+              <span>Download for Mac (.dmg)</span>
+            </a>
+          </div>
+
+          <!-- Windows Card -->
+          <div class="desktop-download-card" style="background: #151b26; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="font-size: 2.2rem;">🪟</span>
+                <span class="badge badge-success" style="font-size: 0.7rem; font-weight: 700;">Windows .ZIP</span>
+              </div>
+              <h4 style="margin: 0 0 0.35rem 0; color: #fff; font-size: 1.05rem;">Microsoft Windows</h4>
+              <p style="font-size: 0.75rem; color: #94a3b8; margin: 0 0 0.75rem 0;">
+                Portable 1-click desktop package with automatic double-click batch launcher.
+              </p>
+              <ul style="font-size: 0.73rem; color: #cbd5e1; margin: 0 0 1rem 1rem; padding: 0; line-height: 1.6;">
+                <li>Windows 10 &amp; 11 (64-bit architecture)</li>
+                <li>Edge &amp; Chrome borderless 60fps DAW window</li>
+                <li>Zero installation required (portable extract &amp; run)</li>
+                <li>Portable package size: <strong>146 KB</strong></li>
+              </ul>
+            </div>
+            <a href="/api/download/windows" download="Global-Dub-Plate-Windows-Portable.zip" class="btn btn-outline btn-block" style="font-weight: 800; text-align: center; text-decoration: none; padding: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-color: #10b981; color: #34d399;">
+              <span>🪟</span>
+              <span>Download for Windows (.zip)</span>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Keyboard Shortcuts & Quick Info -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 0.75rem; margin-bottom: 1rem; text-align: center; font-size: 0.75rem;">
+          <div>
+            <div style="color: var(--gold-primary); font-weight: 700;"><kbd>F5</kbd></div>
+            <div style="color: #94a3b8;">Playlist Arrangement</div>
+          </div>
+          <div>
+            <div style="color: var(--gold-primary); font-weight: 700;"><kbd>F9</kbd></div>
+            <div style="color: #94a3b8;">Floating Mixer Console</div>
+          </div>
+          <div>
+            <div style="color: var(--gold-primary); font-weight: 700;"><kbd>Space</kbd></div>
+            <div style="color: #94a3b8;">Zero-Latency Play/Stop</div>
+          </div>
+        </div>
+
+        <!-- Mandatory Attribution per RULE[user_global] -->
+        <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0.75rem; font-size: 0.72rem; color: #94a3b8; line-height: 1.5;">
+          <div style="color: var(--gold-primary); font-weight: 700; margin-bottom: 0.2rem;">PROJECT &amp; CREATOR ATTRIBUTION:</div>
+          <div>This project was made by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music &amp; Terence Taona Technologies.</div>
+          <div>Owner: Adrian Anesu Mupemhi | Contact: <a href="tel:+27724425958" style="color: var(--gold-primary);">+2772442 5958</a> | Address: 34 Derby Road, Kensington, Johannesburg, South Africa, 2094 | Email: <a href="mailto:mupemhianesu@gmail.com" style="color: var(--gold-primary);">mupemhianesu@gmail.com</a></div>
+        </div>
+      </div>
     </div>
   </div>
 

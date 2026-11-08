@@ -93,21 +93,27 @@ npm start
 
 Visit the app in your browser: `http://localhost:3333`
 
-### 💽 Building the macOS DMG Installer
+### 💽 Building the macOS DMG & Windows Desktop Packages
 
-To build the native macOS `.app` bundle and compressed Apple Disk Image (`.dmg`):
+#### macOS DMG Installer:
 ```bash
 npm run build:dmg
 ```
-
-The outputs are generated into `dist/`:
+Outputs:
 - `dist/Global-Dub-Plate-1.0.0.dmg` (1.3 MB compressed drag-and-drop installer)
 - `dist/Global Dub Plate.app` (Standalone macOS Application)
 
-To install:
-1. Double click `dist/Global-Dub-Plate-1.0.0.dmg` to mount the disk image.
-2. Drag `Global Dub Plate.app` into `/Applications`.
-3. Launch from Launchpad or Spotlight.
+#### Windows Portable Desktop Edition:
+```bash
+npm run build:windows
+```
+Outputs:
+- `dist/Global-Dub-Plate-Windows-Portable.zip` (146 KB 1-click portable desktop package with `Launch-Global-Dub-Plate.bat` & PowerShell launcher)
+
+### ⬇️ Direct Download Links in Web App
+Visitors to the web application can click the **💻 Download App** button in the header or the DAW menu bar to download:
+- 🍏 **macOS:** `/api/download/mac` -> `Global-Dub-Plate-1.0.0.dmg`
+- 🪟 **Windows:** `/api/download/windows` -> `Global-Dub-Plate-Windows-Portable.zip`
 
 ---
 
@@ -121,14 +127,16 @@ Dub Plating Thursday /
 │   ├── AppIcon.icns           # High-resolution multi-size Apple icon container
 │   └── icon-1024.png          # Master 1024x1024 Dubplate vinyl icon
 ├── dist/
-│   ├── Global-Dub-Plate-1.0.0.dmg  # Compressed macOS DMG installer
-│   └── Global Dub Plate.app        # Standalone native application bundle
+│   ├── Global-Dub-Plate-1.0.0.dmg              # Compressed macOS DMG installer (1.3 MB)
+│   ├── Global-Dub-Plate-Windows-Portable.zip  # Windows 10/11 portable package (146 KB)
+│   └── Global Dub Plate.app                    # Standalone native application bundle
 ├── electron/
 │   ├── main.js                # Electron main process & low-latency desktop audio flags
 │   └── preload.js             # Electron context bridge & desktop APIs
 ├── scripts/
 │   ├── generate-icon.js       # Master vinyl icon generator & iconset compiler
-│   └── build-dmg.js           # Automated macOS bundle and hdiutil DMG builder
+│   ├── build-dmg.js           # Automated macOS bundle and hdiutil DMG builder
+│   └── build-windows.js       # Windows batch/powershell portable packager
 ├── data/
 │   ├── artists.json           # Global artist roster (JM, GH, ZW, US, KE, EU, JP)
 │   ├── riddims.json           # Classic sound clash foundation riddims

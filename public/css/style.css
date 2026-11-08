@@ -3062,7 +3062,7 @@ body {
   width: 100%;
   min-width: 900px;
   position: relative;
-  cursor: pointer;
+  cursor: ew-resize;
   user-select: none;
 }
 
@@ -3085,21 +3085,33 @@ body {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 1px;
+  width: 1.5px;
   background: #ffffff;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.95);
   z-index: 25;
   pointer-events: none;
-  transition: left 0.04s linear;
+  transition: left 0.03s linear;
+}
+
+.daw-playhead-line.is-dragging {
+  transition: none !important;
 }
 
 .daw-playhead-line .playhead-cap {
-  width: 11px;
-  height: 14px;
+  width: 13px;
+  height: 15px;
   background: #ffffff;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
-  margin-left: -5px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+  margin-left: -6px;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.9));
+  pointer-events: auto;
+  cursor: ew-resize;
+  transition: transform 0.1s ease;
+}
+
+.daw-playhead-line .playhead-cap:hover {
+  transform: scale(1.2);
+  background: #f59e0b;
 }
 
 /* Scissors Cut Line Overlay */
@@ -4927,4 +4939,48 @@ body {
   background: #161c2b;
   border-top: 1px solid #232c40;
 }
+
+/* =========================================================================
+   DESKTOP APP DOWNLOAD BUTTONS & MODAL STYLES
+   Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+   ========================================================================= */
+.nav-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  color: #fbbf24 !important;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.08) !important;
+  transition: all 0.2s ease;
+}
+
+.nav-download-btn:hover {
+  background: rgba(245, 158, 11, 0.22) !important;
+  border-color: #f59e0b !important;
+  color: #fff !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+  transform: translateY(-1px);
+}
+
+.desktop-badge-pill {
+  font-size: 0.6rem;
+  padding: 0.1rem 0.35rem;
+  background: #f59e0b;
+  color: #0b0e15;
+  border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+.desktop-download-card {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.desktop-download-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold-primary) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
 

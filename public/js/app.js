@@ -1408,6 +1408,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // =========================================================================
+  // UNIFIED DAW PLAYHEAD & TIMELINE SYNCHRONIZATION
+  // Synchronizes DAW arrangement timeline with Web Audio engine and bottom player
+  // Created by Adrian Anesu Mupemhi for Jahvisions, Benjamin Music & Terence Taona Technologies
+  // =========================================================================
+  function updateDawPlayheadAndPosition(timeInSeconds) {
+    const playhead = document.getElementById('daw-playhead');
+    const bpm = engine.bpm || 85;
+    const loopDuration = 48 * (4 * (60 / bpm)); // 48 bars in seconds
+    const curTime = Math.max(0, timeInSeconds || 0);
+
+    const pct = Math.max(0, Math.min(100, (curTime % loopDuration) / loopDuration * 100));
+    if (playhead) {
+      playhead.style.left = `${pct}%`;
+    }
+
+    const mins = Math.floor(curTime / 60);
+    const secs = Math.floor(curTime % 60);
+    const frames = Math.floor((curTime % 1) * 30);
+
+    const tc = document.getElementById('daw-timecode-display');
+    if (tc) {
+      tc.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}:${frames < 10 ? '0' : ''}${frames}`;
+    }
+
+    const barBeat = document.getElementById('daw-bar-beat-display');
+    if (barBeat) {
+      const beatSec = 60 / bpm;
+      const totalBeats = Math.floor(curTime / beatSec);
+      const bar = Math.floor(totalBeats / 4) + 1;
+      const beat = (totalBeats % 4) + 1;
+      barBeat.textContent = `BAR ${bar < 10 ? '0' : ''}${bar} . ${beat < 10 ? '0' : ''}${beat}`;
+    }
+
+    const counterEl = document.getElementById('deck-counter-display');
+    if (counterEl) {
+      counterEl.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}:${frames < 10 ? '0' : ''}${frames}`;
+    }
+  }
+
+  function seekBothEngines(timeInSeconds) {
+    const target = Math.max(0, timeInSeconds || 0);
+
+    if (engine.fourTrack) {
+      engine.fourTrack.currentTime = target;
+    }
+    if (engine.seek) {
+      engine.seek(target);
+    } else {
+      engine.currentTime = target;
+    }
+
+    updateDawPlayheadAndPosition(target);
+
+    // Synchronize bottom player progress bar
+    if (playerProgressBar && engine.totalDuration) {
+      const pct = Math.max(0, Math.min(100, (target / engine.totalDuration) * 100));
+      playerProgressBar.style.width = `${pct}%`;
+    }
+    if (playerTimeCurrent) {
+      playerTimeCurrent.textContent = formatTime(target);
+    }
+  }
+
   function startPlayback() {
     if (!state.activeOrder) {
       if (state.orders.length > 0) {
@@ -1419,19 +1483,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     engine.initContext();
     engine.play();
+    if (state.activeTab === 'artist-recorder' && !engine.fourTrack?.isPlaying) {
+      engine.startFourTrack(false);
+      updateFourTrackTransportUI();
+    }
     updatePlayerButtonUI();
   }
 
   function stopPlayback() {
     engine.stop();
+    if (engine.fourTrack && engine.fourTrack.isPlaying) {
+      engine.stopFourTrack();
+      updateFourTrackTransportUI();
+    }
     if (playerProgressBar) playerProgressBar.style.width = '0%';
     if (playerTimeCurrent) playerTimeCurrent.textContent = '0:00';
+    updateDawPlayheadAndPosition(0);
     updatePlayerButtonUI();
     showToast('⏹ Dubplate Audio Stopped & Reset to 0:00', 'info');
   }
 
   function toggleStartStop() {
-    if (engine.isPlaying) {
+    if (engine.isPlaying || (engine.fourTrack && engine.fourTrack.isPlaying)) {
       stopPlayback();
     } else {
       startPlayback();
@@ -1447,6 +1520,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       playerProgressBar.style.width = `${percent}%`;
     }
 
+    // Move DAW Playlist Playhead smoothly in real-time
+    updateDawPlayheadAndPosition(currentTime);
     updatePlayerButtonUI();
   };
 
@@ -2147,66 +2222,57 @@ document.addEventListener('DOMContentLoaded', async () => {
   function animateFourTrackVUMeters() {
     fourTrackAnimId = requestAnimationFrame(animateFourTrackVUMeters);
 
-    const levels = engine.getFourTrackVULevels();
+    try {
+      const levels = engine.getFourTrackVULevels();
 
-    // Update dynamic Multitrack mixer channel dual meters
-    const trackIds = Object.keys(engine.fourTrack?.tracks || {});
-    trackIds.forEach(tKey => {
-      const i = parseInt(tKey);
-      const lvl = levels[i] || 0;
-      updateVUColumn(`mix-vu-${i}-l`, lvl);
-      // stereo phase nuance
-      const lvlR = Math.max(0, Math.min(1.0, lvl * (0.88 + Math.sin(Date.now() * 0.008 + i) * 0.12)));
-      updateVUColumn(`mix-vu-${i}-r`, lvlR);
-    });
+      // If Dubplate audio engine is playing, drive VU meters from engine.analyser
+      if (engine.isPlaying && engine.analyser) {
+        try {
+          const dataArray = new Uint8Array(engine.analyser.frequencyBinCount);
+          engine.analyser.getByteTimeDomainData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const val = (dataArray[i] - 128) / 128;
+            sum += val * val;
+          }
+          const rms = Math.min(1.0, Math.sqrt(sum / dataArray.length) * 3.2);
+          levels.masterL = Math.max(levels.masterL || 0, rms);
+          levels.masterR = Math.max(levels.masterR || 0, rms * 0.94);
+          if (!levels[1]) levels[1] = rms * 0.85; // TR-808
+          if (!levels[2]) levels[2] = rms * 0.92; // Lead Vocal
+        } catch (e) {}
+      }
 
-    // Update Master Stereo Meter
-    updateVUColumn('mix-vu-master-l', levels.masterL || 0);
-    updateVUColumn('mix-vu-master-r', levels.masterR || 0);
+      // Update dynamic Multitrack mixer channel dual meters
+      const trackIds = Object.keys(engine.fourTrack?.tracks || {});
+      trackIds.forEach(tKey => {
+        const i = parseInt(tKey);
+        const lvl = levels[i] || 0;
+        updateVUColumn(`mix-vu-${i}-l`, lvl);
+        // stereo phase nuance
+        const lvlR = Math.max(0, Math.min(1.0, lvl * (0.88 + Math.sin(Date.now() * 0.008 + i) * 0.12)));
+        updateVUColumn(`mix-vu-${i}-r`, lvlR);
+      });
 
-    // Legacy meters support
-    for (let i = 1; i <= 4; i++) {
-      updateVUBar(`vu-bar-trk-${i}`, `vu-peak-${i}`, levels[i]);
+      // Update Master Stereo Meter
+      updateVUColumn('mix-vu-master-l', levels.masterL || 0);
+      updateVUColumn('mix-vu-master-r', levels.masterR || 0);
+
+      // Legacy meters support
+      for (let i = 1; i <= 4; i++) {
+        updateVUBar(`vu-bar-trk-${i}`, `vu-peak-${i}`, levels[i]);
+      }
+      updateVUBar('vu-bar-master-L', 'vu-peak-master', levels.masterL);
+      updateVUBar('vu-bar-master-R', 'vu-peak-master', levels.masterR);
+    } catch (err) {
+      // Keep animation frame resilient
     }
-    updateVUBar('vu-bar-master-L', 'vu-peak-master', levels.masterL);
-    updateVUBar('vu-bar-master-R', 'vu-peak-master', levels.masterR);
 
-    // Update Timecode, Bar/Beat & Playhead
-    if (engine.fourTrack) {
-      const curTime = engine.fourTrack.currentTime || 0;
-      const mins = Math.floor(curTime / 60);
-      const secs = Math.floor(curTime % 60);
-      const frames = Math.floor((curTime % 1) * 30);
-
-      const tc = document.getElementById('daw-timecode-display');
-      if (tc) {
-        tc.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}:${frames < 10 ? '0' : ''}${frames}`;
-      }
-
-      const barBeat = document.getElementById('daw-bar-beat-display');
-      if (barBeat) {
-        const bpm = engine.bpm || 85;
-        const beatSec = 60 / bpm;
-        const totalBeats = Math.floor(curTime / beatSec);
-        const bar = Math.floor(totalBeats / 4) + 1;
-        const beat = (totalBeats % 4) + 1;
-        barBeat.textContent = `BAR ${bar < 10 ? '0' : ''}${bar} . ${beat < 10 ? '0' : ''}${beat}`;
-      }
-
-      // Smooth playhead line progression across timeline
-      const playhead = document.getElementById('daw-playhead');
-      if (playhead && (engine.fourTrack.isPlaying || engine.fourTrack.isRecording)) {
-        const bpm = engine.bpm || 85;
-        const loopDuration = 48 * (4 * (60 / bpm));
-        const pct = (curTime % loopDuration) / loopDuration * 100;
-        playhead.style.left = `${pct}%`;
-      }
-
-      // Legacy counter
-      const counterEl = document.getElementById('deck-counter-display');
-      if (counterEl) {
-        counterEl.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}:${frames < 10 ? '0' : ''}${frames}`;
-      }
+    // Continuous 60fps Playhead & Position Update for ANY playing audio
+    const isAudioActive = engine.isPlaying || engine.fourTrack?.isPlaying || engine.fourTrack?.isRecording;
+    if (isAudioActive) {
+      const activeCurTime = engine.isPlaying ? (engine.currentTime || 0) : (engine.fourTrack?.currentTime || 0);
+      updateDawPlayheadAndPosition(activeCurTime);
     }
   }
 
@@ -2755,27 +2821,54 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // Timeline Ruler Click Seek
+    // Timeline Ruler Click & Drag Seek (FL Studio Scrubber)
     const ruler = document.getElementById('daw-timeline-ruler');
-    if (ruler) {
-      ruler.addEventListener('click', (e) => {
-        const rect = ruler.getBoundingClientRect();
-        const frac = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-        const playhead = document.getElementById('daw-playhead');
-        if (playhead) playhead.style.left = `${frac * 100}%`;
+    const playhead = document.getElementById('daw-playhead');
+    let isRulerDragging = false;
 
-        const bpm = engine.bpm || 85;
-        const loopDuration = 48 * (4 * (60 / bpm));
-        engine.fourTrack.currentTime = frac * loopDuration;
+    function handleRulerScrub(clientX) {
+      if (!ruler) return;
+      const rect = ruler.getBoundingClientRect();
+      const frac = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      const bpm = engine.bpm || 85;
+      const loopDuration = 48 * (4 * (60 / bpm));
+      const targetTime = frac * loopDuration;
 
-        const curTime = engine.fourTrack.currentTime;
-        const mins = Math.floor(curTime / 60);
-        const secs = Math.floor(curTime % 60);
-        const frames = Math.floor((curTime % 1) * 30);
-        const tc = document.getElementById('daw-timecode-display');
-        if (tc) tc.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}:${frames < 10 ? '0' : ''}${frames}`;
+      seekBothEngines(targetTime);
+    }
+
+    if (ruler && !ruler._wiredScrub) {
+      ruler._wiredScrub = true;
+      ruler.addEventListener('mousedown', (e) => {
+        isRulerDragging = true;
+        playhead?.classList.add('is-dragging');
+        handleRulerScrub(e.clientX);
       });
     }
+
+    if (playhead && !playhead._wiredScrub) {
+      playhead._wiredScrub = true;
+      const cap = playhead.querySelector('.playhead-cap') || playhead;
+      cap.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        isRulerDragging = true;
+        playhead.classList.add('is-dragging');
+      });
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      if (isRulerDragging) {
+        handleRulerScrub(e.clientX);
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isRulerDragging) {
+        isRulerDragging = false;
+        playhead?.classList.remove('is-dragging');
+      }
+    });
 
     // Interactive Clip Slicing, Draw, Mute & Context Menus
     setupTimelineClipInteractions();
@@ -5111,10 +5204,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         const clickX = e.clientX - rect.left;
         const width = rect.width;
         const targetPercent = clickX / width;
-        const targetSeconds = targetPercent * engine.totalDuration;
-        engine.seek(targetSeconds);
+        const targetSeconds = targetPercent * (engine.totalDuration || 120);
+        seekBothEngines(targetSeconds);
       });
     }
+
+    // Desktop Application Download Modal (Mac & Windows)
+    const downloadModal = document.getElementById('desktop-download-modal');
+    const btnNavDownload = document.getElementById('btn-nav-download');
+    const menuDownloadDesktop = document.getElementById('menu-download-desktop');
+    const btnCloseDownload = document.getElementById('btn-close-download-modal');
+
+    const openDownloadModal = () => {
+      if (downloadModal) downloadModal.classList.add('active');
+    };
+    const closeDownloadModal = () => {
+      if (downloadModal) downloadModal.classList.remove('active');
+    };
+
+    btnNavDownload?.addEventListener('click', openDownloadModal);
+    menuDownloadDesktop?.addEventListener('click', openDownloadModal);
+    btnCloseDownload?.addEventListener('click', closeDownloadModal);
+    downloadModal?.addEventListener('click', (e) => {
+      if (e.target === downloadModal) closeDownloadModal();
+    });
 
     if (playerUnlockBtn) {
       playerUnlockBtn.addEventListener('click', () => {
@@ -5414,6 +5527,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         try { await engine.ctx.resume(); } catch (e) {}
       }
       engine.startFourTrack(false);
+      if (state.activeOrder && !engine.isPlaying) {
+        engine.play();
+        updatePlayerButtonUI();
+      }
       updateFourTrackTransportUI();
       showToast('▶ DAW Playback Active (6 Channels Live)', 'info');
     });
@@ -5421,8 +5538,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // DAW Transport: Stop
     document.getElementById('daw-btn-stop')?.addEventListener('click', () => {
       engine.stopFourTrack();
+      if (engine.isPlaying) {
+        engine.stop();
+        updatePlayerButtonUI();
+      }
+      updateDawPlayheadAndPosition(0);
       updateFourTrackTransportUI();
-      showToast('⏹ DAW Playback Stopped', 'info');
+      showToast('⏹ DAW Playback Stopped & Reset', 'info');
     });
 
     // DAW Transport: Record (FL Studio Arm & Pre-Count)
@@ -5476,44 +5598,37 @@ document.addEventListener('DOMContentLoaded', async () => {
       addNewPlaylistTrack();
     });
 
-    // Spacebar to Play/Stop in DAW Workstation
+    // Spacebar to Play/Stop across DAW Workstation & Dubplate Desk
     window.addEventListener('keydown', async (e) => {
-      if (e.code === 'Space' && state.activeTab === 'artist-recorder') {
+      if (e.code === 'Space') {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
         e.preventDefault();
-        const ft = engine.fourTrack;
-        if (ft && ft.isPlaying) {
-          engine.stopFourTrack();
-        } else {
-          if (engine.ctx && engine.ctx.state === 'suspended') {
-            try { await engine.ctx.resume(); } catch (err) {}
-          }
-          engine.startFourTrack(false);
-        }
-        updateFourTrackTransportUI();
+        toggleStartStop();
       }
     });
 
     // DAW Transport: Return to Zero
     document.getElementById('daw-btn-rtz')?.addEventListener('click', () => {
-      engine.returnToZeroFourTrack();
-      const playhead = document.getElementById('daw-playhead');
-      if (playhead) playhead.style.left = '0%';
-      const tc = document.getElementById('daw-timecode-display');
-      if (tc) tc.textContent = '00:00:00';
-      const bb = document.getElementById('daw-bar-beat-display');
-      if (bb) bb.textContent = 'BAR 01 . 01';
+      seekBothEngines(0);
       showToast('⏮ Returned to Bar 1 (00:00:00)', 'info');
     });
 
     // DAW Transport: Rewind & Fast Forward
     document.getElementById('daw-btn-rew')?.addEventListener('click', () => {
-      engine.rewindFourTrack();
+      const bpm = engine.bpm || 85;
+      const beatSec = 60 / bpm;
+      const fourBarsSec = 16 * beatSec;
+      const cur = engine.isPlaying ? (engine.currentTime || 0) : (engine.fourTrack?.currentTime || 0);
+      seekBothEngines(Math.max(0, cur - fourBarsSec));
       showToast('◀ Rewound 4 Bars', 'info');
     });
 
     document.getElementById('daw-btn-ff')?.addEventListener('click', () => {
-      engine.fastForwardFourTrack();
+      const bpm = engine.bpm || 85;
+      const beatSec = 60 / bpm;
+      const fourBarsSec = 16 * beatSec;
+      const cur = engine.isPlaying ? (engine.currentTime || 0) : (engine.fourTrack?.currentTime || 0);
+      seekBothEngines(cur + fourBarsSec);
       showToast('▶▶ Fast-Forwarded 4 Bars', 'info');
     });
 
