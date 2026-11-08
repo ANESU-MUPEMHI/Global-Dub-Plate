@@ -49,6 +49,12 @@
           </button>
         </div>
 
+        <button type="button" class="btn btn-outline btn-sm nav-download-btn" id="btn-landing-top-download" title="Download Desktop App for Mac & Windows">
+          <span style="font-size: 0.95rem;">💻</span>
+          <span>Download App</span>
+          <span class="desktop-badge-pill">Mac / Win</span>
+        </button>
+
         <button type="button" class="btn-landing-login-nav" id="btn-landing-login-trigger">
           <span>🔑</span> Sign In
         </button>
@@ -94,14 +100,41 @@
         <span class="enter-btn-arrow">➔</span>
       </button>
 
-      <!-- Secondary Quick Actions -->
-      <div class="landing-secondary-actions">
-        <button type="button" class="btn-landing-sub" id="btn-landing-signin-btn">
-          <span>🔑</span> Sign In with Google or Email
-        </button>
-        <button type="button" class="btn-landing-sub" id="btn-landing-guest-btn">
-          <span>🎧</span> Quick Studio Guest Access
-        </button>
+      <!-- Desktop Application Downloads on Landing Page (Full Individual Names) -->
+      <div class="landing-downloads-section">
+        <div class="landing-downloads-badge">
+          <span class="landing-dl-pulse-dot"></span>
+          <span>OFFICIAL DESKTOP EDITIONS (STANDALONE STUDIO SUITE)</span>
+        </div>
+        <div class="landing-downloads-grid">
+          <!-- macOS Download Link -->
+          <a href="/api/download/mac" download="Global-Dub-Plate-1.0.0.dmg" class="landing-dl-card mac-card" id="landing-dl-mac-link" title="Download Global Dub Plate for macOS (.dmg)">
+            <div class="landing-dl-icon-col">
+              <span class="dl-os-icon">🍏</span>
+            </div>
+            <div class="landing-dl-info-col">
+              <span class="landing-dl-fullname">Download Global Dub Plate for macOS (.dmg)</span>
+              <span class="landing-dl-specs">Apple Silicon (M1/M2/M3/M4) &amp; Intel Universal • macOS 10.15+ (5.44 MB)</span>
+            </div>
+            <div class="landing-dl-action-col">
+              <span class="btn-dl-badge">⬇️ Download .dmg</span>
+            </div>
+          </a>
+
+          <!-- Windows Download Link -->
+          <a href="/api/download/windows" download="Global-Dub-Plate-Windows-Portable.zip" class="landing-dl-card win-card" id="landing-dl-win-link" title="Download Global Dub Plate for Windows (.zip)">
+            <div class="landing-dl-icon-col">
+              <span class="dl-os-icon">🪟</span>
+            </div>
+            <div class="landing-dl-info-col">
+              <span class="landing-dl-fullname">Download Global Dub Plate for Windows (.zip)</span>
+              <span class="landing-dl-specs">Windows 10 &amp; 11 64-bit • Standalone Portable Suite • Zero Setup (2.37 MB)</span>
+            </div>
+            <div class="landing-dl-action-col">
+              <span class="btn-dl-badge">⬇️ Download .zip</span>
+            </div>
+          </a>
+        </div>
       </div>
 
       <!-- 3 Core Platform Pillars -->

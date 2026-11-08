@@ -5166,7 +5166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const portalPage = document.getElementById('landing-portal-page');
     const authModal = document.getElementById('auth-login-modal');
     const btnEnter = document.getElementById('btn-portal-enter');
-    const btnLandingSignIn = document.getElementById('btn-landing-signin-btn');
+    const btnLandingTopDownload = document.getElementById('btn-landing-top-download');
     const btnLandingTrigger = document.getElementById('btn-landing-login-trigger');
     const btnCloseAuth = document.getElementById('btn-close-auth-modal');
     const btnExitToPortal = document.getElementById('btn-exit-to-portal');
@@ -5192,8 +5192,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     });
 
-    // Restore saved logo preference
-    const savedLogo = localStorage.getItem('GDP_PREFERRED_LOGO');
+    // Restore saved logo preference (Option 1 default)
+    const savedLogo = localStorage.getItem('GDP_PREFERRED_LOGO') || 'opt1';
     if (savedLogo && logoSources[savedLogo]) {
       const activeBtn = document.querySelector(`.logo-option-btn[data-logo="${savedLogo}"]`);
       if (activeBtn) activeBtn.click();
@@ -5201,15 +5201,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Modal helpers
     const openAuthModal = () => {
-      if (authModal) authModal.classList.add('active');
+      if (authModal) {
+        authModal.classList.add('active');
+        authModal.style.zIndex = '1000001';
+      }
+      try {
+        engine.initContext();
+      } catch (e) {}
     };
     const closeAuthModal = () => {
       if (authModal) authModal.classList.remove('active');
     };
 
-    btnEnter?.addEventListener('click', openAuthModal);
-    btnLandingSignIn?.addEventListener('click', openAuthModal);
-    btnLandingTrigger?.addEventListener('click', openAuthModal);
+    // Activate ENTER SOUND SYSTEM ARENA button as the direct link to the login modal
+    btnEnter?.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuthModal();
+    });
+
+    btnLandingTrigger?.addEventListener('click', (e) => {
+      e.preventDefault();
+      openAuthModal();
+    });
+
+    // Landing top download badge button
+    btnLandingTopDownload?.addEventListener('click', () => {
+      const dlModal = document.getElementById('desktop-download-modal');
+      if (dlModal) {
+        dlModal.classList.add('active');
+        dlModal.style.zIndex = '1000002';
+      }
+    });
+
     btnCloseAuth?.addEventListener('click', closeAuthModal);
     authModal?.addEventListener('click', (e) => {
       if (e.target === authModal) closeAuthModal();
@@ -5217,7 +5240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Enter App Animation & Transition
     function unlockAndEnterApp(userName = 'Adrian Anesu Mupemhi', soundName = 'Jahvisions International Sound') {
-      localStorage.setItem('GDP_LOGGED_IN', 'true');
+      sessionStorage.setItem('GDP_LOGGED_IN', 'true');
       localStorage.setItem('GDP_AUTH_USER', userName);
       localStorage.setItem('GDP_AUTH_SOUND', soundName);
 
@@ -5239,16 +5262,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Exit to Landing Portal
     btnExitToPortal?.addEventListener('click', () => {
+      sessionStorage.removeItem('GDP_LOGGED_IN');
       localStorage.removeItem('GDP_LOGGED_IN');
       if (portalPage) {
         portalPage.classList.remove('portal-hidden');
       }
       showToast('🚪 Returned to Global Dub Plate Landing Portal', 'info');
-    });
-
-    // Quick Guest Access
-    document.getElementById('btn-landing-guest-btn')?.addEventListener('click', () => {
-      unlockAndEnterApp('Guest Selector', 'Worldwide Sound System Guest');
     });
 
     document.getElementById('btn-quick-jahvisions')?.addEventListener('click', () => {
@@ -5336,10 +5355,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (forgotPanel) forgotPanel.classList.remove('active');
     });
 
-    // Check login state on initial load
-    const isLoggedIn = localStorage.getItem('GDP_LOGGED_IN') === 'true';
-    if (isLoggedIn && portalPage) {
+    // Check login state on initial load (defaults to showing Landing Portal for visitors)
+    const urlParams = new URLSearchParams(window.location.search);
+    const forcePortal = urlParams.get('portal') === '1';
+    const isLoggedIn = sessionStorage.getItem('GDP_LOGGED_IN') === 'true';
+    if (isLoggedIn && !forcePortal && portalPage) {
       portalPage.classList.add('portal-hidden');
+    } else if (portalPage) {
+      portalPage.classList.remove('portal-hidden');
     }
   }
 
