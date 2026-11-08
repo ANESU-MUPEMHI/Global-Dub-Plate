@@ -1051,51 +1051,50 @@
         </div>
 
         <!-- 5. FLOATING MIXER CONSOLE ON TOP OF PLAYLIST (FL Studio Emulation) -->
-        <div class="daw-mixer-dock autohide-mode" id="daw-mixer-dock">
+        <div class="daw-mixer-dock fl-floating-window" id="daw-mixer-dock">
           
-          <!-- Floating Window Handle & Control Bar -->
-          <div class="mixer-dock-handle-bar" id="mixer-dock-handle-bar" title="Drag to reposition floating mixer or click buttons">
+          <!-- FL Studio Floating Window Titlebar -->
+          <div class="mixer-dock-handle-bar" id="mixer-dock-handle-bar" title="Drag to reposition floating mixer window">
             <div class="dock-handle-left">
-              <span class="dock-handle-icon">
-                <svg class="fl-win-icon" style="width: 16px; height: 16px; vertical-align: middle;" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <line x1="11" y1="4" x2="11" y2="28" stroke="#a5f3fc" stroke-width="2" stroke-linecap="round"/>
-                  <rect x="7" y="10.5" width="8" height="9" rx="1.2" fill="#1b212b" stroke="#e2e8f0" stroke-width="1.8"/>
-                  <line x1="7" y1="15" x2="9" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
-                  <line x1="13" y1="15" x2="15" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
-                  <line x1="21" y1="4" x2="21" y2="28" stroke="#a5f3fc" stroke-width="2" stroke-linecap="round"/>
-                  <rect x="17" y="10.5" width="8" height="9" rx="1.2" fill="#1b212b" stroke="#e2e8f0" stroke-width="1.8"/>
-                  <line x1="17" y1="15" x2="19" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
-                  <line x1="23" y1="15" x2="25" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
-                </svg>
-              </span>
-              <strong class="dock-title">MIXER CONSOLE</strong>
-              <span class="dock-mode-badge" id="dock-mode-badge">FLOATING ON PLAYLIST</span>
-              <span class="dock-hint" id="dock-status-hint">Always on top • Zero scroll required (F9)</span>
+              <div class="fl-win-header-tools">
+                <!-- Waveform Icon -->
+                <span class="fl-win-tool-icon" title="Waveform Monitor">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"><path d="M2 12h3l3-7 4 14 4-9 3 5 3-3"/></svg>
+                </span>
+                <!-- Routing Nodes Icon -->
+                <span class="fl-win-tool-icon" title="Track Routing">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.5 8.5l7 7"/></svg>
+                </span>
+                <!-- Cable Routing Icon -->
+                <span class="fl-win-tool-icon" title="Audio Cables">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M4 17l6-6M9 22l6-6M14 7l6-6"/></svg>
+                </span>
+                <!-- Add Track / Insert Button -->
+                <button type="button" class="btn-fl-mini-add" id="btn-fl-mixer-add-insert" title="Add Insert Track Channel">+</button>
+                <!-- Layout Mode Dropdown -->
+                <div class="fl-dropdown-wrapper">
+                  <span class="fl-view-preset-label">Wide ▾</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dock-handle-center">
+              <strong class="fl-mixer-win-title" id="fl-mixer-win-title">Mixer - Master</strong>
             </div>
 
             <div class="dock-handle-right">
-              <!-- Detach / Dock Window Mode Toggle -->
-              <button type="button" class="btn-mixer-win-ctrl" id="btn-mixer-detach-toggle" title="Toggle Detached Floating Window vs Docked Bottom Overlay">
-                <span id="mixer-detach-icon">🗗</span> <span id="mixer-detach-text">Detach Window</span>
-              </button>
-
-              <label class="autohide-checkbox-label" title="When checked, mixer collapses to a compact bar when not in use">
-                <input type="checkbox" id="chk-mixer-autohide">
-                <span>Auto-Hide</span>
-              </label>
-
-              <!-- Minimize / Expand -->
-              <button type="button" class="btn-dock-toggle" id="btn-dock-manual-toggle" title="Toggle Mixer Expand / Minimize (F9)">
-                <span id="dock-caret-symbol">▼</span> <span id="dock-btn-text">Collapse</span>
-              </button>
-
-              <!-- Close Button -->
-              <button type="button" class="btn-mixer-close" id="btn-mixer-close-win" title="Close Floating Mixer (Press F9 or Toolbar Mixer Icon to Re-open)">✕</button>
+              <!-- Window Action Buttons: Minimize, Maximize, Close -->
+              <button type="button" class="btn-fl-win-action" id="btn-mixer-min" title="Minimize Floating Mixer Window">—</button>
+              <button type="button" class="btn-fl-win-action" id="btn-mixer-max" title="Maximize / Restore Floating Mixer Window">□</button>
+              <button type="button" class="btn-fl-win-action btn-fl-win-close" id="btn-mixer-close-win" title="Close Floating Mixer (Press F9 or Toolbar Mixer Icon to Reopen)">✕</button>
             </div>
           </div>
 
-          <!-- Channel Strips Chassis (Modeled after user layout with Master on far left) -->
-          <div class="mixer-strips-chassis" id="mixer-strips-chassis">
+          <!-- Mixer Window Content Body: Strips on Left + FX Inspector on Right -->
+          <div class="mixer-window-body" id="mixer-window-body">
+            
+            <!-- Left & Middle: Channel Strips Chassis -->
+            <div class="mixer-strips-chassis" id="mixer-strips-chassis">
             
             <!-- Master Channel (Far Left, Pinned) -->
             <div class="daw-channel-strip ch-master" data-track="master">
@@ -1523,9 +1522,402 @@
                 </div>
               </div>
 
+              <!-- Extended Channels 7 through 16 (FL Studio Standard 16 Inserts) -->
+              <!-- Channel 7: Tubby Reverb -->
+              <div class="daw-channel-strip ch-7" data-track="7" id="ch-strip-7">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="7"></span>
+                  <span class="ch-name">07 Reverb</span>
+                  <span class="ch-badge-letter">7</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-7" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-7" data-val="40"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-27deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-7" data-val="20"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-81deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-7"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="80" class="daw-vertical-fader" data-track="7"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="7">S</button><button type="button" class="mix-btn btn-m" data-track="7">M</button><button type="button" class="mix-btn btn-r" data-track="7">R</button></div>
+              </div>
+
+              <!-- Channel 8: Space Echo -->
+              <div class="daw-channel-strip ch-8" data-track="8" id="ch-strip-8">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="8"></span>
+                  <span class="ch-name">08 Delay</span>
+                  <span class="ch-badge-letter">8</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-8" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-8" data-val="30"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-54deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-8" data-val="50"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-8"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="78" class="daw-vertical-fader" data-track="8"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="8">S</button><button type="button" class="mix-btn btn-m" data-track="8">M</button><button type="button" class="mix-btn btn-r" data-track="8">R</button></div>
+              </div>
+
+              <!-- Channel 9: Dub Siren -->
+              <div class="daw-channel-strip ch-9" data-track="9" id="ch-strip-9">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="9"></span>
+                  <span class="ch-name">09 Siren</span>
+                  <span class="ch-badge-letter">9</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-9" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-9" data-val="20"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-81deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-9" data-val="20"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-81deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-9"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="76" class="daw-vertical-fader" data-track="9"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="9">S</button><button type="button" class="mix-btn btn-m" data-track="9">M</button><button type="button" class="mix-btn btn-r" data-track="9">R</button></div>
+              </div>
+
+              <!-- Channel 10: Horn Section -->
+              <div class="daw-channel-strip ch-10" data-track="10" id="ch-strip-10">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="10"></span>
+                  <span class="ch-name">10 Horns</span>
+                  <span class="ch-badge-letter">10</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-10" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-10" data-val="30"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-54deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-10" data-val="25"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-67.5deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-10"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="75" class="daw-vertical-fader" data-track="10"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="10">S</button><button type="button" class="mix-btn btn-m" data-track="10">M</button><button type="button" class="mix-btn btn-r" data-track="10">R</button></div>
+              </div>
+
+              <!-- Channel 11: Percussion -->
+              <div class="daw-channel-strip ch-11" data-track="11" id="ch-strip-11">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="11"></span>
+                  <span class="ch-name">11 Percs</span>
+                  <span class="ch-badge-letter">11</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-11" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-11" data-val="20"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-81deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-11" data-val="15"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-94.5deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-11"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="72" class="daw-vertical-fader" data-track="11"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="11">S</button><button type="button" class="mix-btn btn-m" data-track="11">M</button><button type="button" class="mix-btn btn-r" data-track="11">R</button></div>
+              </div>
+
+              <!-- Channel 12: Vocal Double -->
+              <div class="daw-channel-strip ch-12" data-track="12" id="ch-strip-12">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="12"></span>
+                  <span class="ch-name">12 Dub Vc</span>
+                  <span class="ch-badge-letter">12</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-12" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-12" data-val="30"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-54deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-12" data-val="30"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-54deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-12"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="70" class="daw-vertical-fader" data-track="12"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="12">S</button><button type="button" class="mix-btn btn-m" data-track="12">M</button><button type="button" class="mix-btn btn-r" data-track="12">R</button></div>
+              </div>
+
+              <!-- Channel 13: Sub Bass -->
+              <div class="daw-channel-strip ch-13" data-track="13" id="ch-strip-13">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="13"></span>
+                  <span class="ch-name">13 Sub Bass</span>
+                  <span class="ch-badge-letter">13</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-13" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-13" data-val="10"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-108deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-13" data-val="10"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-108deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-13"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="75" class="daw-vertical-fader" data-track="13"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="13">S</button><button type="button" class="mix-btn btn-m" data-track="13">M</button><button type="button" class="mix-btn btn-r" data-track="13">R</button></div>
+              </div>
+
+              <!-- Channel 14: Tape Drive -->
+              <div class="daw-channel-strip ch-14" data-track="14" id="ch-strip-14">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="14"></span>
+                  <span class="ch-name">14 Tape FX</span>
+                  <span class="ch-badge-letter">14</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-14" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-14" data-val="35"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-40.5deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-14" data-val="20"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-81deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-14"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="78" class="daw-vertical-fader" data-track="14"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="14">S</button><button type="button" class="mix-btn btn-m" data-track="14">M</button><button type="button" class="mix-btn btn-r" data-track="14">R</button></div>
+              </div>
+
+              <!-- Channel 15: Bus Limiter -->
+              <div class="daw-channel-strip ch-15" data-track="15" id="ch-strip-15">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="15"></span>
+                  <span class="ch-name">15 Limiter</span>
+                  <span class="ch-badge-letter">15</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-15" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-15" data-val="25"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-67.5deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-15" data-val="25"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-67.5deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-15"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="82" class="daw-vertical-fader" data-track="15"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="15">S</button><button type="button" class="mix-btn btn-m" data-track="15">M</button><button type="button" class="mix-btn btn-r" data-track="15">R</button></div>
+              </div>
+
+              <!-- Channel 16: Aux Send -->
+              <div class="daw-channel-strip ch-16" data-track="16" id="ch-strip-16">
+                <div class="ch-strip-top">
+                  <span class="fl-mute-led active" data-track="16"></span>
+                  <span class="ch-name">16 Aux Send</span>
+                  <span class="ch-badge-letter">16</span>
+                </div>
+                <div class="ch-pan-send-row">
+                  <div class="ch-rotary-unit"><span class="rotary-label">Pan</span><div class="rotary-knob-container" id="knob-pan-16" data-val="0"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div><input type="range" class="rotary-dial-hidden" min="-100" max="100" value="0"></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send A</span><div class="rotary-knob-container" id="knob-senda-16" data-val="30"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-54deg);"></div></div></div></div>
+                  <div class="ch-rotary-unit"><span class="rotary-label">Send B</span><div class="rotary-knob-container" id="knob-sendb-16" data-val="30"><div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-54deg);"></div></div></div></div>
+                </div>
+                <div class="ch-meter-fader-body">
+                  <div class="daw-vu-meter-column"><div class="meter-scale-text"><span>0</span><span>-6</span><span>-12</span><span>-18</span><span>-24</span><span>-30</span><span>-44</span></div><div class="dual-led-bar" id="mix-vu-16"><div class="led-col left"></div><div class="led-col right"></div></div></div>
+                  <div class="ch-fader-track"><input type="range" orient="vertical" min="0" max="120" value="80" class="daw-vertical-fader" data-track="16"></div>
+                </div>
+                <div class="ch-strip-btns-row"><button type="button" class="mix-btn btn-fx">FX</button><button type="button" class="mix-btn btn-s" data-track="16">S</button><button type="button" class="mix-btn btn-m" data-track="16">M</button><button type="button" class="mix-btn btn-r" data-track="16">R</button></div>
+              </div>
+
             </div>
           </div>
+
+          <!-- Right: FX Slot Rack & Parametric Equalizer Inspector Panel (FL Studio Emulation) -->
+          <aside class="mixer-fx-inspector-panel" id="mixer-fx-inspector-panel">
+            <!-- Top Preset Bar -->
+            <div class="fx-panel-top-bar">
+              <div class="fx-panel-target">
+                <span class="fx-routing-arrow">▸</span>
+                <select class="fx-preset-select" id="fx-preset-select" title="Plugin Slot Preset">
+                  <option value="none">(none)</option>
+                  <option value="dubplate_master">Dubplate Master Chain</option>
+                  <option value="king_tubby">King Tubby Reverb & Delay</option>
+                  <option value="sound_clash">Sound Clash Vocal Pressure</option>
+                  <option value="heavy_steppers">Heavy Steppers 808 Sub</option>
+                </select>
+              </div>
+              <button type="button" class="fx-power-btn active" id="fx-master-power-btn" title="FX Rack Power / Bypass">
+                <span class="power-ring">⊙</span>
+              </button>
+            </div>
+
+            <!-- 10 Insert Plugin Slots (Matching FL Studio Mixer Slots) -->
+            <div class="fl-fx-slots-rack" id="fl-fx-slots-rack">
+              
+              <!-- Slot 1 -->
+              <div class="fl-slot-row" data-slot="1">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label" id="fx-slot-name-1">Slot 1</span>
+                <span class="slot-power-led active" data-slot="1" title="Enable / Bypass Slot 1">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 1 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="1" data-val="100">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(135deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slot 2 -->
+              <div class="fl-slot-row" data-slot="2">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label" id="fx-slot-name-2">Slot 2</span>
+                <span class="slot-power-led active" data-slot="2" title="Enable / Bypass Slot 2">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 2 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="2" data-val="100">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(135deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slot 3 -->
+              <div class="fl-slot-row" data-slot="3">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label" id="fx-slot-name-3">Slot 3</span>
+                <span class="slot-power-led active" data-slot="3" title="Enable / Bypass Slot 3">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 3 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="3" data-val="100">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(135deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slot 4 -->
+              <div class="fl-slot-row" data-slot="4">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label" id="fx-slot-name-4">Slot 4</span>
+                <span class="slot-power-led active" data-slot="4" title="Enable / Bypass Slot 4">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 4 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="4" data-val="100">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(135deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slot 5 -->
+              <div class="fl-slot-row" data-slot="5">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label" id="fx-slot-name-5">Slot 5</span>
+                <span class="slot-power-led active" data-slot="5" title="Enable / Bypass Slot 5">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 5 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="5" data-val="100">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(135deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slot 6 -->
+              <div class="fl-slot-row" data-slot="6">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label" id="fx-slot-name-6">Slot 6</span>
+                <span class="slot-power-led active" data-slot="6" title="Enable / Bypass Slot 6">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 6 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="6" data-val="100">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(135deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slot 7 -->
+              <div class="fl-slot-row" data-slot="7">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label" id="fx-slot-name-7">Slot 7</span>
+                <span class="slot-power-led active" data-slot="7" title="Enable / Bypass Slot 7">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 7 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="7" data-val="100">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(135deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slot 8 -->
+              <div class="fl-slot-row" data-slot="8">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label" id="fx-slot-name-8">Slot 8</span>
+                <span class="slot-power-led active" data-slot="8" title="Enable / Bypass Slot 8">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 8 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="8" data-val="100">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(135deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slot 9 -->
+              <div class="fl-slot-row" data-slot="9">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label" id="fx-slot-name-9">Slot 9</span>
+                <span class="slot-power-led active" data-slot="9" title="Enable / Bypass Slot 9">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 9 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="9" data-val="100">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(135deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slot 10: Emphasizer (Matching User FL Studio Reference) -->
+              <div class="fl-slot-row active-plugin" data-slot="10">
+                <span class="slot-arrow">▸</span>
+                <span class="slot-label highlight" id="fx-slot-name-10">Emphasizer</span>
+                <span class="slot-power-led active" data-slot="10" title="Enable / Bypass Slot 10">⊙</span>
+                <div class="slot-rotary-mix" title="Slot 10 Wet/Dry Mix">
+                  <div class="rotary-knob-container mini-mix-knob" data-slot="10" data-val="80">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(81deg);"></div></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Parametric Graphic Equalizer Panel -->
+            <div class="fl-fx-eq-section">
+              <div class="fl-eq-header">
+                <span class="fl-eq-title">Equalizer</span>
+                <span class="fl-eq-active-dot"></span>
+              </div>
+              <div class="fl-eq-screen-box">
+                <canvas id="fl-eq-canvas" width="240" height="75"></canvas>
+                <div class="fl-eq-sliders-row">
+                  <input type="range" orient="vertical" min="-12" max="12" value="2" class="fl-eq-slider low" id="fl-eq-gain-low" title="Low Gain (+2 dB)">
+                  <input type="range" orient="vertical" min="-12" max="12" value="0" class="fl-eq-slider mid" id="fl-eq-gain-mid" title="Mid Gain (0 dB)">
+                  <input type="range" orient="vertical" min="-12" max="12" value="3" class="fl-eq-slider high" id="fl-eq-gain-high" title="High Gain (+3 dB)">
+                </div>
+              </div>
+              <div class="fl-eq-knobs-row">
+                <div class="eq-knob-col">
+                  <div class="rotary-knob-container micro-dial" id="knob-eq-low-freq" data-val="100" title="Low Freq (100 Hz)">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(-45deg);"></div></div>
+                  </div>
+                  <span class="eq-knob-lbl">Low</span>
+                </div>
+                <div class="eq-knob-col">
+                  <div class="rotary-knob-container micro-dial" id="knob-eq-mid-freq" data-val="1000" title="Mid Freq (1 kHz)">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div>
+                  </div>
+                  <span class="eq-knob-lbl">Mid</span>
+                </div>
+                <div class="eq-knob-col">
+                  <div class="rotary-knob-container micro-dial" id="knob-eq-high-freq" data-val="8000" title="High Freq (8 kHz)">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(45deg);"></div></div>
+                  </div>
+                  <span class="eq-knob-lbl">High</span>
+                </div>
+                <div class="eq-knob-col">
+                  <div class="rotary-knob-container micro-dial" id="knob-eq-q" data-val="1" title="EQ Bandwidth Q (1.0)">
+                    <div class="rotary-knob-dial"><div class="rotary-knob-indicator" style="transform: rotate(0deg);"></div></div>
+                  </div>
+                  <span class="eq-knob-lbl">Q</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Output Device Routing Row -->
+            <div class="fl-fx-output-row">
+              <span class="fx-out-power-icon" title="Output Active">⊙ (none)</span>
+              <div class="fx-out-dropdown-wrap">
+                <select class="fx-out-select" id="fx-out-select" title="Audio Device Output">
+                  <option value="out_1_2">Output 1 - Output 2</option>
+                  <option value="out_3_4">Output 3 - Output 4 (Dub Monitor)</option>
+                  <option value="none">(none)</option>
+                </select>
+              </div>
+            </div>
+
+          </aside>
+
         </div>
+      </div>
 
 
         <!-- =========================================================================

@@ -2293,59 +2293,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mixerDock = document.getElementById('daw-mixer-dock');
     const btnMixer = document.getElementById('btn-fl-toggle-mixer');
     const btnTopToggle = document.getElementById('btn-toggle-autohide-mixer');
-    const caret = document.getElementById('dock-caret-symbol');
-    const btnText = document.getElementById('dock-btn-text');
-    const dockStatusHint = document.getElementById('dock-status-hint');
-    const dockBadge = document.getElementById('dock-mode-badge');
-    const chkAuto = document.getElementById('chk-mixer-autohide');
+    const winTitle = document.getElementById('fl-mixer-win-title');
     if (!mixerDock) return;
 
     const isClosed = mixerDock.classList.contains('mixer-closed');
-    const isCollapsed = mixerDock.classList.contains('autohide-mode') && 
-                        !mixerDock.classList.contains('expanded') && 
-                        !mixerDock.classList.contains('floating-open');
-    const isCurrentlyVisible = !isClosed && !isCollapsed;
-
+    const isCurrentlyVisible = !isClosed;
     const shouldOpen = forceState !== undefined ? forceState : !isCurrentlyVisible;
 
     if (shouldOpen) {
       // Bring out mixer floating directly on top of the playlist!
-      mixerDock.classList.remove('mixer-closed', 'autohide-mode');
-      mixerDock.classList.add('floating-open', 'expanded', 'pinned-mode');
+      mixerDock.classList.remove('mixer-closed');
+      mixerDock.classList.add('active-floating');
       btnMixer?.classList.add('active');
-      btnTopToggle?.classList.remove('autohide-active');
-      if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Mixer <span class="badge-status">FLOATING</span>';
-      
-      const isDetached = mixerDock.classList.contains('mode-detached');
-      if (dockBadge) dockBadge.textContent = isDetached ? 'DETACHED WINDOW' : 'FLOATING ON PLAYLIST';
-      if (dockStatusHint) dockStatusHint.textContent = isDetached ? 'FL Studio Movable Window (F9)' : 'Floating on top of Playlist (F9)';
-      if (caret) caret.textContent = '▼';
-      if (btnText) btnText.textContent = 'Collapse';
-      if (chkAuto) chkAuto.checked = false;
-
-      // Visual flash pulse on the mixer strips chassis
-      const chassis = document.getElementById('mixer-strips-chassis');
-      if (chassis) {
-        chassis.classList.add('mixer-focus-flash');
-        setTimeout(() => chassis.classList.remove('mixer-focus-flash'), 800);
+      if (btnTopToggle) {
+        btnTopToggle.classList.remove('autohide-active');
+        btnTopToggle.innerHTML = '🎚️ Mixer <span class="badge-status">FLOATING</span>';
       }
+
+      // If position wasn't set by dragging yet, center it floating over the playlist
+      if (!mixerDock.style.top) {
+        mixerDock.style.top = '48px';
+        mixerDock.style.left = '50%';
+        mixerDock.style.transform = 'translateX(-50%)';
+      }
+
+      // Draw the Parametric EQ canvas in right panel
+      setTimeout(drawParametricEQCurve, 50);
+
+      // Visual flash pulse on window
+      mixerDock.classList.add('mixer-focus-flash');
+      setTimeout(() => mixerDock.classList.remove('mixer-focus-flash'), 800);
+
       showToast('🎚️ Mixer Floating on Top of Playlist! (F9)', 'info');
     } else {
-      // Collapse or close floating mixer to reveal full playlist view
-      if (mixerDock.classList.contains('mode-detached')) {
-        mixerDock.classList.add('mixer-closed');
-      } else {
-        mixerDock.classList.remove('floating-open', 'expanded', 'pinned-mode');
-        mixerDock.classList.add('autohide-mode');
-      }
+      // Close floating mixer to reveal full unobstructed playlist
+      mixerDock.classList.add('mixer-closed');
       btnMixer?.classList.remove('active');
-      btnTopToggle?.classList.add('autohide-active');
-      if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Mixer: Auto-Hide ON';
-      if (dockStatusHint) dockStatusHint.textContent = 'Collapsed at bottom (Press F9 to Bring Out)';
-      if (caret) caret.textContent = '▲';
-      if (btnText) btnText.textContent = 'Expand';
-      if (chkAuto) chkAuto.checked = true;
-      showToast('🎚️ Mixer Collapsed to Reveal Full Playlist (F9)', 'info');
+      if (btnTopToggle) {
+        btnTopToggle.classList.add('autohide-active');
+        btnTopToggle.innerHTML = '🎚️ Mixer (Press F9 to Bring Out)';
+      }
+      showToast('🎚️ Mixer Closed (Press F9 or Toolbar Icon to Reopen)', 'info');
     }
   }
 
@@ -2357,12 +2345,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     btnPlaylist?.classList.add('active');
 
-    // If mixer was floating open and covering, collapse it so the entire playlist has full focus
-    if (mixerDock && (mixerDock.classList.contains('expanded') || mixerDock.classList.contains('floating-open'))) {
-      mixerDock.classList.remove('floating-open', 'expanded', 'pinned-mode');
-      mixerDock.classList.add('autohide-mode');
-      document.getElementById('btn-fl-toggle-mixer')?.classList.remove('active');
-      showToast('📋 Playlist Unobstructed (Mixer Collapsed to Bottom) (F5)', 'info');
+    // If mixer was expanded and covering the entire window, minimize or un-maximize
+    if (mixerDock && mixerDock.classList.contains('is-maximized')) {
+      mixerDock.classList.remove('is-maximized');
+      showToast('📋 Playlist Revealed (Mixer Restored to Floating) (F5)', 'info');
     } else {
       showToast('📋 Playlist Arrangement Focused (F5)', 'info');
     }
@@ -2427,78 +2413,166 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
-  // AUTO-HIDE MIXER LOGIC & FLOATING WINDOW DRAGGING
+  // PARAMETRIC GRAPHIC EQUALIZER CANVAS (FL STUDIO MIXER RACK)
+  // =========================================================================
+  function drawParametricEQCurve() {
+    const canvas = document.getElementById('fl-eq-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const w = canvas.width || 240;
+    const h = canvas.height || 75;
+
+    // Read gain sliders (-12 to +12 dB)
+    const lowSlider = document.getElementById('fl-eq-gain-low');
+    const midSlider = document.getElementById('fl-eq-gain-mid');
+    const highSlider = document.getElementById('fl-eq-gain-high');
+
+    const lowGain = lowSlider ? parseFloat(lowSlider.value) || 0 : 2;
+    const midGain = midSlider ? parseFloat(midSlider.value) || 0 : 0;
+    const highGain = highSlider ? parseFloat(highSlider.value) || 0 : 3;
+
+    // Clear background
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#0b0e15';
+    ctx.fillRect(0, 0, w, h);
+
+    // Draw logarithmic grid lines
+    ctx.strokeStyle = '#1e2637';
+    ctx.lineWidth = 1;
+
+    // Horizontal center line (0 dB)
+    const midY = h / 2;
+    ctx.beginPath();
+    ctx.setLineDash([2, 3]);
+    ctx.moveTo(0, midY);
+    ctx.lineTo(w, midY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Vertical frequency markers (100Hz, 1kHz, 10kHz)
+    const freqXs = [w * 0.22, w * 0.52, w * 0.82];
+    freqXs.forEach(fx => {
+      ctx.beginPath();
+      ctx.moveTo(fx, 0);
+      ctx.lineTo(fx, h);
+      ctx.stroke();
+    });
+
+    // Compute curve points
+    // Map -12dB..+12dB to pixel heights
+    const maxDb = 12;
+    const dbToY = (db) => midY - (db / maxDb) * (h * 0.4);
+
+    const p0 = { x: 0, y: dbToY(lowGain * 0.9) };
+    const p1 = { x: w * 0.25, y: dbToY(lowGain) };
+    const p2 = { x: w * 0.52, y: dbToY(midGain) };
+    const p3 = { x: w * 0.82, y: dbToY(highGain) };
+    const p4 = { x: w, y: dbToY(highGain * 0.95) };
+
+    // Draw fill gradient under curve
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+    grad.addColorStop(1, 'rgba(56, 189, 248, 0.02)');
+
+    ctx.beginPath();
+    ctx.moveTo(p0.x, p0.y);
+    ctx.bezierCurveTo(w * 0.12, p1.y, w * 0.18, p1.y, p1.x, p1.y);
+    ctx.bezierCurveTo(w * 0.38, p1.y, w * 0.42, p2.y, p2.x, p2.y);
+    ctx.bezierCurveTo(w * 0.65, p2.y, w * 0.72, p3.y, p3.x, p3.y);
+    ctx.bezierCurveTo(w * 0.9, p3.y, w * 0.95, p4.y, p4.x, p4.y);
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Draw main response curve stroke
+    ctx.beginPath();
+    ctx.moveTo(p0.x, p0.y);
+    ctx.bezierCurveTo(w * 0.12, p1.y, w * 0.18, p1.y, p1.x, p1.y);
+    ctx.bezierCurveTo(w * 0.38, p1.y, w * 0.42, p2.y, p2.x, p2.y);
+    ctx.bezierCurveTo(w * 0.65, p2.y, w * 0.72, p3.y, p3.x, p3.y);
+    ctx.bezierCurveTo(w * 0.9, p3.y, w * 0.95, p4.y, p4.x, p4.y);
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2.2;
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 6;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Draw 3 band control dots
+    [p1, p2, p3].forEach((pt, idx) => {
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = idx === 0 ? '#10b981' : idx === 1 ? '#38bdf8' : '#f59e0b';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    });
+  }
+
+  // =========================================================================
+  // FLOATING MIXER WINDOW CONTROLS, DRAGGING & FX INSPECTOR
   // =========================================================================
   function setupDawAutoHideFlags() {
-    const chkAuto = document.getElementById('chk-mixer-autohide');
     const btnTopToggle = document.getElementById('btn-toggle-autohide-mixer');
-    const btnManualToggle = document.getElementById('btn-dock-manual-toggle');
-    const btnDetachToggle = document.getElementById('btn-mixer-detach-toggle');
+    const btnMin = document.getElementById('btn-mixer-min');
+    const btnMax = document.getElementById('btn-mixer-max');
     const btnCloseWin = document.getElementById('btn-mixer-close-win');
     const mixerDock = document.getElementById('daw-mixer-dock');
     const handleBar = document.getElementById('mixer-dock-handle-bar');
-    const dockBadge = document.getElementById('dock-mode-badge');
-    const detachIcon = document.getElementById('mixer-detach-icon');
-    const detachText = document.getElementById('mixer-detach-text');
+    const winTitle = document.getElementById('fl-mixer-win-title');
+    const btnAddInsert = document.getElementById('btn-fl-mixer-add-insert');
 
     if (!mixerDock) return;
 
-    // Detach / Dock Floating Window Mode Toggle
-    btnDetachToggle?.addEventListener('click', (e) => {
+    // 1. Minimize Floating Window Button (—)
+    btnMin?.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isDetached = mixerDock.classList.toggle('mode-detached');
-      if (isDetached) {
-        mixerDock.classList.remove('autohide-mode');
-        mixerDock.classList.add('floating-open');
-        mixerDock.style.top = '100px';
-        mixerDock.style.left = 'calc(50% - min(48%, 560px))';
-        if (detachIcon) detachIcon.textContent = '⚓';
-        if (detachText) detachText.textContent = 'Dock Bottom';
-        if (dockBadge) dockBadge.textContent = 'DETACHED WINDOW';
-        showToast('🗗 Mixer detached as floating window over playlist (Drag by header)', 'info');
+      const isMin = mixerDock.classList.toggle('is-minimized');
+      if (isMin) {
+        showToast('🗕 Mixer Minimized to Sleek Bar (Click — to Restore)', 'info');
       } else {
-        mixerDock.style.top = '';
-        mixerDock.style.left = '';
-        mixerDock.style.transform = '';
-        if (detachIcon) detachIcon.textContent = '🗗';
-        if (detachText) detachText.textContent = 'Detach Window';
-        if (dockBadge) dockBadge.textContent = 'FLOATING ON PLAYLIST';
-        showToast('⚓ Mixer docked floating over bottom of playlist', 'info');
+        showToast('🗖 Mixer Restored', 'info');
       }
     });
 
-    // Close Floating Window Button (✕)
+    // 2. Maximize Floating Window Button (□)
+    btnMax?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isMax = mixerDock.classList.toggle('is-maximized');
+      if (isMax) {
+        showToast('🗖 Mixer Maximized Across Workstation', 'info');
+      } else {
+        showToast('🗗 Mixer Restored to Floating Window', 'info');
+      }
+    });
+
+    // 3. Close Floating Window Button (✕)
     btnCloseWin?.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleMixerConsole(false);
-      mixerDock.classList.add('mixer-closed');
-      showToast('🎚️ Floating mixer closed (Press F9 or Toolbar Mixer Icon to Reopen)', 'info');
     });
 
-    chkAuto?.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        toggleMixerConsole(false);
-      } else {
-        toggleMixerConsole(true);
-      }
-    });
-
+    // 4. Top Toolbar Action Button
     btnTopToggle?.addEventListener('click', () => {
       toggleMixerConsole();
     });
 
-    btnManualToggle?.addEventListener('click', (e) => {
+    // 5. Add Insert Track Button (+)
+    btnAddInsert?.addEventListener('click', (e) => {
       e.stopPropagation();
-      toggleMixerConsole();
+      const btnAddPlaylist = document.getElementById('btn-daw-add-track');
+      if (btnAddPlaylist) {
+        btnAddPlaylist.click();
+        showToast('➕ New Insert Channel Added to Mixer & Playlist!', 'success');
+      }
     });
 
-    // Clicking anywhere on the dock handle bar brings out the mixer
-    handleBar?.addEventListener('click', (e) => {
-      if (e.target.closest('input') || e.target.closest('button') || e.target.closest('label')) return;
-      toggleMixerConsole();
-    });
-
-    // Draggable Floating Window when in mode-detached
+    // 6. Smooth Draggable Floating Window (FL Studio Style)
     if (handleBar && !handleBar._wiredDrag) {
       handleBar._wiredDrag = true;
       let isDragging = false;
@@ -2506,8 +2580,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       let initialLeft = 0, initialTop = 0;
 
       handleBar.addEventListener('mousedown', (e) => {
-        if (e.target.closest('button') || e.target.closest('input') || e.target.closest('label')) return;
-        if (!mixerDock.classList.contains('mode-detached')) return;
+        if (e.target.closest('button') || e.target.closest('select') || e.target.closest('input')) return;
+        if (mixerDock.classList.contains('is-maximized')) return;
 
         isDragging = true;
         startX = e.clientX;
@@ -2516,9 +2590,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rect = mixerDock.getBoundingClientRect();
         const chassis = document.querySelector('.daw-workstation-chassis');
         const chassisRect = chassis ? chassis.getBoundingClientRect() : { left: 0, top: 0, width: 1200, height: 800 };
+
+        // Convert centered transform to direct pixel offset
         initialLeft = rect.left - chassisRect.left;
         initialTop = rect.top - chassisRect.top;
+        mixerDock.style.transform = 'none';
+        mixerDock.style.left = `${initialLeft}px`;
+        mixerDock.style.top = `${initialTop}px`;
+
         handleBar.style.cursor = 'grabbing';
+        e.preventDefault();
 
         function onMouseMove(moveEvent) {
           if (!isDragging) return;
@@ -2529,9 +2610,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           let newTop = initialTop + deltaY;
 
           const maxLeft = chassisRect.width - rect.width;
-          const maxTop = chassisRect.height - 80;
+          const maxTop = chassisRect.height - 50;
           newLeft = Math.max(0, Math.min(maxLeft, newLeft));
-          newTop = Math.max(35, Math.min(maxTop, newTop));
+          newTop = Math.max(30, Math.min(maxTop, newTop));
 
           mixerDock.style.left = `${newLeft}px`;
           mixerDock.style.top = `${newTop}px`;
@@ -2549,6 +2630,58 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.addEventListener('mouseup', onMouseUp);
       });
     }
+
+    // 7. Channel Strip Selection & Dynamic Window Title Updating
+    const channelStrips = mixerDock.querySelectorAll('.daw-channel-strip');
+    channelStrips.forEach(strip => {
+      if (strip._wiredSelect) return;
+      strip._wiredSelect = true;
+
+      strip.addEventListener('click', (e) => {
+        if (e.target.closest('button') || e.target.closest('input')) return;
+
+        // Deselect others, select this
+        channelStrips.forEach(s => s.classList.remove('active-selected'));
+        strip.classList.add('active-selected');
+
+        const trackNameEl = strip.querySelector('.ch-name');
+        const trackName = trackNameEl ? trackNameEl.textContent.trim() : 'Track';
+        if (winTitle) {
+          winTitle.textContent = `Mixer - ${trackName}`;
+        }
+      });
+    });
+
+    // 8. FX Slots Bypass / Power Toggle & Wet/Dry Mix Knobs
+    const slotRows = mixerDock.querySelectorAll('.fl-slot-row');
+    slotRows.forEach(row => {
+      const pwrLed = row.querySelector('.slot-power-led');
+      pwrLed?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        pwrLed.classList.toggle('bypassed');
+        const isBypassed = pwrLed.classList.contains('bypassed');
+        const slotNum = row.getAttribute('data-slot');
+        showToast(`🎛️ Slot ${slotNum}: ${isBypassed ? 'Bypassed' : 'Enabled'}`, 'info');
+      });
+
+      // Clicking slot row opens effect selector
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('.slot-power-led') || e.target.closest('.slot-rotary-mix')) return;
+        const slotNum = row.getAttribute('data-slot');
+        const slotNameEl = row.querySelector('.slot-label');
+        const curr = slotNameEl ? slotNameEl.textContent.trim() : `Slot ${slotNum}`;
+        showToast(`🎛️ Slot ${slotNum} Active (${curr})`, 'info');
+      });
+    });
+
+    // 9. Equalizer Sliders & Curve Live Redraw
+    ['fl-eq-gain-low', 'fl-eq-gain-mid', 'fl-eq-gain-high'].forEach(id => {
+      const slider = document.getElementById(id);
+      slider?.addEventListener('input', drawParametricEQCurve);
+    });
+
+    // Initial draw
+    setTimeout(drawParametricEQCurve, 100);
   }
 
   // =========================================================================
@@ -2725,14 +2858,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // 2. Main Clip Drag and Move across Timeline & Tracks
-    clipEl.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
-      if (e.target.closest('.clip-curve-handle') || e.target.closest('.clip-trim-handle')) return;
-      if (activeDawTool === 'scissors' || activeDawTool === 'mute') return;
-
-      const startX = e.clientX;
-      const startY = e.clientY;
+    // 2. Main Clip Drag and Move across Timeline & Tracks (FL Studio Playlist Events)
+    function startClipDrag(clientX, clientY, isTouchEvent) {
+      const startX = clientX;
+      const startY = clientY;
       const origLane = clipEl.closest('.daw-track-lane');
       let targetLane = origLane;
       const origLeft = parseFloat(clipEl.style.left) || 0;
@@ -2743,11 +2872,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelectorAll('.daw-clip-block').forEach(c => c.classList.remove('selected'));
       clipEl.classList.add('selected');
 
-      function onMouseMove(moveEvent) {
-        const deltaX = moveEvent.clientX - startX;
-        const deltaY = moveEvent.clientY - startY;
+      function onMove(currentX, currentY) {
+        const deltaX = currentX - startX;
+        const deltaY = currentY - startY;
 
-        if (!hasDragged && (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4)) {
+        if (!hasDragged && (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3)) {
           hasDragged = true;
           clipEl.classList.add('is-dragging-event');
         }
@@ -2771,8 +2900,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         clipEl.style.left = `${newLeft.toFixed(2)}%`;
 
         // Vertical track lane targeting
-        const elementsUnder = document.elementsFromPoint(moveEvent.clientX, moveEvent.clientY);
-        const hoveredLane = elementsUnder.find(el => el.classList.contains('daw-track-lane'));
+        const elementsUnder = document.elementsFromPoint(currentX, currentY);
+        const hoveredLane = elementsUnder ? elementsUnder.find(el => el.classList.contains('daw-track-lane')) : null;
         
         document.querySelectorAll('.daw-track-lane').forEach(l => l.classList.remove('drag-target-lane'));
         if (hoveredLane && hoveredLane !== origLane) {
@@ -2783,9 +2912,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      function onMouseUp(upEvent) {
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
+      function onEnd() {
+        if (isTouchEvent) {
+          window.removeEventListener('touchmove', onTouchMove);
+          window.removeEventListener('touchend', onTouchEnd);
+        } else {
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+        }
 
         clipEl.classList.remove('is-dragging-event');
         document.querySelectorAll('.daw-track-lane').forEach(l => l.classList.remove('drag-target-lane'));
@@ -2801,9 +2935,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
+      function onMouseMove(moveEvent) {
+        onMove(moveEvent.clientX, moveEvent.clientY);
+      }
+      function onMouseUp() {
+        onEnd();
+      }
+      function onTouchMove(touchEvent) {
+        if (touchEvent.touches.length > 0) {
+          touchEvent.preventDefault();
+          onMove(touchEvent.touches[0].clientX, touchEvent.touches[0].clientY);
+        }
+      }
+      function onTouchEnd() {
+        onEnd();
+      }
+
+      if (isTouchEvent) {
+        window.addEventListener('touchmove', onTouchMove, { passive: false });
+        window.addEventListener('touchend', onTouchEnd);
+      } else {
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      }
+    }
+
+    clipEl.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      if (e.target.closest('.clip-curve-handle') || e.target.closest('.clip-trim-handle')) return;
+      if (activeDawTool === 'scissors' || activeDawTool === 'mute') return;
+
+      e.preventDefault(); // Stop native browser text selection/image ghosting
+      startClipDrag(e.clientX, e.clientY, false);
     });
+
+    clipEl.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.clip-curve-handle') || e.target.closest('.clip-trim-handle')) return;
+      if (activeDawTool === 'scissors' || activeDawTool === 'mute') return;
+
+      if (e.touches.length === 1) {
+        startClipDrag(e.touches[0].clientX, e.touches[0].clientY, true);
+      }
+    }, { passive: true });
   }
 
   function setupTimelineClipInteractions() {

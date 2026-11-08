@@ -3156,6 +3156,8 @@ body {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: transform 0.1s ease, box-shadow 0.15s ease;
   user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
 
 .daw-clip-block:hover {
@@ -3209,18 +3211,21 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
 }
 
 .clip-top-bar .clip-label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  pointer-events: none;
 }
 
 .clip-top-bar .clip-time {
   font-size: 0.55rem;
   opacity: 0.8;
   font-family: var(--font-mono, monospace);
+  pointer-events: none;
 }
 
 .clip-waveform-svg {
@@ -3228,11 +3233,13 @@ body {
   display: flex;
   align-items: center;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .clip-waveform-svg .clip-wave {
   width: 100%;
   height: 28px;
+  pointer-events: none;
 }
 
 /* Audio Curves & Trim Handles on Clip */
@@ -3385,91 +3392,80 @@ body {
   border-color: #60a5fa;
 }
 
-/* 5. FLOATING MIXER CONSOLE DIRECTLY ON TOP OF PLAYLIST */
-.daw-mixer-dock {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 85;
-  background: rgba(11, 14, 21, 0.98);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-top: 2px solid #283348;
-  box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(0, 0, 0, 0.8);
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, max-height 0.28s ease, box-shadow 0.2s ease;
-  overflow: hidden;
-  max-height: 275px;
+/* 5. FLOATING MIXER CONSOLE DIRECTLY ON TOP OF PLAYLIST (FL Studio Emulation) */
+.daw-mixer-dock,
+.daw-mixer-dock.fl-floating-window {
+  position: absolute !important;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(97%, 1240px);
+  height: 495px;
+  max-height: calc(100% - 60px);
+  z-index: 100;
+  border-radius: 6px;
+  background: #1c222d;
+  border: 1px solid #374457;
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.94), 0 2px 10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  user-select: none;
 }
 
-/* Floating Bottom Dock: Open / Expanded */
+/* Floating Window Active / Visible */
+.daw-mixer-dock.active-floating,
 .daw-mixer-dock.floating-open,
 .daw-mixer-dock.expanded,
 .daw-mixer-dock.pinned-mode {
-  transform: translateY(0) !important;
   opacity: 1 !important;
   visibility: visible !important;
-  pointer-events: auto;
+  pointer-events: auto !important;
 }
 
-/* Floating Bottom Dock: Auto-Hide / Collapsed */
-.daw-mixer-dock.autohide-mode:not(.expanded):not(.floating-open) {
-  transform: translateY(calc(100% - 32px));
+/* Minimized Floating Window (Compact Floating Titlebar) */
+.daw-mixer-dock.is-minimized {
+  height: 34px !important;
+  max-height: 34px !important;
+  overflow: hidden !important;
 }
 
-.daw-mixer-dock.autohide-mode:not(.expanded):not(.floating-open):hover {
-  transform: translateY(0);
-  box-shadow: 0 -16px 45px rgba(0, 0, 0, 0.98);
-}
-
-/* Hidden state (when closed with ✕) */
-.daw-mixer-dock.mixer-closed {
-  transform: translateY(105%) !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none;
-}
-
-/* DETACHED FLOATING WINDOW MODE (FL Studio Movable Window) */
-.daw-mixer-dock.mode-detached {
-  position: absolute !important;
-  bottom: auto !important;
-  right: auto !important;
-  top: 100px;
-  left: calc(50% - min(48%, 560px));
-  width: min(96%, 1120px);
-  max-width: 1120px;
-  border-radius: 8px;
-  border: 2px solid #38bdf8;
-  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.95), 0 0 35px rgba(56, 189, 248, 0.3);
-  transform: none !important;
-  z-index: 120 !important;
-}
-
-@media (max-width: 1200px) {
-  .daw-mixer-dock.mode-detached {
-    left: 2%;
-    width: 96%;
-  }
-}
-
-.daw-mixer-dock.mode-detached.mixer-closed {
+.daw-mixer-dock.is-minimized .mixer-window-body {
   display: none !important;
 }
 
-/* Mixer Handle Bar */
+/* Maximized Floating Window (Expanded Screen Size) */
+.daw-mixer-dock.is-maximized {
+  top: 36px !important;
+  left: 8px !important;
+  transform: none !important;
+  width: calc(100% - 16px) !important;
+  height: calc(100% - 44px) !important;
+  max-height: calc(100% - 44px) !important;
+}
+
+/* Hidden State (When closed via ✕) */
+.daw-mixer-dock.mixer-closed {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translate(-50%, 15px) scale(0.98) !important;
+}
+
+/* FL Studio Window Titlebar */
 .mixer-dock-handle-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #161922;
-  border-bottom: 1px solid #232a3b;
-  padding: 0.35rem 1rem;
+  background: #232b38;
+  border-bottom: 1px solid #364457;
+  padding: 0 10px;
+  height: 34px;
   cursor: move;
   user-select: none;
   flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .dock-handle-left {
@@ -3478,153 +3474,528 @@ body {
   gap: 0.6rem;
 }
 
-.dock-handle-icon {
-  font-size: 0.85rem;
+.fl-win-header-tools {
   display: flex;
   align-items: center;
+  gap: 6px;
 }
 
-.dock-title {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: #f1f5f9;
-  letter-spacing: 0.05em;
-}
-
-.dock-mode-badge {
-  font-size: 0.58rem;
-  font-weight: 800;
-  color: #00f0ff;
-  background: rgba(0, 240, 255, 0.12);
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  padding: 1px 6px;
+.fl-win-tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  opacity: 0.8;
   border-radius: 3px;
-  letter-spacing: 0.04em;
-  font-family: var(--font-mono, monospace);
-  text-transform: uppercase;
+  transition: all 0.12s;
 }
 
-.dock-hint {
-  font-size: 0.65rem;
-  color: #64748b;
-  font-family: var(--font-mono, monospace);
+.fl-win-tool-icon:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-fl-mini-add {
+  width: 20px;
+  height: 20px;
+  background: #1a2230;
+  border: 1px solid #3d4a60;
+  color: #cbd5e1;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.btn-fl-mini-add:hover {
+  background: #253348;
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+.fl-view-preset-label {
+  font-size: 0.68rem;
+  color: #cbd5e1;
+  font-weight: 700;
+  background: #181f2b;
+  padding: 2px 7px;
+  border-radius: 3px;
+  border: 1px solid #334155;
+  cursor: pointer;
+}
+
+.dock-handle-center {
+  flex: 1;
+  text-align: center;
+}
+
+.fl-mixer-win-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: 0.05em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .dock-handle-right {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-}
-
-.btn-mixer-win-ctrl {
-  background: #1a2230;
-  border: 1px solid #2d3b52;
-  color: #94a3b8;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.2rem 0.55rem;
-  border-radius: 4px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
   gap: 4px;
-  transition: all 0.15s ease;
 }
 
-.btn-mixer-win-ctrl:hover {
-  background: #232f44;
-  color: #38bdf8;
-  border-color: #38bdf8;
-}
-
-.btn-mixer-close {
-  background: transparent;
-  border: 1px solid #334155;
-  color: #94a3b8;
+.btn-fl-win-action {
   width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  cursor: pointer;
+  height: 20px;
+  background: #1b2230;
+  border: 1px solid #364457;
+  color: #cbd5e1;
   font-size: 0.72rem;
   font-weight: 800;
-  transition: all 0.15s ease;
-  padding: 0;
-}
-
-.btn-mixer-close:hover {
-  background: #dc2626;
-  border-color: #ef4444;
-  color: #fff;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
-}
-
-.autohide-checkbox-label {
+  border-radius: 3px;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.68rem;
-  color: #cbd5e1;
-  font-weight: 600;
-  cursor: pointer;
+  justify-content: center;
+  transition: all 0.12s ease;
+  line-height: 1;
 }
 
-.autohide-checkbox-label input {
-  accent-color: #3b82f6;
+.btn-fl-win-action:hover {
+  background: #283448;
+  color: #fff;
+  border-color: #60a5fa;
 }
 
-.btn-dock-toggle {
-  background: #1f2533;
-  border: 1px solid #334155;
-  color: #f8fafc;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
+.btn-fl-win-close:hover {
+  background: #dc2626 !important;
+  border-color: #ef4444 !important;
+  color: #fff !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
 }
 
-/* Mixer Channel Strips Chassis (Master Pinned on Far Left, Channels Scrollable) */
+/* Mixer Window Body (Channels on Left + Inspector on Right) */
+.mixer-window-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #141822;
+}
+
+/* Mixer Channel Strips Chassis */
 .mixer-strips-chassis {
   display: flex;
-  gap: 8px;
   align-items: stretch;
-  padding: 0.75rem 1rem;
-  background: #090c13;
+  gap: 5px;
+  padding: 6px 8px;
+  background: #11151e;
   overflow-x: auto;
   scrollbar-width: thin;
+  flex: 1;
+  min-height: 0;
 }
 
 .mixer-master-divider {
   width: 2px;
-  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.15) 20%, rgba(255, 255, 255, 0.15) 80%, transparent);
-  margin: 0 4px;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.2) 80%, transparent);
+  margin: 0 2px;
   flex-shrink: 0;
 }
 
 .daw-mixer-strips-list {
   display: flex;
-  gap: 8px;
+  gap: 5px;
   flex: 1;
   overflow-x: auto;
   scrollbar-width: thin;
 }
 
+/* Channel Strip (FL Studio Authentic Look) */
 .daw-channel-strip {
-  background: #111420;
-  border: 1px solid #1e2638;
-  border-radius: 8px;
-  padding: 0.6rem 0.5rem;
+  background: #181d28;
+  border: 1px solid #242c3c;
+  border-radius: 4px;
+  padding: 5px 4px;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  min-width: 130px;
-  width: 130px;
+  gap: 4px;
+  min-width: 64px;
+  width: 64px;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+  user-select: none;
+  cursor: pointer;
+}
+
+.daw-channel-strip:hover {
+  border-color: #3b4764;
+  background: #1b212e;
+}
+
+.daw-channel-strip.active-selected {
+  border-color: #00f0ff !important;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4), inset 0 0 6px rgba(0, 240, 255, 0.1) !important;
+}
+
+.daw-channel-strip.ch-master {
+  background: #191c24;
+  border-color: #4a3818;
+  width: 72px;
+  min-width: 72px;
+}
+
+.daw-channel-strip.ch-current {
+  background: #12151e;
+  border-color: #232c3c;
+  width: 58px;
+  min-width: 58px;
+  opacity: 0.85;
+}
+
+.ch-strip-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #cbd5e1;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #232c3c;
+}
+
+.ch-strip-top .ch-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.62rem;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: -0.02em;
+}
+
+.ch-strip-top .ch-name.gold {
+  color: #f59e0b;
+}
+
+.ch-badge-letter {
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #64748b;
+  font-family: var(--font-mono, monospace);
+}
+
+.ch-badge-letter.gold {
+  color: #f59e0b;
+}
+
+.rotary-label-fl {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.mini-dial .rotary-knob-dial {
+  width: 22px;
+  height: 22px;
+}
+
+.micro-dial .rotary-knob-dial {
+  width: 17px;
+  height: 17px;
+}
+
+.fl-strip-icon-btn {
+  background: #141822;
+  border: 1px solid #252e40;
+  color: #94a3b8;
+  font-size: 0.58rem;
+  font-weight: 800;
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.12s;
+}
+
+.fl-strip-icon-btn:hover {
+  background: #253348;
+  color: #fff;
+  border-color: #60a5fa;
+}
+
+.fl-strip-icon-btn.btn-mix-arm.active {
+  background: #ef4444 !important;
+  color: #fff !important;
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+
+.fl-arm-led {
+  font-size: 0.62rem;
+  color: #64748b;
+}
+
+.fl-fx-enable-led {
+  font-size: 0.62rem;
+  color: #10b981;
+}
+
+/* RIGHT: FX SLOT RACK & EQUALIZER INSPECTOR PANEL */
+.mixer-fx-inspector-panel {
+  width: 275px;
+  flex-shrink: 0;
+  background: #191e29;
+  border-left: 2px solid #293448;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  gap: 6px;
+  box-shadow: inset 2px 0 6px rgba(0, 0, 0, 0.4);
+}
+
+.fx-panel-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  background: #131722;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid #242e40;
+}
+
+.fx-panel-target {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.fx-routing-arrow {
+  font-size: 0.7rem;
+  color: #38bdf8;
+}
+
+.fx-preset-select {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+}
+
+.fx-power-btn {
+  background: transparent;
+  border: none;
+  color: #10b981;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: all 0.12s;
+}
+
+.fx-power-btn:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 4px #10b981);
+}
+
+/* 10 Slot Plugin Rack */
+.fl-fx-slots-rack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fl-slot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 22px;
+  padding: 0 6px;
+  background: #131823;
+  border: 1px solid #222b3b;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.fl-slot-row:hover {
+  background: #1c2434;
+  border-color: #38bdf8;
+}
+
+.fl-slot-row .slot-arrow {
+  font-size: 0.65rem;
+  color: #64748b;
+  margin-right: 4px;
+}
+
+.fl-slot-row .slot-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fl-slot-row.active-plugin .slot-label.highlight {
+  color: #38bdf8;
+  font-weight: 800;
+}
+
+.slot-power-led {
+  font-size: 0.75rem;
+  color: #10b981;
+  cursor: pointer;
+  margin: 0 4px;
+  transition: color 0.12s;
+}
+
+.slot-power-led.bypassed {
+  color: #475569 !important;
+}
+
+.mini-mix-knob .rotary-knob-dial {
+  width: 16px;
+  height: 16px;
+}
+
+/* Parametric Graphic Equalizer Panel */
+.fl-fx-eq-section {
+  background: #131722;
+  border: 1px solid #232d3e;
+  border-radius: 4px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fl-eq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #94a3b8;
+}
+
+.fl-eq-active-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 5px #10b981;
+}
+
+.fl-eq-screen-box {
+  position: relative;
+  width: 100%;
+  height: 75px;
+  background: #0b0e15;
+  border: 1px solid #1f2737;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#fl-eq-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fl-eq-sliders-row {
+  position: absolute;
+  right: 5px;
+  top: 4px;
+  bottom: 4px;
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.fl-eq-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: slider-vertical;
+  height: 65px;
+  width: 12px;
+  cursor: pointer;
+  opacity: 0.85;
+  accent-color: #38bdf8;
+}
+
+.fl-eq-knobs-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.eq-knob-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.eq-knob-lbl {
+  font-size: 0.55rem;
+  color: #64748b;
+  font-weight: 700;
+}
+
+/* Audio Output Routing Row */
+.fl-fx-output-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  color: #f59e0b;
+  background: #131722;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #232d3e;
+}
+
+.fx-out-power-icon {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.fx-out-dropdown-wrap {
+  flex: 1;
+}
+
+.fx-out-select {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.7rem;
+  font-weight: 700;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
 }
 
 .daw-channel-strip:hover {
