@@ -709,7 +709,7 @@ function startServer(portToTry) {
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    const nextPorts = [3333, 8888, 4000, 5000, 8080];
+    const nextPorts = [3000, 8080, 5000, 3333, 8888];
     const currentPort = server.address() ? server.address().port : PORT;
     const nextPort = nextPorts.find(p => p > currentPort) || (currentPort + 1);
     console.log(`⚠️ Port ${currentPort} is currently occupied. Auto-switching to port ${nextPort}...`);
@@ -721,5 +721,5 @@ server.on('error', (err) => {
   }
 });
 
-const defaultPort = process.env.PORT ? parseInt(process.env.PORT, 10) : 3333;
+const defaultPort = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 startServer(defaultPort);
