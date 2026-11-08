@@ -6,7 +6,44 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "node test-api.js"
+    "test": "node test-api.js",
+    "build:icon": "node scripts/generate-icon.js",
+    "build:dmg": "node scripts/build-dmg.js",
+    "electron": "electron electron/main.js",
+    "dist:mac": "electron-builder --mac dmg"
+  },
+  "build": {
+    "appId": "com.jahvisions.globaldubplate",
+    "productName": "Global Dub Plate",
+    "mac": {
+      "category": "public.app-category.music",
+      "icon": "build/AppIcon.icns",
+      "target": [
+        "dmg"
+      ]
+    },
+    "dmg": {
+      "title": "Global Dub Plate DAW Installer",
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "files": [
+      "server.js",
+      "electron/**/*",
+      "public/**/*",
+      "data/**/*",
+      "package.json"
+    ]
   },
   "keywords": [
     "reggae",

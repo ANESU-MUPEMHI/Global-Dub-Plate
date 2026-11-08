@@ -67,14 +67,20 @@
     - **Dual LED VU Meters & Faders:** 12-segment dual LED VU meters displaying real-time RMS levels, pan rotary dials, dual delay sends, and long-throw channel faders.
     - **Slide-out Audio Pool & 24-bit WAV Mixdown:** Dedicated takes drawer with quick audition, track routing, and master bounce export.
 
+12. **Native macOS Desktop Application & Standalone DMG Installer:**
+    - **FL Studio Window Architecture:** Floating, draggable Mixer console (<kbd>F9</kbd>) over multitrack Playlist arrangement (<kbd>F5</kbd>).
+    - **Zero-Latency Desktop Window:** Hardware-accelerated 60fps borderless DAW window with background audio throttling disabled.
+    - **One-Click Drag-and-Drop Installation:** Packaged into `dist/Global-Dub-Plate-1.0.0.dmg` with `/Applications` symlink and Dubplate master vinyl app icon.
+
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
+- macOS (for .dmg and .app bundle packaging)
 
-### Running the Platform
+### Running the Web Platform
 
 Run the built-in HTTP server:
 ```bash
@@ -85,10 +91,23 @@ Or with npm:
 npm start
 ```
 
-Visit the app in your browser:
+Visit the app in your browser: `http://localhost:3333`
+
+### 💽 Building the macOS DMG Installer
+
+To build the native macOS `.app` bundle and compressed Apple Disk Image (`.dmg`):
+```bash
+npm run build:dmg
 ```
-http://localhost:3000
-```
+
+The outputs are generated into `dist/`:
+- `dist/Global-Dub-Plate-1.0.0.dmg` (1.3 MB compressed drag-and-drop installer)
+- `dist/Global Dub Plate.app` (Standalone macOS Application)
+
+To install:
+1. Double click `dist/Global-Dub-Plate-1.0.0.dmg` to mount the disk image.
+2. Drag `Global Dub Plate.app` into `/Applications`.
+3. Launch from Launchpad or Spotlight.
 
 ---
 
@@ -96,8 +115,20 @@ http://localhost:3000
 
 ```
 Dub Plating Thursday /
-├── package.json               # Node project configuration
+├── package.json               # Node project configuration & DMG scripts
 ├── server.js                  # Zero-dependency Node server & REST API
+├── build/
+│   ├── AppIcon.icns           # High-resolution multi-size Apple icon container
+│   └── icon-1024.png          # Master 1024x1024 Dubplate vinyl icon
+├── dist/
+│   ├── Global-Dub-Plate-1.0.0.dmg  # Compressed macOS DMG installer
+│   └── Global Dub Plate.app        # Standalone native application bundle
+├── electron/
+│   ├── main.js                # Electron main process & low-latency desktop audio flags
+│   └── preload.js             # Electron context bridge & desktop APIs
+├── scripts/
+│   ├── generate-icon.js       # Master vinyl icon generator & iconset compiler
+│   └── build-dmg.js           # Automated macOS bundle and hdiutil DMG builder
 ├── data/
 │   ├── artists.json           # Global artist roster (JM, GH, ZW, US, KE, EU, JP)
 │   ├── riddims.json           # Classic sound clash foundation riddims

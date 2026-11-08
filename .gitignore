@@ -17,3 +17,11 @@ yarn-error.log*
 .env
 .env.local
 *.log
+
+# Build & Distribution
+dist/*.app
+dist/*.app/**
+dist/staging/**
+build/icon.iconset/**
+
+
