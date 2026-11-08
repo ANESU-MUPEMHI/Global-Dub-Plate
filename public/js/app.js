@@ -5166,8 +5166,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const portalPage = document.getElementById('landing-portal-page');
     const authModal = document.getElementById('auth-login-modal');
     const btnEnter = document.getElementById('btn-portal-enter');
-    const btnLandingTopDownload = document.getElementById('btn-landing-top-download');
-    const btnLandingTrigger = document.getElementById('btn-landing-login-trigger');
     const btnCloseAuth = document.getElementById('btn-close-auth-modal');
     const btnExitToPortal = document.getElementById('btn-exit-to-portal');
     const heroImg = document.getElementById('landing-hero-img');
@@ -5195,20 +5193,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnEnter?.addEventListener('click', (e) => {
       e.preventDefault();
       openAuthModal();
-    });
-
-    btnLandingTrigger?.addEventListener('click', (e) => {
-      e.preventDefault();
-      openAuthModal();
-    });
-
-    // Landing top download badge button
-    btnLandingTopDownload?.addEventListener('click', () => {
-      const dlModal = document.getElementById('desktop-download-modal');
-      if (dlModal) {
-        dlModal.classList.add('active');
-        dlModal.style.zIndex = '1000002';
-      }
     });
 
     btnCloseAuth?.addEventListener('click', closeAuthModal);
