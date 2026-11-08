@@ -3877,6 +3877,74 @@ body {
    FL STUDIO 2026 EMULATION STYLING: TRANSPORT, PLAYLIST, MIXER & RIGHT-CLICK
    ========================================================================= */
 
+/* FL Studio Main Window View Toggles: Playlist (F5) & Mixer (F9) */
+.fl-window-toggles-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #090c14;
+  border: 1px solid #1f2738;
+  border-radius: 5px;
+  padding: 2px;
+}
+
+.fl-win-icon-btn {
+  width: 32px;
+  height: 32px;
+  background: #181d26;
+  border: 1px solid #2d3748;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 3px;
+  transition: all 0.15s ease;
+  user-select: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+}
+
+.fl-win-icon-btn:hover {
+  background: #232b38;
+  border-color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.fl-win-icon-btn:active {
+  transform: translateY(1px);
+}
+
+.fl-win-icon-btn.active {
+  background: #142132;
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6), inset 0 1px 3px rgba(0, 240, 255, 0.3);
+}
+
+.fl-win-icon-btn.active .fl-win-icon {
+  filter: drop-shadow(0 0 3px rgba(56, 189, 248, 0.8));
+}
+
+.fl-win-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+@keyframes winFocusFlash {
+  0% { box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.8), 0 0 25px rgba(56, 189, 248, 0.5); }
+  50% { box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4), 0 0 15px rgba(56, 189, 248, 0.2); }
+  100% { box-shadow: none; }
+}
+
+.mixer-focus-flash {
+  animation: winFocusFlash 0.8s ease-out;
+}
+
+.playlist-focus-flash {
+  animation: winFocusFlash 0.8s ease-out;
+}
+
 /* 1. PAT / SONG Mode Switcher */
 .fl-mode-switch-group {
   display: flex;

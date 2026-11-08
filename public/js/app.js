@@ -2079,6 +2079,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     setupDawAutoHideFlags();
+    setupFLStudioWindowToggles();
     setupDawToolBar();
     setupDawMixerControls();
     setupFLStudioTransport();
@@ -2285,6 +2286,151 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =========================================================================
+  // FL STUDIO MAIN WINDOW VIEW TOGGLES (PLAYLIST F5 & MIXER F9)
+  // Modeled precisely after FL Studio toolbar buttons to bring out Playlist & Mixer
+  // =========================================================================
+  function toggleMixerConsole(forceState) {
+    const mixerDock = document.getElementById('daw-mixer-dock');
+    const btnMixer = document.getElementById('btn-fl-toggle-mixer');
+    const btnTopToggle = document.getElementById('btn-toggle-autohide-mixer');
+    const caret = document.getElementById('dock-caret-symbol');
+    const btnText = document.getElementById('dock-btn-text');
+    const dockStatusHint = document.getElementById('dock-status-hint');
+    const chkAuto = document.getElementById('chk-mixer-autohide');
+    if (!mixerDock) return;
+
+    const isBroughtOut = mixerDock.classList.contains('expanded') || 
+                         (mixerDock.classList.contains('pinned-mode') && !mixerDock.classList.contains('autohide-mode'));
+    const shouldOpen = forceState !== undefined ? forceState : !isBroughtOut;
+
+    if (shouldOpen) {
+      // Bring out mixer into pinned/expanded prominent view!
+      mixerDock.classList.remove('autohide-mode');
+      mixerDock.classList.add('pinned-mode', 'expanded');
+      btnMixer?.classList.add('active');
+      btnTopToggle?.classList.remove('autohide-active');
+      if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Mixer <span class="badge-status">OPEN</span>';
+      if (dockStatusHint) dockStatusHint.textContent = 'Mixer Brought Out (F9)';
+      if (caret) caret.textContent = '▼';
+      if (btnText) btnText.textContent = 'Collapse Mixer';
+      if (chkAuto) chkAuto.checked = false;
+
+      // Smooth scroll to mixer console
+      mixerDock.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+      // Visual flash pulse on the mixer strips chassis
+      const chassis = document.getElementById('mixer-strips-chassis');
+      if (chassis) {
+        chassis.classList.add('mixer-focus-flash');
+        setTimeout(() => chassis.classList.remove('mixer-focus-flash'), 800);
+      }
+      showToast('🎚️ Mixer Console Brought Out! (F9)', 'info');
+    } else {
+      // Collapse mixer down into auto-hide mode
+      mixerDock.classList.remove('expanded', 'pinned-mode');
+      mixerDock.classList.add('autohide-mode');
+      btnMixer?.classList.remove('active');
+      btnTopToggle?.classList.add('autohide-active');
+      if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Auto-Hide Mixer <span class="badge-status">ON</span>';
+      if (dockStatusHint) dockStatusHint.textContent = 'Auto-Hide Active (Hover or Click F9 to Expand)';
+      if (caret) caret.textContent = '▲';
+      if (btnText) btnText.textContent = 'Expand Mixer';
+      if (chkAuto) chkAuto.checked = true;
+      showToast('🎚️ Mixer Console Collapsed to Dock (F9)', 'info');
+    }
+  }
+
+  function togglePlaylistArrangement(forceState) {
+    const playlistView = document.querySelector('.daw-main-arrangement-view');
+    const btnPlaylist = document.getElementById('btn-fl-toggle-playlist');
+    const mixerDock = document.getElementById('daw-mixer-dock');
+    if (!playlistView) return;
+
+    const isVisible = playlistView.style.display !== 'none';
+    const shouldShow = forceState !== undefined ? forceState : true;
+
+    if (shouldShow) {
+      playlistView.style.display = 'grid';
+      btnPlaylist?.classList.add('active');
+
+      // If mixer was expanded high and covering, collapse it to give playlist full stage
+      if (mixerDock && mixerDock.classList.contains('expanded')) {
+        mixerDock.classList.remove('expanded', 'pinned-mode');
+        mixerDock.classList.add('autohide-mode');
+        document.getElementById('btn-fl-toggle-mixer')?.classList.remove('active');
+      }
+
+      // Smooth scroll up to playlist
+      playlistView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Visual focus pulse on playlist
+      playlistView.classList.add('playlist-focus-flash');
+      setTimeout(() => playlistView.classList.remove('playlist-focus-flash'), 800);
+
+      showToast('📋 Playlist Arrangement Brought Out & Focused! (F5)', 'info');
+    } else {
+      // Toggle off / minimize
+      playlistView.style.display = 'none';
+      btnPlaylist?.classList.remove('active');
+      showToast('📋 Playlist Minimized (F5)', 'info');
+    }
+  }
+
+  function setupFLStudioWindowToggles() {
+    // 1. Playlist icon button (F5)
+    const btnPlaylist = document.getElementById('btn-fl-toggle-playlist');
+    if (btnPlaylist && !btnPlaylist._wired) {
+      btnPlaylist._wired = true;
+      btnPlaylist.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePlaylistArrangement();
+      });
+    }
+
+    // 2. Mixer icon button (F9)
+    const btnMixer = document.getElementById('btn-fl-toggle-mixer');
+    if (btnMixer && !btnMixer._wired) {
+      btnMixer._wired = true;
+      btnMixer.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMixerConsole();
+      });
+    }
+
+    // 3. Top Menu Navigation items
+    const menuPlaylist = document.getElementById('menu-view-playlist');
+    if (menuPlaylist && !menuPlaylist._wired) {
+      menuPlaylist._wired = true;
+      menuPlaylist.addEventListener('click', () => {
+        togglePlaylistArrangement();
+      });
+    }
+
+    const menuMixer = document.getElementById('menu-view-mixer');
+    if (menuMixer && !menuMixer._wired) {
+      menuMixer._wired = true;
+      menuMixer.addEventListener('click', () => {
+        toggleMixerConsole();
+      });
+    }
+
+    // 4. Keyboard Shortcuts: F5 for Playlist, F9 for Mixer
+    if (!window._wiredFLWindowKeys) {
+      window._wiredFLWindowKeys = true;
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+        if (e.key === 'F5') {
+          e.preventDefault();
+          togglePlaylistArrangement();
+        } else if (e.key === 'F9') {
+          e.preventDefault();
+          toggleMixerConsole();
+        }
+      });
+    }
+  }
+
+  // =========================================================================
   // AUTO-HIDE MIXER LOGIC & PIN TOGGLE
   // =========================================================================
   function setupDawAutoHideFlags() {
@@ -2292,51 +2438,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnTopToggle = document.getElementById('btn-toggle-autohide-mixer');
     const btnManualToggle = document.getElementById('btn-dock-manual-toggle');
     const mixerDock = document.getElementById('daw-mixer-dock');
-    const dockStatusHint = document.getElementById('dock-status-hint');
-    const caret = document.getElementById('dock-caret-symbol');
-    const btnText = document.getElementById('dock-btn-text');
+    const handleBar = document.getElementById('mixer-dock-handle-bar');
 
     if (!mixerDock) return;
 
-    function applyAutoHide(isAuto) {
-      if (isAuto) {
-        mixerDock.classList.remove('pinned-mode');
-        mixerDock.classList.add('autohide-mode');
-        btnTopToggle?.classList.add('autohide-active');
-        if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Auto-Hide Mixer <span class="badge-status">ON</span>';
-        if (dockStatusHint) dockStatusHint.textContent = 'Auto-Hide Active (Hover or Click to Expand)';
-        if (chkAuto) chkAuto.checked = true;
-      } else {
-        mixerDock.classList.remove('autohide-mode', 'expanded');
-        mixerDock.classList.add('pinned-mode');
-        btnTopToggle?.classList.remove('autohide-active');
-        if (btnTopToggle) btnTopToggle.innerHTML = '🎚️ Auto-Hide Mixer <span class="badge-status">PINNED</span>';
-        if (dockStatusHint) dockStatusHint.textContent = 'Mixer Pinned Open';
-        if (caret) caret.textContent = '▼';
-        if (btnText) btnText.textContent = 'Mixer Pinned';
-        if (chkAuto) chkAuto.checked = false;
-      }
-    }
-
     chkAuto?.addEventListener('change', (e) => {
-      applyAutoHide(e.target.checked);
-      showToast(`🎚️ Mixer Console ${e.target.checked ? 'Auto-Hide ON (slides on hover)' : 'PINNED Open'}`, 'info');
+      if (e.target.checked) {
+        toggleMixerConsole(false);
+      } else {
+        toggleMixerConsole(true);
+      }
     });
 
     btnTopToggle?.addEventListener('click', () => {
-      const willBeAuto = !mixerDock.classList.contains('autohide-mode');
-      applyAutoHide(willBeAuto);
-      showToast(`🎚️ Mixer Console ${willBeAuto ? 'Auto-Hide ON' : 'PINNED Open'}`, 'info');
+      toggleMixerConsole();
     });
 
-    btnManualToggle?.addEventListener('click', () => {
-      if (mixerDock.classList.contains('pinned-mode')) {
-        applyAutoHide(true);
-        return;
-      }
-      const isExpanded = mixerDock.classList.toggle('expanded');
-      if (caret) caret.textContent = isExpanded ? '▼' : '▲';
-      if (btnText) btnText.textContent = isExpanded ? 'Collapse Mixer' : 'Expand Mixer';
+    btnManualToggle?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMixerConsole();
+    });
+
+    // Clicking anywhere on the dock handle bar brings out the mixer
+    handleBar?.addEventListener('click', (e) => {
+      if (e.target.closest('input') || e.target.closest('button') || e.target.closest('label')) return;
+      toggleMixerConsole();
     });
   }
 

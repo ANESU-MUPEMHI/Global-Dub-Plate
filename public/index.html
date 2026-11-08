@@ -389,7 +389,8 @@
               <span class="menu-item">File</span>
               <span class="menu-item">Edit</span>
               <span class="menu-item">Create</span>
-              <span class="menu-item">View</span>
+              <span class="menu-item" id="menu-view-playlist" title="Bring out Playlist (F5)">Playlist (F5)</span>
+              <span class="menu-item" id="menu-view-mixer" title="Bring out Mixer (F9)">Mixer (F9)</span>
               <span class="menu-item">Options</span>
               <span class="menu-item active">Dubplate Tools</span>
             </nav>
@@ -422,6 +423,42 @@
             <div class="fl-mode-switch-group" role="group" aria-label="Playback Mode">
               <button type="button" class="fl-mode-btn" id="fl-btn-pat" title="Pattern Mode: Audition selected clip/take">PAT</button>
               <button type="button" class="fl-mode-btn active" id="fl-btn-song" title="Song Mode: Full playlist multitrack playback">SONG</button>
+            </div>
+
+            <!-- FL Studio Main Window View Toggles: Playlist (F5) & Mixer (F9) -->
+            <div class="fl-window-toggles-cluster" role="group" aria-label="FL Studio Window View Toggles">
+              <button type="button" class="fl-win-icon-btn active" id="btn-fl-toggle-playlist" title="Playlist Arrangement (F5) — Click to Bring Out / Focus Playlist">
+                <svg class="fl-win-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Downward arrow indicator -->
+                  <path d="M16 8.5L12 3.5H20L16 8.5Z" fill="#cfdcee" stroke="#8fa6c2" stroke-width="0.6"/>
+                  <!-- Window frame border -->
+                  <rect x="5.5" y="10.5" width="21" height="17" rx="1.5" fill="#1b212b" stroke="#cfdcee" stroke-width="1.8"/>
+                  <!-- Window top title bar line -->
+                  <path d="M5.5 13.5H26.5" stroke="#cfdcee" stroke-width="2"/>
+                  <!-- 3 Staggered Clip Blocks -->
+                  <rect x="7.5" y="21.5" width="5" height="3.2" rx="0.6" fill="#cfdcee"/>
+                  <rect x="13.5" y="18" width="5" height="3.2" rx="0.6" fill="#cfdcee"/>
+                  <rect x="19.5" y="15" width="5" height="3.2" rx="0.6" fill="#cfdcee"/>
+                </svg>
+              </button>
+
+              <button type="button" class="fl-win-icon-btn" id="btn-fl-toggle-mixer" title="Mixer Console (F9) — Click to Bring Out / Focus Multitrack Mixer">
+                <svg class="fl-win-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Left Fader Stem Rail -->
+                  <line x1="11" y1="4" x2="11" y2="28" stroke="#a5f3fc" stroke-width="1.8" stroke-linecap="round"/>
+                  <!-- Left Fader Cap (Rect with horizontal H-slits) -->
+                  <rect x="7" y="10.5" width="8" height="9" rx="1.2" fill="#1b212b" stroke="#e2e8f0" stroke-width="1.8"/>
+                  <line x1="7" y1="15" x2="9" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
+                  <line x1="13" y1="15" x2="15" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
+
+                  <!-- Right Fader Stem Rail -->
+                  <line x1="21" y1="4" x2="21" y2="28" stroke="#a5f3fc" stroke-width="1.8" stroke-linecap="round"/>
+                  <!-- Right Fader Cap (Rect with horizontal H-slits) -->
+                  <rect x="17" y="10.5" width="8" height="9" rx="1.2" fill="#1b212b" stroke="#e2e8f0" stroke-width="1.8"/>
+                  <line x1="17" y1="15" x2="19" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
+                  <line x1="23" y1="15" x2="25" y2="15" stroke="#e2e8f0" stroke-width="1.6"/>
+                </svg>
+              </button>
             </div>
 
             <!-- FL Studio Playlist Tools -->
