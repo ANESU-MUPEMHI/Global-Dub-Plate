@@ -2615,7 +2615,9 @@ body {
   margin-bottom: 0.35rem;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
+  text-align: center;
 }
 
 .prompter-sound-name {
@@ -2624,8 +2626,9 @@ body {
   color: #fff;
   text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
   letter-spacing: 0.03em;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   line-height: 1.2;
+  text-align: center;
 }
 
 .prompter-grid-details {
@@ -2633,6 +2636,9 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1rem;
   margin-bottom: 1.25rem;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .prompter-field-card {
@@ -2640,6 +2646,11 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   padding: 0.85rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .prompter-field-label {
@@ -2649,6 +2660,11 @@ body {
   letter-spacing: 0.06em;
   margin-bottom: 0.35rem;
   font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
 }
 
 .prompter-field-value {
@@ -2656,6 +2672,7 @@ body {
   color: #f1f5f9;
   font-weight: 600;
   line-height: 1.4;
+  text-align: center;
 }
 
 .prompter-lyrics-box {
@@ -2663,8 +2680,10 @@ body {
   border: 2px dashed rgba(245, 158, 11, 0.45);
   border-radius: 10px;
   padding: 1.25rem 1.5rem;
-  margin: 1.25rem 0;
+  margin: 1.25rem auto;
+  max-width: 960px;
   position: relative;
+  text-align: center;
 }
 
 .prompter-lyrics-title {
@@ -2676,7 +2695,9 @@ body {
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
+  text-align: center;
 }
 
 .prompter-lyrics-text {
@@ -2685,6 +2706,7 @@ body {
   color: #fef08a;
   font-style: italic;
   font-weight: 600;
+  text-align: center;
 }
 
 /* Metronome Rhythm Console */
