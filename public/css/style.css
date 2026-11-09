@@ -62,9 +62,9 @@ body {
 }
 
 .header-inner {
-  max-width: 1380px;
+  max-width: 1480px;
   margin: 0 auto;
-  padding: 0.85rem 1.5rem;
+  padding: 0.75rem 1.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -75,6 +75,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.85rem;
+  flex: 0 0 auto;
 }
 
 .brand-logo-icon {
@@ -156,7 +157,8 @@ body {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
+  flex: 0 0 auto;
 }
 
 /* LIVE TICKER */
@@ -2258,14 +2260,51 @@ body {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 992px) {
+  .header-inner {
+    gap: 1rem;
+    padding: 0.65rem 1rem;
+  }
+  .brand-text p {
+    display: none;
+  }
+  .portal-role-pills {
+    max-width: 520px;
+  }
+  .portal-pill-btn {
+    padding: 0.5rem 0.85rem;
+    gap: 0.55rem;
+    min-height: 46px;
+  }
+  .portal-pill-btn .pill-icon {
+    font-size: 1.3rem;
+  }
+  .portal-pill-btn .pill-title {
+    font-size: 0.82rem;
+  }
+  .portal-pill-btn .pill-sub {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 768px) {
   .header-inner {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 0.85rem;
   }
-  .header-stats {
+  .brand-wrap {
+    justify-content: center;
+  }
+  .portal-role-container {
+    margin: 0;
     width: 100%;
-    justify-content: space-around;
+  }
+  .portal-role-pills {
+    max-width: 100%;
+  }
+  .nav-actions {
+    justify-content: center;
   }
   .price-matrix {
     grid-template-columns: repeat(2, 1fr);
@@ -2281,88 +2320,149 @@ body {
    ========================================================================== */
 
 .portal-role-container {
+  flex: 1;
   display: flex;
+  justify-content: center;
   align-items: center;
-  margin: 0 0.5rem;
+  margin: 0 1.5rem;
+  min-width: 0;
 }
 
 .portal-role-pills {
-  display: inline-flex;
-  background: rgba(10, 15, 29, 0.95);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  border-radius: 30px;
-  padding: 3px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 680px;
+  background: linear-gradient(180deg, #131b2e 0%, #0a0e1a 100%);
+  border: 2px solid rgba(245, 158, 11, 0.45);
+  border-radius: 9999px;
+  padding: 5px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65), 0 0 20px rgba(245, 158, 11, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  gap: 6px;
 }
 
 .portal-pill-btn {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.45rem 1rem;
-  border-radius: 25px;
-  background: transparent;
-  border: none;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid transparent;
   color: #94a3b8;
   cursor: pointer;
   font-family: inherit;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   text-align: left;
+  min-height: 52px;
+  user-select: none;
 }
 
 .portal-pill-btn .pill-icon {
-  font-size: 1.15rem;
+  font-size: 1.55rem;
+  line-height: 1;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  transition: transform 0.25s ease;
+}
+
+.portal-pill-btn:hover .pill-icon {
+  transform: scale(1.15);
 }
 
 .portal-pill-btn .pill-text-wrap {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 
 .portal-pill-btn .pill-title {
-  font-size: 0.8rem;
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   color: #cbd5e1;
+  white-space: nowrap;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
 }
 
 .portal-pill-btn .pill-sub {
-  font-size: 0.62rem;
+  font-size: 0.68rem;
+  font-weight: 600;
   color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
+  margin-top: 2px;
+  white-space: nowrap;
+  transition: color 0.2s ease;
 }
 
-.portal-pill-btn:hover {
+.portal-pill-btn:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.portal-pill-btn:hover:not(.active) .pill-title {
+  color: #f8fafc;
+}
+
+.portal-pill-btn:hover:not(.active) .pill-sub {
+  color: #94a3b8;
+}
+
+/* Sound System Portal Active (Golden Dub Sound Glow) */
+.portal-pill-btn#btn-role-selector.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.32) 0%, rgba(217, 119, 6, 0.48) 100%);
+  border: 2px solid #f59e0b;
   color: #fff;
-  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
-.portal-pill-btn.active {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%);
-  border: 1px solid var(--gold-primary);
+.portal-pill-btn#btn-role-selector.active .pill-title {
+  color: #fbbf24;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+}
+
+.portal-pill-btn#btn-role-selector.active .pill-sub {
+  color: #fef08a;
+}
+
+/* Artist Studio Portal Active (Emerald Vocal Studio Glow) */
+.portal-pill-btn#btn-role-artist.active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.32) 0%, rgba(5, 150, 105, 0.48) 100%);
+  border: 2px solid #10b981;
   color: #fff;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 22px rgba(16, 185, 129, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
-.portal-pill-btn.active .pill-title {
-  color: var(--gold-primary);
+.portal-pill-btn#btn-role-artist.active .pill-title {
+  color: #34d399;
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
 }
 
-.portal-pill-btn.active .pill-sub {
-  color: #cbd5e1;
+.portal-pill-btn#btn-role-artist.active .pill-sub {
+  color: #a7f3d0;
 }
 
 .portal-pill-btn .pill-badge {
-  background: var(--red-clash);
+  background: #ef4444;
   color: #fff;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.1rem 0.45rem;
-  border-radius: 10px;
-  margin-left: 0.35rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.12rem 0.55rem;
+  border-radius: 9999px;
+  margin-left: 0.45rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
+  flex-shrink: 0;
 }
 
 /* Operator Banner */
